@@ -1,4 +1,4 @@
-# /impeccable hooks
+# /fk hooks
 
 Manage the **design detector hook** for the current project.
 
@@ -36,7 +36,7 @@ The first argument is the action. Defaults to `status`.
    node {{scripts_path}}/hook-admin.mjs <action> [args...]
    ```
 
-3. If `<action>` is `off`, follow up with a one-line note: "Done. New edits will not trigger the design hook in this project until you run `{{command_prefix}}impeccable hooks on`."
+3. If `<action>` is `off`, follow up with a one-line note: "Done. New edits will not trigger the design hook in this project until you run `{{command_prefix}}fk hooks on`."
 4. If `<action>` is `on`, follow up with: "Done. The design hook will fire after the next Edit/Write/MultiEdit on a UI file."
 5. If `<action>` is `ignore-value`, `ignore-file`, or `ignore-rule`, just print the script output. The default scope is shared `.impeccable/config.json`; add `--local` only when the user explicitly asks for a private exception.
 6. If `<action>` is `status`, just print the script output. Do not add commentary unless the user asked a follow-up question.
@@ -51,7 +51,7 @@ Prefer the narrowest exception:
 - For value-specific findings such as `overused-font` and `bounce-easing`, use `ignore-value` when the user confirms the specific value. Do not use `ignore-rule overused-font` for a specific font.
 - If the finding has no value-specific command, such as `side-tab`, prefer `ignore-file <path>` for the current file.
 - Use `ignore-rule <id>` only when the user asks to suppress that whole rule across the project. For broad overused-font suppression, use `ignore-rule overused-font --all-values` only when the user asks to ignore overused fonts generally.
-- Do not add source comments such as `impeccable: ignore`; inline comments pollute code and are not a supported suppression mechanism.
+- Do not add source comments such as `fk: ignore`; inline comments pollute code and are not a supported suppression mechanism.
 
 Example value-specific exception:
 
@@ -87,4 +87,4 @@ node {{scripts_path}}/hook-admin.mjs ignore-file "src/legacy/Card.tsx"
 ## Failure modes
 
 - If `.impeccable/config.json` or `.impeccable/config.local.json` is unreadable or malformed, the hook ignores that file and uses the remaining valid config/defaults. `hook-admin.mjs status` will show malformed files as ignored.
-- If the user asks to "disable the hook" globally, lead with `{{command_prefix}}impeccable hooks off` (persistent for this project; writes `hook.enabled: false` to config). The legacy `IMPECCABLE_HOOK_DISABLED=1` env var also works as a one-shot override that follows the shell.
+- If the user asks to "disable the hook" globally, lead with `{{command_prefix}}fk hooks off` (persistent for this project; writes `hook.enabled: false` to config). The legacy `IMPECCABLE_HOOK_DISABLED=1` env var also works as a one-shot override that follows the shell.

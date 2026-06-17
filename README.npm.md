@@ -56,7 +56,7 @@ npx impeccable detect --fast src/
 
 **Quality**: tiny body text, cramped padding, long line lengths, small touch targets
 
-44 deterministic detector rules in total. See the full catalog at [impeccable.style/slop](https://impeccable.style/slop).
+44 deterministic detector rules in total.
 
 ## Exit Codes
 
@@ -66,7 +66,7 @@ npx impeccable detect --fast src/
 ## Options
 
 ```
-impeccable detect [options] [file-or-dir-or-url...]
+fk detect [options] [file-or-dir-or-url...]
 
   --fast    Regex-only mode (skip jsdom, faster but less accurate)
   --json    Output findings as JSON
@@ -79,10 +79,10 @@ impeccable detect [options] [file-or-dir-or-url...]
 - `jsdom` (included as dependency, used for HTML scanning)
 - `puppeteer` (optional, only needed for URL scanning)
 
-## Part of Impeccable
+## Part of fk-skills
 
-This CLI is part of [Impeccable](https://impeccable.style), a cross-provider design skill pack for AI-powered development tools. The full suite includes 23 commands for Claude, Cursor, Gemini, Codex, and more.
+This CLI is part of [fk-skills](https://github.com/ThinhTP204/fk-skills), a cross-provider design skill pack for AI-powered development tools. The full suite includes 23 commands for Claude, Cursor, Gemini, Codex, and more.
 
 ## License
 
-[Apache 2.0](https://github.com/pbakaus/impeccable/blob/main/LICENSE)
+[Apache 2.0](https://github.com/ThinhTP204/fk-skills/blob/main/LICENSE)

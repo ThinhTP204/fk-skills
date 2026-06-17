@@ -1,0 +1,4 @@
+interface:
+  display_name: Fk
+  short_description: Use when the user wants to design, redesign, plan, review, check, finish, copy, trim,...
+  default_prompt: Use Fk to redesign, critique, audit, or polish this frontend.

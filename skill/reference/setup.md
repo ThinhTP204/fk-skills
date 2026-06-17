@@ -4,9 +4,9 @@ The setup command for a project. One codebase crawl feeds everything it writes:
 
 - **PRODUCT.md** (strategic): root project file for register, target users, product purpose, brand personality, anti-references, strategic design principles. Answers "who/what/why".
 - **DESIGN.md** (visual): root project file for visual theme, color palette, typography, components, layout. Follows the [Google Stitch DESIGN.md format](https://stitch.withgoogle.com/docs/design-md/format/). Answers "how it looks".
-- **`.impeccable/live/config.json`** (live mode): pre-configured so `{{command_prefix}}impeccable live` boots straight into variant mode with no first-time detour.
+- **`.impeccable/live/config.json`** (live mode): pre-configured so `{{command_prefix}}fk live` boots straight into variant mode with no first-time detour.
 
-It closes by pointing the user at the best command to run next. Every other impeccable command reads PRODUCT.md and DESIGN.md before doing any work.
+It closes by pointing the user at the best command to run next. Every other fk command reads PRODUCT.md and DESIGN.md before doing any work.
 
 ## Step 1: Load current state
 
@@ -14,14 +14,14 @@ Check what already exists. PRODUCT.md and DESIGN.md live at the project root, or
 
 Decision tree:
 - **Neither file exists (empty project or no context yet)**: do Steps 2-4 (write PRODUCT.md), then decide on DESIGN.md based on whether there's code to analyze.
-- **PRODUCT.md exists, DESIGN.md missing**: skip to Step 5 and offer to run `/impeccable document` for DESIGN.md.
+- **PRODUCT.md exists, DESIGN.md missing**: skip to Step 5 and offer to run `/fk spec` for DESIGN.md.
 - **PRODUCT.md exists but has no `## Register` section (legacy)**: add it. Infer a hypothesis from the codebase (see Step 2), confirm with the user, write the field.
 - **Both exist**: {{ask_instruction}} Ask which file to refresh. Skip the one the user doesn't want changed.
 - **Just DESIGN.md exists (unusual)**: do Steps 2-4 to produce PRODUCT.md.
 
 Never silently overwrite an existing file. Always confirm first.
 
-If init was invoked as a setup blocker by another command, such as `{{command_prefix}}impeccable craft landing page`, pause that command here. Complete init, then resume the original command. Your own writes are the freshest source; no reload needed. For craft, resume into shape next; init creates project context, but it is not a substitute for the task-specific shape interview and confirmed design brief.
+If init was invoked as a setup blocker by another command, such as `{{command_prefix}}fk build landing page`, pause that command here. Complete init, then resume the original command. Your own writes are the freshest source; no reload needed. For build, resume into plan next; init creates project context, but it is not a substitute for the task-specific shape interview and confirmed design brief.
 
 ## Step 2: Explore the codebase
 
@@ -126,18 +126,18 @@ Write to `PROJECT_ROOT/PRODUCT.md`. If `.impeccable.md` existed, the loader alre
 
 ## Step 5: Decide on DESIGN.md
 
-Offer `/impeccable document` either way. Two paths:
+Offer `/fk spec` either way. Two paths:
 
 - **Code exists** (CSS tokens, components, a running site): "I can generate a DESIGN.md that captures your visual system (colors, typography, components) so variants stay on-brand. Want to do that now?"
 - **Pre-implementation** (empty project): "I can seed a starter DESIGN.md from five quick questions about color strategy, type direction, motion energy, and references. You can re-run once there's code, to capture the real tokens. Want to do that now?"
 
-If the user agrees, delegate to `/impeccable document` (it auto-detects scan vs seed). Load its reference and follow that flow.
+If the user agrees, delegate to `/fk spec` (it auto-detects scan vs seed). Load its reference and follow that flow.
 
-If the user prefers to skip, mention they can run `/impeccable document` any time later.
+If the user prefers to skip, mention they can run `/fk spec` any time later.
 
 ## Step 6: Configure live mode (when code exists)
 
-If the project has code with HTML entries and a dev server (the same "code exists" condition that puts `/impeccable document` in scan mode), pre-configure live mode now. You already identified the framework and the served HTML entry in Step 2, so this is nearly free, and it spares the user the first-time setup detour when they later run `/impeccable live`.
+If the project has code with HTML entries and a dev server (the same "code exists" condition that puts `/fk spec` in scan mode), pre-configure live mode now. You already identified the framework and the served HTML entry in Step 2, so this is nearly free, and it spares the user the first-time setup detour when they later run `/fk live`.
 
 **Skip this step for empty / pre-implementation projects** (nothing to inject into yet). Tell the user live mode will configure itself the first time they run it once there's code.
 
@@ -161,12 +161,12 @@ Summarize tersely:
 
 Then recommend the **best commands to run next**, drawn from what your Step 2 crawl already surfaced. Do not run a fresh analysis here; surface observations you already have. Tailor to register and to what you saw, offer the 2-4 most relevant (not a menu dump), and give the exact command to type. Group by intent:
 
-- **Build something new**: `/impeccable craft <feature>` (shape, then build end-to-end) or `/impeccable shape <feature>` (plan first). Lead with this for empty or early-stage projects.
-- **Improve what's there**: name the specific surface. `/impeccable critique <page>` for a scored UX review; `/impeccable audit <area>` for a11y / perf / responsive checks; `/impeccable polish <component>` for a pre-ship pass. When the crawl flagged a specific weakness, point the matching command at it: thin hierarchy or spacing → `layout`, flat or gray palette → `colorize`, missing error / empty states → `harden` or `onboard`, dull or unclear copy → `clarify`.
-- **Iterate visually**: `/impeccable live` (configured in Step 6) to pick elements in the browser and generate variants in place.
+- **Build something new**: `/fk build <feature>` (shape, then build end-to-end) or `/fk plan <feature>` (plan first). Lead with this for empty or early-stage projects.
+- **Improve what's there**: name the specific surface. `/fk review <page>` for a scored UX review; `/fk check <area>` for a11y / perf / responsive checks; `/fk finish <component>` for a pre-ship pass. When the crawl flagged a specific weakness, point the matching command at it: thin hierarchy or spacing → `space`, flat or gray palette → `color`, missing error / empty states → `prod` or `welcome`, dull or unclear copy → `copy`.
+- **Iterate visually**: `/fk live` (configured in Step 6) to pick elements in the browser and generate variants in place.
 
-The full command menu is one bare `/impeccable` away; keep this list short and pointed.
+The full command menu is one bare `/fk` away; keep this list short and pointed.
 
-If init was invoked as a blocker by another impeccable command (e.g. the user ran `/impeccable polish` with no PRODUCT.md), resume that original task now. Your own writes are the freshest source; no reload needed.
+If init was invoked as a blocker by another fk command (e.g. the user ran `/fk finish` with no PRODUCT.md), resume that original task now. Your own writes are the freshest source; no reload needed.
 
 Optionally {{ask_instruction}} Ask whether they'd like a brief summary of PRODUCT.md appended to {{config_file}} for easier agent reference. If yes, append a short **Design Context** pointer section there.

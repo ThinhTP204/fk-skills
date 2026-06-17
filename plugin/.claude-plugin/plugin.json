@@ -1,13 +1,12 @@
 {
-  "name": "impeccable",
-  "description": "Design fluency for frontend development. 1 skill with 23 commands (/impeccable polish, /impeccable audit, /impeccable critique, etc.) and curated anti-pattern detection.",
-  "version": "3.7.1",
+  "name": "fk",
+  "description": "Design fluency for frontend development. 1 skill with 23 commands (/fk finish, /fk check, /fk review, etc.) and curated anti-pattern detection.",
+  "version": "1.0.0",
   "author": {
-    "name": "Paul Bakaus",
-    "email": "paul@paulbakaus.com"
+    "name": "Trần Phú Thịnh",
+    "email": "tptvt.2002@gmail.com"
   },
-  "homepage": "https://impeccable.style",
-  "repository": "https://github.com/pbakaus/impeccable",
+  "repository": "https://github.com/ThinhTP204/fk-skills",
   "skills": "./skills/",
   "agents": [
     "./agents/impeccable-manual-edit-applier.md"

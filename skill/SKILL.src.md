@@ -1,10 +1,10 @@
 ---
-name: impeccable
-description: "Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks."
+name: fk
+description: "Use when the user wants to design, redesign, plan, review, check, finish, copy, trim, prod, perf, responsive, motion, color, tokens, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks."
 argument-hint: "[{{command_hint}}] [target]"
 user-invocable: true
 allowed-tools:
-  - Bash(npx impeccable *)
+  - Bash(npx fk *)
 license: Apache 2.0
 ---
 
@@ -15,7 +15,7 @@ Designs and iterates production-grade frontend interfaces. Real working code, co
 You MUST do these steps before proceeding:
 
 1. Run `node {{scripts_path}}/context.mjs` once per session. If you've already seen its output in this conversation, do not re-run it. The script either prints the project's PRODUCT.md (and DESIGN.md when present) as a markdown block, or tells you it's missing. Follow whatever it prints. **If it reports `NO_PRODUCT_MD`, stop and follow `reference/init.md` before doing anything else.** If the output ends with an `UPDATE_AVAILABLE` directive, follow it (ask the user once about updating, then continue). It never blocks the current task.
-2. If the user invoked a sub-command (`craft`, `shape`, `audit`, `polish`, ...), you MUST read `reference/<command>.md` next. Non-optional. The reference defines the command's flow; without it you will skip steps the user expects.
+2. If the user invoked a sub-command (`build`, `plan`, `check`, `finish`, ...), you MUST read `reference/<command>.md` next. Non-optional. The reference defines the command's flow; without it you will skip steps the user expects.
 3. Familiarize yourself with any existing design system, conventions, and components in the code. Read at least one project file (CSS / tokens / theme / a representative component or page). **Required even when you've loaded a sub-command reference in step 2.** Don't reinvent the wheel; use what's there when it works, branch out when the UX wins.
 4. Read the matching register reference. **This is non-optional; skipping it produces generic output.** If the project is marketing, a landing page, a campaign, long-form content, or a portfolio (design IS the product), read `reference/brand.md`. If it is app UI, admin, a dashboard, or a tool (design SERVES the product), read `reference/product.md`. Pick by first match: (1) task cue ("landing page" vs "dashboard"); (2) surface in focus (the page, file, or route being worked on); (3) `register` field in PRODUCT.md.
 5. **If the project is brand-new (no existing CSS tokens / theme / committed brand colors found in step 3)**, run `node {{scripts_path}}/palette.mjs` to receive a brand seed color and composition guidance. This is the anchor for your primary brand color. Compose the rest of the palette (bg, surface, ink, accent, muted) around it per the script's instructions. Use OKLCH throughout. **Skip this step only if step 3 found committed brand colors in existing tokens; in that case identity-preservation wins.**
@@ -120,28 +120,28 @@ If someone could look at this interface and say "AI made that" without doubt, it
 
 | Command | Category | Description | Reference |
 |---|---|---|---|
-| `craft [feature]` | Build | Shape, then build a feature end-to-end | [reference/craft.md](reference/craft.md) |
-| `shape [feature]` | Build | Plan UX/UI before writing code | [reference/shape.md](reference/shape.md) |
-| `init` | Build | Set up project context: PRODUCT.md, DESIGN.md, live config, next steps | [reference/init.md](reference/init.md) |
-| `document` | Build | Generate DESIGN.md from existing project code | [reference/document.md](reference/document.md) |
-| `extract [target]` | Build | Pull reusable tokens and components into design system | [reference/extract.md](reference/extract.md) |
-| `critique [target]` | Evaluate | UX design review with heuristic scoring | [reference/critique.md](reference/critique.md) |
-| `audit [target]` | Evaluate | Technical quality checks (a11y, perf, responsive) | [reference/audit.md](reference/audit.md) |
-| `polish [target]` | Refine | Final quality pass before shipping | [reference/polish.md](reference/polish.md) |
-| `bolder [target]` | Refine | Amplify safe or bland designs | [reference/bolder.md](reference/bolder.md) |
-| `quieter [target]` | Refine | Tone down aggressive or overstimulating designs | [reference/quieter.md](reference/quieter.md) |
-| `distill [target]` | Refine | Strip to essence, remove complexity | [reference/distill.md](reference/distill.md) |
-| `harden [target]` | Refine | Production-ready: errors, i18n, edge cases | [reference/harden.md](reference/harden.md) |
-| `onboard [target]` | Refine | Design first-run flows, empty states, activation | [reference/onboard.md](reference/onboard.md) |
-| `animate [target]` | Enhance | Add purposeful animations and motion | [reference/animate.md](reference/animate.md) |
-| `colorize [target]` | Enhance | Add strategic color to monochromatic UIs | [reference/colorize.md](reference/colorize.md) |
-| `typeset [target]` | Enhance | Improve typography hierarchy and fonts | [reference/typeset.md](reference/typeset.md) |
-| `layout [target]` | Enhance | Fix spacing, rhythm, and visual hierarchy | [reference/layout.md](reference/layout.md) |
-| `delight [target]` | Enhance | Add personality and memorable touches | [reference/delight.md](reference/delight.md) |
-| `overdrive [target]` | Enhance | Push past conventional limits | [reference/overdrive.md](reference/overdrive.md) |
-| `clarify [target]` | Fix | Improve UX copy, labels, and error messages | [reference/clarify.md](reference/clarify.md) |
-| `adapt [target]` | Fix | Adapt for different devices and screen sizes | [reference/adapt.md](reference/adapt.md) |
-| `optimize [target]` | Fix | Diagnose and fix UI performance | [reference/optimize.md](reference/optimize.md) |
+| `build [feature]` | Build | Plan, then build a feature end-to-end | [reference/build.md](reference/build.md) |
+| `plan [feature]` | Build | Plan UX/UI before writing code | [reference/plan.md](reference/plan.md) |
+| `setup` | Build | Set up project context: PRODUCT.md, DESIGN.md, live config, next steps | [reference/setup.md](reference/setup.md) |
+| `spec` | Build | Generate DESIGN.md from existing project code | [reference/spec.md](reference/spec.md) |
+| `tokens [target]` | Build | Pull reusable tokens and components into design system | [reference/tokens.md](reference/tokens.md) |
+| `review [target]` | Evaluate | UX design review with heuristic scoring | [reference/review.md](reference/review.md) |
+| `check [target]` | Evaluate | Technical quality checks (a11y, perf, responsive) | [reference/check.md](reference/check.md) |
+| `finish [target]` | Refine | Final quality pass before shipping | [reference/finish.md](reference/finish.md) |
+| `amplify [target]` | Refine | Amplify safe or bland designs | [reference/amplify.md](reference/amplify.md) |
+| `calm [target]` | Refine | Tone down aggressive or overstimulating designs | [reference/calm.md](reference/calm.md) |
+| `trim [target]` | Refine | Strip to essence, remove complexity | [reference/trim.md](reference/trim.md) |
+| `prod [target]` | Refine | Production-ready: errors, i18n, edge cases | [reference/prod.md](reference/prod.md) |
+| `welcome [target]` | Refine | Design first-run flows, empty states, activation | [reference/welcome.md](reference/welcome.md) |
+| `motion [target]` | Enhance | Add purposeful animations and motion | [reference/motion.md](reference/motion.md) |
+| `color [target]` | Enhance | Add strategic color to monochromatic UIs | [reference/color.md](reference/color.md) |
+| `type [target]` | Enhance | Improve typography hierarchy and fonts | [reference/type.md](reference/type.md) |
+| `space [target]` | Enhance | Fix spacing, rhythm, and visual hierarchy | [reference/space.md](reference/space.md) |
+| `joy [target]` | Enhance | Add personality and memorable touches | [reference/joy.md](reference/joy.md) |
+| `wow [target]` | Enhance | Push past conventional limits | [reference/wow.md](reference/wow.md) |
+| `copy [target]` | Fix | Improve UX copy, labels, and error messages | [reference/copy.md](reference/copy.md) |
+| `responsive [target]` | Fix | Adapt for different devices and screen sizes | [reference/responsive.md](reference/responsive.md) |
+| `perf [target]` | Fix | Diagnose and fix UI performance | [reference/perf.md](reference/perf.md) |
 | `live` | Iterate | Visual variant mode: pick elements in the browser, generate alternatives | [reference/live.md](reference/live.md) |
 
 Plus three management commands: `pin <command>`, `unpin <command>`, and `hooks <on|off|status|...>`, detailed below.
@@ -152,28 +152,28 @@ Plus three management commands: `pin <command>`, `unpin <command>`, and `hooks <
 
    Reason over the signals; there is no score to obey:
    - `setup.hasDesign` false while `setup.hasCode` true → `document` (capture the visual system).
-   - `critique.latest` is `null` → the project has never been critiqued; for a set-up project with a real surface, offering `/impeccable critique <surface>` is a strong default.
-   - `critique.latest` with a low `score` or non-zero `p0` / `p1` → `polish` (it reads that snapshot as its backlog), or re-run `critique` if the snapshot looks stale.
-   - `git.changedFiles` pointing at one surface → scope `audit` or `polish` to those files specifically, naming them.
+   - `critique.latest` is `null` → the project has never been reviewed; for a set-up project with a real surface, offering `/fk review <surface>` is a strong default.
+   - `critique.latest` with a low `score` or non-zero `p0` / `p1` → `finish` (it reads that snapshot as its backlog), or re-run `review` if the snapshot looks stale.
+   - `git.changedFiles` pointing at one surface → scope `check` or `finish` to those files specifically, naming them.
    - `devServer.running` true → `live` is available for in-browser iteration; if false, don't lead with `live`.
-   - Otherwise group by intent exactly as init's "Recommend starting points" step does (build new / improve what's there / iterate visually), tailored to `setup.register`.
+   - Otherwise group by intent exactly as setup's "Recommend starting points" step does (build new / improve what's there / iterate visually), tailored to `setup.register`.
 
-   **If `scan.targets` is non-empty, run `node {{scripts_path}}/detect.mjs --json <scan.targets joined by spaces>` once** (the bundled detector over local files: no network, no npx). `scan.via` tells you what they are: `git-changes` (the markup/style files in your dirty tree, the most relevant set), `source-dir` (e.g. `src`, `app`), `html`, or `root`. Fold the hits into your picks: many quality / contrast hits → `audit` or `polish`; a specific slop family → the matching command (gradient text or eyebrows → `quieter` / `typeset`, flat or gray palette → `colorize`, and so on). It's a real, current signal that beats guessing. If detect errors or the tree is large and slow, skip it and recommend the user run `audit` themselves; never block the suggestion on it.
+   **If `scan.targets` is non-empty, run `node {{scripts_path}}/detect.mjs --json <scan.targets joined by spaces>` once** (the bundled detector over local files: no network, no npx). `scan.via` tells you what they are: `git-changes` (the markup/style files in your dirty tree, the most relevant set), `source-dir` (e.g. `src`, `app`), `html`, or `root`. Fold the hits into your picks: many quality / contrast hits → `check` or `finish`; a specific slop family → the matching command (gradient text or eyebrows → `calm` / `type`, flat or gray palette → `color`, and so on). It's a real, current signal that beats guessing. If detect errors or the tree is large and slow, skip it and recommend the user run `check` themselves; never block the suggestion on it.
 
    Keep it to 2-3 pointed picks with the exact command to type. The menu stays the fallback; the recommendation is the lede.
 2. **First word matches a command** (table above OR `pin` / `unpin` / `hooks`): load its reference file and follow its instructions. Everything after the command name is the target.
-3. **First word doesn't match, but the intent clearly maps to one command** (e.g. "fix the spacing" → `layout`, "rewrite this error message" → `clarify`, "the colors feel flat" → `colorize`): load that command's reference and proceed as if invoked. If two commands could fit, ask once which.
+3. **First word doesn't match, but the intent clearly maps to one command** (e.g. "fix the spacing" → `space`, "rewrite this error message" → `copy`, "the colors feel flat" → `color`): load that command's reference and proceed as if invoked. If two commands could fit, ask once which.
 4. **No clear command match**: general design invocation. Apply the setup steps, the General rules, and the loaded register reference, using the full argument as context.
 
-Setup (context gathering, register) is already loaded by then; sub-commands don't re-invoke `{{command_prefix}}impeccable`.
+Setup (context gathering, register) is already loaded by then; sub-commands don't re-invoke `{{command_prefix}}fk`.
 
-If the first word is `craft`, setup still runs first, but [reference/craft.md](reference/craft.md) owns the rest of the flow. If setup invokes `init` as a blocker, finish init, refresh context, then resume the original command and target.
+If the first word is `build`, setup still runs first, but [reference/build.md](reference/build.md) owns the rest of the flow. If setup invokes `setup` as a blocker, finish setup, refresh context, then resume the original command and target.
 
-`teach` is a deprecated alias for `init`: if the user types it, load [reference/init.md](reference/init.md) and proceed as if they ran `init`.
+`teach` is a deprecated alias for `setup`: if the user types it, load [reference/setup.md](reference/setup.md) and proceed as if they ran `setup`.
 
 ## Pin / Unpin
 
-**Pin** creates a standalone shortcut so `{{command_prefix}}<command>` invokes `{{command_prefix}}impeccable <command>` directly. **Unpin** removes it. The script writes to every harness directory present in the project.
+**Pin** creates a standalone shortcut so `{{command_prefix}}<command>` invokes `{{command_prefix}}fk <command>` directly. **Unpin** removes it. The script writes to every harness directory present in the project.
 
 ```bash
 node {{scripts_path}}/pin.mjs <pin|unpin> <command>
@@ -183,4 +183,4 @@ Valid `<command>` is any command from the table above. Report the script's resul
 
 ## Hooks
 
-`{{command_prefix}}impeccable hooks <on|off|status|ignore-rule|ignore-file|ignore-value|reset>` manages the design detector hook for this project. The hook auto-runs the detector after direct UI file edits and surfaces findings as system reminders. Full flow is in [reference/hooks.md](reference/hooks.md); load it when the user invokes `{{command_prefix}}impeccable hooks` with any argument.
+`{{command_prefix}}fk hooks <on|off|status|ignore-rule|ignore-file|ignore-value|reset>` manages the design detector hook for this project. The hook auto-runs the detector after direct UI file edits and surfaces findings as system reminders. Full flow is in [reference/hooks.md](reference/hooks.md); load it when the user invokes `{{command_prefix}}fk hooks` with any argument.

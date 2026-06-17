@@ -33,7 +33,7 @@ import { ANTIPATTERNS } from '../cli/engine/registry/antipatterns.mjs';
 function generateCounts(rootDir, skills, buildDir) {
   // Count active commands. After the v3.0 consolidation, commands are sub-commands
   // of /impeccable. Count them from the command router table in SKILL.md.
-  const impeccableSkill = skills.find(s => s.name === 'impeccable');
+  const impeccableSkill = skills.find(s => s.name === 'fk');
   let commandCount;
   if (impeccableSkill) {
     // Count lines in the command table that start with | `...` | — tolerant
@@ -738,10 +738,10 @@ async function build() {
       JSON.stringify(pluginManifest, null, 2) + '\n',
     );
 
-    const claudeSkillsSrc = path.join(DIST_DIR, 'claude-code', '.claude', 'skills', 'impeccable');
+    const claudeSkillsSrc = path.join(DIST_DIR, 'claude-code', '.claude', 'skills', 'fk');
     if (fs.existsSync(claudeSkillsSrc)) {
       fs.mkdirSync(pluginSkillsDir, { recursive: true });
-      copyDirSync(claudeSkillsSrc, path.join(pluginSkillsDir, 'impeccable'));
+      copyDirSync(claudeSkillsSrc, path.join(pluginSkillsDir, 'fk'));
     }
 
     if (fs.existsSync(claudeAgentsSrc)) {

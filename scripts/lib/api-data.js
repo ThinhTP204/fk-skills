@@ -45,18 +45,18 @@ export function generateApiData(outDir, skills, patterns, rootDir) {
   if (!fs.existsSync(metadataPath)) {
     throw new Error(`command-metadata.json is missing at ${metadataPath}. This file is required to generate the commands API.`);
   }
-  const impeccable = skills.find(s => s.name === 'impeccable');
+  const impeccable = skills.find(s => s.name === 'fk');
   if (!impeccable) {
-    throw new Error('impeccable skill not found at skill/SKILL.src.md. The build system expects exactly one skill at that path.');
+    throw new Error('fk skill not found at skill/SKILL.src.md. The build system expects exactly one skill at that path.');
   }
 
   const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
   const commandsData = [
     {
-      id: 'impeccable',
-      name: 'impeccable',
+      id: 'fk',
+      name: 'fk',
       description: impeccable.description,
-      tagline: readTagline('impeccable'),
+      tagline: readTagline('fk'),
       userInvocable: true,
     },
     ...Object.entries(metadata).map(([id, meta]) => ({

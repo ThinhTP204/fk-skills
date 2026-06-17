@@ -698,17 +698,17 @@ function escapeRegex(str) {
 }
 
 const EXCLUDED_FROM_SUGGESTIONS = new Set([
-  'impeccable',               // foundational skill, not a steering command
+  'fk',                       // foundational skill, not a steering command
   'teach-impeccable',         // deprecated shim
   'frontend-design',          // deprecated shim
 ]);
 
-// Sub-commands of /impeccable that should appear in {{available_commands}}.
-// These are the commands that audit/critique/etc. reference when suggesting next steps.
+// Sub-commands of /fk that should appear in {{available_commands}}.
+// These are the commands that check/review/etc. reference when suggesting next steps.
 const IMPECCABLE_SUB_COMMANDS = [
-  'adapt', 'animate', 'audit', 'bolder', 'clarify', 'colorize',
-  'critique', 'delight', 'distill', 'document', 'harden', 'layout',
-  'onboard', 'optimize', 'overdrive', 'polish', 'quieter', 'shape', 'typeset',
+  'responsive', 'motion', 'check', 'amplify', 'copy', 'color',
+  'review', 'joy', 'trim', 'spec', 'prod', 'space',
+  'welcome', 'perf', 'wow', 'finish', 'calm', 'plan', 'type',
 ];
 
 export function replacePlaceholders(content, provider, commandNames = [], allSkillNames = []) {
@@ -716,15 +716,15 @@ export function replacePlaceholders(content, provider, commandNames = [], allSki
   const cmdPrefix = placeholders.command_prefix || '/';
 
   // Build the available_commands list.
-  // After the v3.0 consolidation, commands are sub-commands of /impeccable.
-  // If there's only one user-invocable skill (impeccable), generate sub-command references.
+  // After the v3.0 consolidation, commands are sub-commands of /fk.
+  // If there's only one user-invocable skill (fk), generate sub-command references.
   // Otherwise fall back to listing skill names (backwards compat for forks).
   const nonExcluded = commandNames.filter(n => !EXCLUDED_FROM_SUGGESTIONS.has(n));
   let commandList;
   if (nonExcluded.length === 0) {
-    // Single-skill architecture: list sub-commands as /impeccable <sub>
+    // Single-skill architecture: list sub-commands as /fk <sub>
     commandList = IMPECCABLE_SUB_COMMANDS
-      .map(n => `${cmdPrefix}impeccable ${n}`)
+      .map(n => `${cmdPrefix}fk ${n}`)
       .join(', ');
   } else {
     // Multi-skill architecture (backwards compat)
