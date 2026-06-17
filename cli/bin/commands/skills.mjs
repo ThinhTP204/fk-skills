@@ -110,12 +110,12 @@ class PromptAbortError extends Error {
   constructor() {
     super('Aborted.');
     this.name = 'PromptAbortError';
-    this.code = 'IMPECCABLE_PROMPT_ABORT';
+    this.code = 'FK_PROMPT_ABORT';
   }
 }
 
 function isPromptAbortError(error) {
-  return error?.code === 'IMPECCABLE_PROMPT_ABORT';
+  return error?.code === 'FK_PROMPT_ABORT';
 }
 
 function canStyleTerminal() {

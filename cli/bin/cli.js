@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Impeccable CLI
+ * fk-skills CLI
  *
  * Usage:
- *   npx impeccable detect [file-or-dir-or-url...]
- *   npx impeccable ignores <list|add-file|add-value|remove-...>
- *   npx impeccable help|install|update
- *   npx impeccable --help
+ *   npx fk-skills detect [file-or-dir-or-url...]
+ *   npx fk-skills ignores <list|add-file|add-value|remove-...>
+ *   npx fk-skills help|install|update
+ *   npx fk-skills --help
  */
 
 import { readFileSync } from 'node:fs';
@@ -22,13 +22,13 @@ async function main() {
   const command = args[0];
 
   if (!command || command === '--help' || command === '-h') {
-    console.log(`Usage: impeccable <command> [options]
+    console.log(`Usage: fk-skills <command> [options]
 
 Commands:
   detect [file-or-dir-or-url...]   Scan for UI anti-patterns and design quality issues
   ignores                          Manage detector ignore rules, files, and values
   help                             List all available skills and commands
-  install                          Install impeccable skills into your project or global harness
+  install                          Install fk skills into your project or global harness
   link                             Symlink skills from a local checkout or submodule
   update                           Update skills to the latest version
   check                            Check if skill updates are available
@@ -38,7 +38,7 @@ Options:
   --version    Show version number
 
 Compatibility:
-  impeccable skills <command>       Legacy namespace; still supported.`);
+  fk-skills skills <command>       Legacy namespace; still supported.`);
     process.exit(0);
   }
 
@@ -70,7 +70,7 @@ Compatibility:
 }
 
 main().catch(error => {
-  if (error?.code === 'IMPECCABLE_PROMPT_ABORT') {
+  if (error?.code === 'FK_PROMPT_ABORT') {
     console.log('\nAborted.');
     process.exit(130);
   }
