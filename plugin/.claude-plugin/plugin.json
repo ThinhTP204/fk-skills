@@ -1,0 +1,14 @@
+{
+  "name": "fk",
+  "description": "Design fluency for frontend development. 1 skill with 23 commands (/fk finish, /fk check, /fk review, etc.) and curated anti-pattern detection.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Trần Phú Thịnh",
+    "email": "tptvt.2002@gmail.com"
+  },
+  "repository": "https://github.com/ThinhTP204/fk-skills",
+  "skills": "./skills/",
+  "agents": [
+    "./agents/impeccable-manual-edit-applier.md"
+  ]
+}
