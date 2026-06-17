@@ -25,7 +25,7 @@ const CONTEXT_MATCH_PER_HINT = 2;
 const SKIP_DIRS = new Set([
   'node_modules',
   '.git',
-  '.impeccable',
+  '.fk-skills',
   '.astro',
   '.next',
   '.nuxt',

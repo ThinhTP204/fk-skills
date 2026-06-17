@@ -2,7 +2,7 @@
 /**
  * `/impeccable hooks <on|off|status|reset>` — manage the design hook runtime
  * via the `hook` key and shared detector ignores via the `detector` key in
- * .impeccable/config.json / .impeccable/config.local.json.
+ * .fk-skills/config.json / .fk-skills/config.local.json.
  *
  * Usage:
  *   node hook-admin.mjs status                         # print current state
@@ -253,9 +253,9 @@ function statusReport(cwd) {
   const cfg = readConfig(cwd);
   const envKill = process.env.IMPECCABLE_HOOK_DISABLED;
   const envState = envKill ? `IMPECCABLE_HOOK_DISABLED=${envKill}` : 'unset';
-  const cfgPath = path.relative(cwd, getConfigPath(cwd)) || '.impeccable/config.json';
-  const localPath = path.relative(cwd, getLocalConfigPath(cwd)) || '.impeccable/config.local.json';
-  const cachePath = path.relative(cwd, getCachePath(cwd)) || '.impeccable/hook.cache.json';
+  const cfgPath = path.relative(cwd, getConfigPath(cwd)) || '.fk-skills/config.json';
+  const localPath = path.relative(cwd, getLocalConfigPath(cwd)) || '.fk-skills/config.local.json';
+  const cachePath = path.relative(cwd, getCachePath(cwd)) || '.fk-skills/hook.cache.json';
   const fileState = (info, relPath, absent) => {
     if (info.malformed) return `${relPath} (malformed; ignored)`;
     if (info.exists) return relPath;

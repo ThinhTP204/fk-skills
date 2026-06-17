@@ -2,7 +2,7 @@
  * CLI helper: insert/remove the live variant mode script tag in the project's
  * main HTML entry point.
  *
- * On first live run, the agent generates `.impeccable/live/config.json`
+ * On first live run, the agent generates `.fk-skills/live/config.json`
  * with the project's insertion target (framework-specific). On
  * every subsequent run, this script handles insert/remove deterministically
  * with zero LLM involvement.
@@ -31,22 +31,22 @@ const IGNORE_MARKER_OPEN = '# impeccable-live-ignore-start';
 const IGNORE_MARKER_CLOSE = '# impeccable-live-ignore-end';
 
 export const LIVE_IGNORE_PATTERNS = Object.freeze([
-  '.impeccable/hook.cache.json',
-  '.impeccable/hook.pending.json',
-  '.impeccable/config.local.json',
-  '.impeccable/live/server.json',
-  '.impeccable/live/sessions/',
-  '.impeccable/live/previews/',
-  '.impeccable/live/annotations/',
-  '.impeccable/live/cache/',
-  '.impeccable/live/manual-edit-apply-transaction.json',
-  '.impeccable/live/manual-edit-events.jsonl',
-  '.impeccable/live/manual-edit-evidence/',
-  '.impeccable/live/pending-manual-edits.json',
-  '.impeccable/live/deferred-svelte-component-accepts.json',
-  '.impeccable-live.json',
-  '.impeccable-live/',
-  'node_modules/.impeccable-live/',
+  '.fk-skills/hook.cache.json',
+  '.fk-skills/hook.pending.json',
+  '.fk-skills/config.local.json',
+  '.fk-skills/live/server.json',
+  '.fk-skills/live/sessions/',
+  '.fk-skills/live/previews/',
+  '.fk-skills/live/annotations/',
+  '.fk-skills/live/cache/',
+  '.fk-skills/live/manual-edit-apply-transaction.json',
+  '.fk-skills/live/manual-edit-events.jsonl',
+  '.fk-skills/live/manual-edit-evidence/',
+  '.fk-skills/live/pending-manual-edits.json',
+  '.fk-skills/live/deferred-svelte-component-accepts.json',
+  '.fk-skills-live.json',
+  '.fk-skills-live/',
+  'node_modules/.fk-skills-live/',
   'src/lib/impeccable/ImpeccableLiveRoot.svelte',
   'src/lib/impeccable/__runtime.js',
   'src/lib/impeccable/[0-9a-f]*/',
@@ -69,12 +69,12 @@ export async function injectCli() {
     console.log(`Usage: node live-inject.mjs [options]
 
 Insert or remove the live mode script tag in the project's HTML entry point.
-Reads configuration from .impeccable/live/config.json.
+Reads configuration from .fk-skills/live/config.json.
 
 Modes:
   --port PORT   Insert script tag pointing at http://localhost:PORT/live.js
   --remove      Remove the script tag (if present)
-  --check       Print whether .impeccable/live/config.json exists and its content
+  --check       Print whether .fk-skills/live/config.json exists and its content
 
 Output (JSON):
   { ok, file, inserted|removed, config? }`);

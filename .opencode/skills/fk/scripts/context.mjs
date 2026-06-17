@@ -33,7 +33,7 @@ const FALLBACK_DIRS = ['.agents/context', 'docs'];
 
 const UPDATE_HOST = (process.env.IMPECCABLE_UPDATE_HOST || 'https://impeccable.style').replace(/\/$/, '');
 const UPDATE_CACHE_PATH =
-  process.env.IMPECCABLE_UPDATE_CACHE || path.join(os.homedir(), '.impeccable', 'update-check.json');
+  process.env.IMPECCABLE_UPDATE_CACHE || path.join(os.homedir(), '.fk-skills', 'update-check.json');
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // throttle the network poll to once a day
 const RENOTIFY_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // don't re-surface the same version for a week
 const FETCH_TIMEOUT_MS = 1200;
@@ -190,7 +190,7 @@ function updateCheckDisabledByConfig(cwd = process.cwd()) {
   let value;
   for (const name of ['config.json', 'config.local.json']) {
     try {
-      const raw = JSON.parse(fs.readFileSync(path.join(cwd, '.impeccable', name), 'utf-8'));
+      const raw = JSON.parse(fs.readFileSync(path.join(cwd, '.fk-skills', name), 'utf-8'));
       if (raw && typeof raw === 'object' && typeof raw.updateCheck === 'boolean') value = raw.updateCheck;
     } catch { /* missing or malformed: ignore */ }
   }

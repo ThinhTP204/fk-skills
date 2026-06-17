@@ -41,7 +41,7 @@ function resolveDesignMdPath(cwd = process.cwd()) {
 
 function resolveDesignSidecarPath(cwd = process.cwd(), contextDir = cwd) {
   const candidates = [
-    path.join(cwd, '.impeccable', 'design.json'),
+    path.join(cwd, '.fk-skills', 'design.json'),
     path.join(cwd, 'DESIGN.json'),
     path.join(contextDir, 'DESIGN.json'),
   ];

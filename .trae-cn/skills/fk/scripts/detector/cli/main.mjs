@@ -89,11 +89,11 @@ Options:
   --gpt               Also report GPT-specific provider tells (off by default)
   --gemini            Also report Gemini-specific provider tells (off by default)
   --no-config         Do not apply project config, detector ignores, or DESIGN.md
-  --no-design-system  Do not load local DESIGN.md / .impeccable/design.json context
+  --no-design-system  Do not load local DESIGN.md / .fk-skills/design.json context
   --help              Show this help message
 
 Project config:
-  Respects .impeccable/config.json and .impeccable/config.local.json detector
+  Respects .fk-skills/config.json and .fk-skills/config.local.json detector
   settings: detector.ignoreRules, detector.ignoreFiles, detector.ignoreValues,
   and detector.designSystem.enabled.
 

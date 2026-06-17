@@ -2,7 +2,7 @@
 /**
  * CLI helper: apply pending live copy edits as one AI-owned batch.
  *
- * The browser Save path stages copy edits in .impeccable/live. This script is
+ * The browser Save path stages copy edits in .fk-skills/live. This script is
  * called by /manual-edit-commit when the user clicks Apply copy edits. It gives
  * the local AI runner the full staged batch plus evidence, validates the files
  * the runner reports touching, and clears only entries reported as applied.
@@ -50,7 +50,7 @@ const ROLLBACK_EXTENSIONS = new Set([
 const ROLLBACK_SKIP_DIRS = new Set([
   '.astro',
   '.git',
-  '.impeccable',
+  '.fk-skills',
   '.next',
   '.nuxt',
   '.svelte-kit',

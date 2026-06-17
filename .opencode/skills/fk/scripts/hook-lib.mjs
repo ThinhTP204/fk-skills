@@ -81,9 +81,9 @@ export const DEFAULT_CONFIG = Object.freeze({
 });
 
 export const HOOK_LOCAL_IGNORE_PATTERNS = Object.freeze([
-  '.impeccable/hook.cache.json',
-  '.impeccable/hook.pending.json',
-  '.impeccable/config.local.json',
+  '.fk-skills/hook.cache.json',
+  '.fk-skills/hook.pending.json',
+  '.fk-skills/config.local.json',
 ]);
 
 const HOOK_IGNORE_MARKER_OPEN = '# impeccable-hook-ignore-start';
@@ -112,19 +112,19 @@ function safeReadJson(filePath) {
 }
 
 export function getConfigPath(cwd) {
-  return path.join(cwd, '.impeccable', 'config.json');
+  return path.join(cwd, '.fk-skills', 'config.json');
 }
 
 export function getLocalConfigPath(cwd) {
-  return path.join(cwd, '.impeccable', 'config.local.json');
+  return path.join(cwd, '.fk-skills', 'config.local.json');
 }
 
 export function getCachePath(cwd) {
-  return path.join(cwd, '.impeccable', 'hook.cache.json');
+  return path.join(cwd, '.fk-skills', 'hook.cache.json');
 }
 
 export function getPendingPath(cwd) {
-  return path.join(cwd, '.impeccable', 'hook.pending.json');
+  return path.join(cwd, '.fk-skills', 'hook.pending.json');
 }
 
 export function resolveProjectCwd(event, fallback = process.cwd()) {
@@ -1235,7 +1235,7 @@ export function designSystemOptions(config, detector, projectCwd) {
 
 export function appendDesignSystemNote(text, scanOptions) {
   if (!text || !scanOptions?.designSystem?.mdNewerThanJson) return text;
-  return `${text}\n\n${ENVELOPE_PREFIX} DESIGN.md is newer than .impeccable/design.json. Run /impeccable document to refresh the design-system sidecar.`;
+  return `${text}\n\n${ENVELOPE_PREFIX} DESIGN.md is newer than .fk-skills/design.json. Run /fk document to refresh the design-system sidecar.`;
 }
 
 // The directive footer is the part of the hook output that steers model

@@ -1,5 +1,5 @@
 /**
- * CLI-side reader/writer for the unified `.impeccable` config.
+ * CLI-side reader/writer for the unified `.fk-skills` config.
  *
  * The CLI (published to npm) and the skill scripts (bundled into the install)
  * live in separate trees and cannot share runtime code, so this duplicates a
@@ -19,11 +19,11 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'no
 import { join, dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 export function getConfigPath(root) {
-  return join(root, '.impeccable', 'config.json');
+  return join(root, '.fk-skills', 'config.json');
 }
 
 export function getLocalConfigPath(root) {
-  return join(root, '.impeccable', 'config.local.json');
+  return join(root, '.fk-skills', 'config.local.json');
 }
 
 function safeReadJson(filePath) {
@@ -584,7 +584,7 @@ export function setHookConsent(root, value) {
 
 const EXCLUDE_OPEN = '# impeccable-config-ignore-start';
 const EXCLUDE_CLOSE = '# impeccable-config-ignore-end';
-const EXCLUDE_PATTERNS = ['.impeccable/config.local.json'];
+const EXCLUDE_PATTERNS = ['.fk-skills/config.local.json'];
 
 /**
  * Add config.local.json to `.git/info/exclude` so a developer's decision is
