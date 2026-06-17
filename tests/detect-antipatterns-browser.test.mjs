@@ -653,7 +653,7 @@ describe('detectUrl — browser-only fixtures', () => {
         document.documentElement.dataset.fkExtension = 'true';
         window.__fkSkillsMessages = [];
         window.addEventListener('message', event => {
-          if (event.source !== window || !event.data?.source?.startsWith('impeccable-')) return;
+          if (event.source !== window || !event.data?.source?.startsWith('fk-skills')) return;
           window.__fkSkillsMessages.push(event.data);
         });
       });
@@ -717,7 +717,7 @@ describe('detectUrl — browser-only fixtures', () => {
         document.documentElement.dataset.fkExtension = 'true';
         window.__fkSkillsMessages = [];
         window.addEventListener('message', event => {
-          if (event.source !== window || !event.data?.source?.startsWith('impeccable-')) return;
+          if (event.source !== window || !event.data?.source?.startsWith('fk-skills')) return;
           window.__fkSkillsMessages.push(event.data);
         });
       });

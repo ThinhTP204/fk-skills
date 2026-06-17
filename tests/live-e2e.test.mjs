@@ -542,7 +542,7 @@ for (const { name, fixture } of fixtures) {
           const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
           assert.equal(snapshot.phase, 'completed');
           assert.equal(snapshot.sourceFile, svelteComponentTarget.manifest.sourceFile);
-          assert.doesNotMatch(snapshot.sourceFile, /node_modules\/\.fk-live/);
+          assert.doesNotMatch(snapshot.sourceFile, /node_modules\/\.fk-skills-live/);
         }
         assert.doesNotMatch(final, /data-fk-variants="/,    'variants wrapper removed');
         assert.doesNotMatch(final, /fk-variants-start/,      'variants-start marker removed');
@@ -828,7 +828,7 @@ async function captureLiveE2eFailure({ name, fixture, session, sourceFile, error
 
     for (const file of walkSources(tmp)) copyFileFromTmp(tmp, file, join(dir, 'sources'));
     copyDirIfExists(join(tmp, '.fk-skills', 'live'), join(dir, 'fk-live'));
-    copyDirIfExists(join(tmp, 'node_modules', '.fk-live'), join(dir, 'fk-live-preview'));
+    copyDirIfExists(join(tmp, 'node_modules', '.fk-skills-live'), join(dir, 'fk-live-preview'));
 
     if (session.page) {
       const html = await withCaptureTimeout(session.page.content(), 5_000, 'page content').catch((err) => `capture failed: ${err.message}`);
@@ -1456,7 +1456,7 @@ function svelteComponentTargetFor(filePath) {
   if (manifest.previewMode !== 'svelte-component' || !manifest.sourceFile || !manifest.componentDir) return null;
   const sep = pathSepFor(filePath);
   const markers = [
-    `${sep}node_modules${sep}.fk-live${sep}`,
+    `${sep}node_modules${sep}.fk-skills-live${sep}`,
     `${sep}src${sep}lib${sep}fk-skills${sep}`,
   ];
   const marker = markers.find((candidate) => filePath.includes(candidate));
