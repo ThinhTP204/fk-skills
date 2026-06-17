@@ -22,14 +22,14 @@ function loadFactory() {
   context.globalThis = context;
   vm.createContext(context);
   vm.runInContext(readFileSync(SCRIPT, 'utf-8'), context, { filename: SCRIPT });
-  return context.__IMPECCABLE_LIVE_SESSION__.createLiveBrowserSessionState;
+  return context.__FK_SKILLS_LIVE_SESSION__.createLiveBrowserSessionState;
 }
 
 describe('live-browser-session state helper', () => {
   it('persists session, handled state, and scroll independently', () => {
     const createState = loadFactory();
     const storage = createMemoryStorage();
-    const state = createState({ prefix: 'impeccable-live', storage, idFactory: () => 'owner-a' });
+    const state = createState({ prefix: 'fk-live', storage, idFactory: () => 'owner-a' });
 
     state.writeScrollY(420);
     state.saveSession({ id: 'session-a', state: 'CYCLING', visible: 2 });
@@ -47,12 +47,12 @@ describe('live-browser-session state helper', () => {
   it('carries checkpoint revision across reload-equivalent helper instances', () => {
     const createState = loadFactory();
     const storage = createMemoryStorage();
-    const first = createState({ prefix: 'impeccable-live', storage, idFactory: () => 'owner-a' });
+    const first = createState({ prefix: 'fk-live', storage, idFactory: () => 'owner-a' });
     first.saveSession({ id: 'session-b', state: 'CYCLING', visible: 1 });
     assert.equal(first.nextCheckpointRevision(), 1);
     assert.equal(first.nextCheckpointRevision(), 2);
 
-    const second = createState({ prefix: 'impeccable-live', storage, idFactory: () => 'owner-b' });
+    const second = createState({ prefix: 'fk-live', storage, idFactory: () => 'owner-b' });
     const restored = second.loadSession();
     assert.equal(restored.checkpointRevision, 2);
     assert.equal(

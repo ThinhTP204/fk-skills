@@ -15,6 +15,7 @@ import {
   getLiveServerPath,
   getLiveSessionsDir,
 } from '../skill/scripts/lib/impeccable-paths.mjs';
+import { ensureLiveGitIgnores } from '../skill/scripts/live-inject.mjs';
 
 const REPO_ROOT = process.cwd();
 const SERVER_SCRIPT = join(REPO_ROOT, 'skill/scripts/live-server.mjs');
@@ -28,7 +29,7 @@ function startServer(port = 8499, { cwd = REPO_ROOT, env = {} } = {}) {
     const proc = spawn('node', [SERVER_SCRIPT, '--port=' + port], {
       cwd,
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, IMPECCABLE_LIVE_COPY_AGENT: 'off', ...env },
+      env: { ...process.env, FK_SKILLS_LIVE_COPY_AGENT: 'off', ...env },
     });
     let output = '';
     proc.stdout.on('data', (d) => {
@@ -94,21 +95,22 @@ async function stashManualEdit(server, entry) {
 }
 
 it('gitignores local Impeccable runtime artifacts', () => {
+  ensureLiveGitIgnores(REPO_ROOT);
   const ignored = execFileSync('git', [
     'check-ignore',
-    '.impeccable/live/manual-edit-apply-transaction.json',
-    '.impeccable/live/manual-edit-evidence/example.json',
-    '.impeccable/hook.cache.json',
-    '.impeccable/hook.pending.json',
-    '.impeccable/config.local.json',
-    '.impeccable/live/deferred-svelte-component-accepts.json',
+    '.fk-skills/live/manual-edit-apply-transaction.json',
+    '.fk-skills/live/manual-edit-evidence/example.json',
+    '.fk-skills/hook.cache.json',
+    '.fk-skills/hook.pending.json',
+    '.fk-skills/config.local.json',
+    '.fk-skills/live/deferred-svelte-component-accepts.json',
   ], { cwd: REPO_ROOT, encoding: 'utf-8' });
-  assert.match(ignored, /\.impeccable\/live\/manual-edit-apply-transaction\.json/);
-  assert.match(ignored, /\.impeccable\/live\/manual-edit-evidence\/example\.json/);
-  assert.match(ignored, /\.impeccable\/hook\.cache\.json/);
-  assert.match(ignored, /\.impeccable\/hook\.pending\.json/);
-  assert.match(ignored, /\.impeccable\/config\.local\.json/);
-  assert.match(ignored, /\.impeccable\/live\/deferred-svelte-component-accepts\.json/);
+  assert.match(ignored, /\.fk-skills\/live\/manual-edit-apply-transaction\.json/);
+  assert.match(ignored, /\.fk-skills\/live\/manual-edit-evidence\/example\.json/);
+  assert.match(ignored, /\.fk-skills\/hook\.cache\.json/);
+  assert.match(ignored, /\.fk-skills\/hook\.pending\.json/);
+  assert.match(ignored, /\.fk-skills\/config\.local\.json/);
+  assert.match(ignored, /\.fk-skills\/live\/deferred-svelte-component-accepts\.json/);
 });
 
 async function readSseUntil(reader, decoder, needle, maxReads = 12) {
@@ -132,9 +134,9 @@ describe('live-server integration', () => {
 
   before(async () => {
     // Run the shared server against an isolated tmpdir so journals/snapshots
-    // never land in the real repo's `.impeccable/live/sessions/`. Those would
+    // never land in the real repo's `.fk-skills/live/sessions/`. Those would
     // otherwise be replayed into the poll queue on the next real `live` run.
-    serverCwd = mkdtempSync(join(tmpdir(), 'impeccable-live-server-'));
+    serverCwd = mkdtempSync(join(tmpdir(), 'fk-live-server-'));
     // The /source endpoint test below reads package.json from the server's
     // cwd, so seed a minimal one that contains the substring it asserts on.
     writeFileSync(join(serverCwd, 'package.json'), JSON.stringify({ name: 'impeccable' }));
@@ -163,13 +165,13 @@ describe('live-server integration', () => {
   });
 
   it('/live.js injects the canonical command vocabulary', async () => {
-    // live-browser.js builds its action picker from window.__IMPECCABLE_VOCAB__
+    // live-browser.js builds its action picker from window.__FK_SKILLS_VOCAB__
     // rather than an inline copy, so the server must serialize the canonical
     // vocabulary into /live.js (next to the token/port).
     const { LIVE_COMMANDS } = await import('../skill/scripts/live/vocabulary.mjs');
     const body = await (await fetch(`http://localhost:${server.port}/live.js`)).text();
-    assert.match(body, /window\.__IMPECCABLE_VOCAB__\s*=/);
-    const injected = JSON.parse(body.match(/window\.__IMPECCABLE_VOCAB__\s*=\s*(\[.*?\]);/s)[1]);
+    assert.match(body, /window\.__FK_SKILLS_VOCAB__\s*=/);
+    const injected = JSON.parse(body.match(/window\.__FK_SKILLS_VOCAB__\s*=\s*(\[.*?\]);/s)[1]);
     assert.deepEqual(injected, LIVE_COMMANDS);
   });
 
@@ -182,7 +184,7 @@ describe('live-server integration', () => {
         token: server.token,
         type: 'generate',
         id: 'a1b2c3d5',
-        action: 'impeccable',
+        action: 'freeform',
         count: 1,
         pageUrl: '/',
         element: { outerHTML: '<button>Book</button>' },
@@ -229,16 +231,16 @@ describe('live-server integration', () => {
     assert.equal(res.status, 200);
     assert.equal(res.headers.get('content-type'), 'application/javascript');
     const text = await res.text();
-    assert.ok(text.includes('__IMPECCABLE_TOKEN__'));
+    assert.ok(text.includes('__FK_SKILLS_TOKEN__'));
     assert.ok(text.includes(server.token));
-    assert.ok(text.includes('__IMPECCABLE_PORT__'));
-    const preludeIndex = text.indexOf('window.__IMPECCABLE_VOCAB__');
-    const sessionPartIndex = text.indexOf('impeccable live script part: session-state (live-browser-session.js)');
-    const domPartIndex = text.indexOf('impeccable live script part: dom-helpers (live-browser-dom.js)');
-    const browserPartIndex = text.indexOf('impeccable live script part: browser-ui (live-browser.js)');
-    const sessionHelperIndex = text.indexOf('__IMPECCABLE_LIVE_SESSION__');
-    const domHelperIndex = text.indexOf('__IMPECCABLE_LIVE_DOM__');
-    const browserInitIndex = text.indexOf('__IMPECCABLE_LIVE_INIT__');
+    assert.ok(text.includes('__FK_SKILLS_PORT__'));
+    const preludeIndex = text.indexOf('window.__FK_SKILLS_VOCAB__');
+    const sessionPartIndex = text.indexOf('fk live script part: session-state (live-browser-session.js)');
+    const domPartIndex = text.indexOf('fk live script part: dom-helpers (live-browser-dom.js)');
+    const browserPartIndex = text.indexOf('fk live script part: browser-ui (live-browser.js)');
+    const sessionHelperIndex = text.indexOf('__FK_SKILLS_LIVE_SESSION__');
+    const domHelperIndex = text.indexOf('__FK_SKILLS_LIVE_DOM__');
+    const browserInitIndex = text.indexOf('__FK_SKILLS_LIVE_INIT__');
     assert.ok(preludeIndex !== -1);
     assert.ok(sessionPartIndex !== -1);
     assert.ok(domPartIndex !== -1);
@@ -268,7 +270,7 @@ describe('live-server integration', () => {
     );
   });
 
-  it('/design-system.json reads DESIGN.md plus .impeccable/design.json', async () => {
+  it('/design-system.json reads DESIGN.md plus .fk-skills/design.json', async () => {
     const tmp = mkdtempSync(join(tmpdir(), 'impeccable-design-system-'));
     let designServer;
     try {
@@ -281,7 +283,7 @@ colors: {}
 # Temp System
 `);
       const sidecarPath = getDesignSidecarPath(tmp);
-      mkdirSync(join(tmp, '.impeccable'), { recursive: true });
+      mkdirSync(join(tmp, '.fk-skills'), { recursive: true });
       writeFileSync(sidecarPath, JSON.stringify({ version: 2, source: 'new-sidecar' }));
 
       designServer = await startServer(8520, { cwd: tmp });
@@ -351,9 +353,9 @@ colors: {}
       commitServer = await startServer(8522, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'mock',
-          IMPECCABLE_LIVE_COPY_AGENT_MOCK_DELAY_MS: '400',
-          IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+          FK_SKILLS_LIVE_COPY_AGENT: 'mock',
+          FK_SKILLS_LIVE_COPY_AGENT_MOCK_DELAY_MS: '400',
+          FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
             status: 'done',
             appliedEntryIds: ['abcdef12'],
             files: ['src/page.html'],
@@ -418,9 +420,9 @@ colors: {}
       asyncServer = await startServer(8546, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'mock',
-          IMPECCABLE_LIVE_COPY_AGENT_MOCK_DELAY_MS: '300',
-          IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+          FK_SKILLS_LIVE_COPY_AGENT: 'mock',
+          FK_SKILLS_LIVE_COPY_AGENT_MOCK_DELAY_MS: '300',
+          FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
             status: 'done',
             appliedEntryIds: ['ab12cd34'],
             files: ['src/page.html'],
@@ -477,7 +479,7 @@ colors: {}
 
       chatServer = await startServer(8524, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       // Stash a single op.
@@ -611,7 +613,7 @@ colors: {}
 
       candidateServer = await startServer(8539, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       await stashManualEdit(candidateServer, {
@@ -694,7 +696,7 @@ colors: {}
 
       chatServer = await startServer(8537, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       await stashManualEdit(chatServer, {
@@ -811,7 +813,7 @@ colors: {}
       chunkServer = await startServer(8528, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -921,7 +923,7 @@ colors: {}
       chunkServer = await startServer(8544, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -1030,7 +1032,7 @@ colors: {}
       splitServer = await startServer(8529, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -1126,7 +1128,7 @@ colors: {}
       failServer = await startServer(8530, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -1236,7 +1238,7 @@ colors: {}
       timeoutServer = await startServer(8525, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_APPLY_EVENT_HARD_TIMEOUT_MS: '300',
           IMPECCABLE_LIVE_APPLY_EVENT_SOFT_DEADLINE_MS: '250',
         },
@@ -1323,7 +1325,7 @@ colors: {}
 
       repairServer = await startServer(8551, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       await stashManualEdit(repairServer, {
@@ -1439,7 +1441,7 @@ colors: {}
 
       decisionServer = await startServer(8552, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       await stashManualEdit(decisionServer, {
@@ -1544,7 +1546,7 @@ colors: {}
 
       discardApplyServer = await startServer(8526, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       const stash = await fetch(`http://localhost:${discardApplyServer.port}/manual-edit-stash`, {
@@ -1651,7 +1653,7 @@ colors: {}
       abandonedServer = await startServer(8547, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -1721,7 +1723,7 @@ colors: {}
       restarted = await startServer(8547, {
         cwd: tmp,
         env: {
-          IMPECCABLE_LIVE_COPY_AGENT: 'chat',
+          FK_SKILLS_LIVE_COPY_AGENT: 'chat',
           IMPECCABLE_LIVE_MANUAL_EDIT_CHUNK_SIZE: '3',
         },
       });
@@ -1761,7 +1763,7 @@ colors: {}
 
       pageScopeServer = await startServer(8527, {
         cwd: tmp,
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
       });
 
       const stashHome = await fetch(`http://localhost:${pageScopeServer.port}/manual-edit-stash`, {
@@ -2272,7 +2274,7 @@ colors: {}
         token: server.token,
         type: 'generate',
         id: 'a1b2c3d9',
-        action: 'impeccable',
+        action: 'freeform',
         count: 1,
         pageUrl: '/',
         element: { outerHTML: '<button>Done</button>' },
@@ -2299,7 +2301,7 @@ colors: {}
         token: server.token,
         type: 'generate',
         id: 'a1b2c3dc',
-        action: 'impeccable',
+        action: 'freeform',
         count: 1,
         pageUrl: '/',
         element: { outerHTML: '<button>Manual</button>' },
@@ -2426,7 +2428,7 @@ colors: {}
         token: server.token,
         type: 'generate',
         id: '5ee7e575',
-        action: 'impeccable',
+        action: 'freeform',
         count: 3,
         pageUrl: '/',
         element: { tagName: 'h1', className: 'hero-title', outerHTML: '<h1 class="hero-title">Hello</h1>', textContent: 'Hello' },

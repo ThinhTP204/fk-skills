@@ -15,16 +15,16 @@ Impeccable works best when it can read the same product and design decisions you
 Run the setup once from your project root:
 
 ```text
-/impeccable init
+/fk init
 ```
 
 That creates `PRODUCT.md`, the strategy file. At the end, say yes when Impeccable offers to run:
 
 ```text
-/impeccable document
+/fk document
 ```
 
-That creates `DESIGN.md`, the visual-system file, plus a generated helper at `.impeccable/design.json`. Review the two markdown files. Edit anything that does not match the real product.
+That creates `DESIGN.md`, the visual-system file, plus a generated helper at `.fk-skills/design.json`. Review the two markdown files. Edit anything that does not match the real product.
 
 <div class="docs-context-flow" aria-label="How Impeccable uses design context">
   <div class="docs-context-flow-source">
@@ -39,7 +39,7 @@ That creates `DESIGN.md`, the visual-system file, plus a generated helper at `.i
   </div>
   <div class="docs-context-flow-source docs-context-flow-source--generated">
     <span class="docs-context-flow-label">Generated</span>
-    <strong>.impeccable/design.json</strong>
+    <strong>.fk-skills/design.json</strong>
     <span>Structured metadata for automation. Do not hand-edit.</span>
   </div>
   <div class="docs-context-flow-output">
@@ -55,7 +55,7 @@ That creates `DESIGN.md`, the visual-system file, plus a generated helper at `.i
 |---|---|---|
 | `PRODUCT.md` | Who is this for? What is the product trying to do? What should the brand feel like? Is this a brand surface or a product surface? What should the work avoid? | Audience, positioning, product purpose, voice, register, or anti-references change. |
 | `DESIGN.md` | What colors, type stacks, component treatments, radii, elevation, and visual rules are allowed? | Palette, typography, components, tokens, spacing/radius scales, or design rules change. |
-| `.impeccable/design.json` | What structured design data should automation use? | Do not edit it directly. Refresh it by running `/impeccable document`. |
+| `.fk-skills/design.json` | What structured design data should automation use? | Do not edit it directly. Refresh it by running `/fk document`. |
 
 The markdown files are the files you own. The generated JSON helps the detector, hooks, and Live Mode read the design system precisely.
 
@@ -71,8 +71,8 @@ The same visual move can be right in one register and wrong in the other. A camp
 Many codebases have both. Set the project default to the surface you work on most, then be explicit when a task differs:
 
 ```text
-/impeccable polish the marketing homepage as a brand surface
-/impeccable audit the billing settings as a product surface
+/fk polish the marketing homepage as a brand surface
+/fk audit the billing settings as a product surface
 ```
 
 ## How context changes the output
@@ -93,10 +93,10 @@ Use this rule:
 
 | Change in the project | Run |
 |---|---|
-| New audience, positioning, product purpose, brand voice, or register | `/impeccable init` |
-| New palette, type stack, component primitives, radius scale, or design rules | `/impeccable document` |
-| A hook says `DESIGN.md` is newer than `.impeccable/design.json` | `/impeccable document` |
-| One-off intentional detector finding | Add a narrow ignore with `/impeccable hooks ignore-value` or `npx impeccable ignores`. |
+| New audience, positioning, product purpose, brand voice, or register | `/fk init` |
+| New palette, type stack, component primitives, radius scale, or design rules | `/fk document` |
+| A hook says `DESIGN.md` is newer than `.fk-skills/design.json` | `/fk document` |
+| One-off intentional detector finding | Add a narrow ignore with `/fk hooks ignore-value` or `npx fk-skills ignores`. |
 
 Treat context files like any other design artifact: review them in code review when they change, and update them when the product changes.
 
@@ -107,7 +107,7 @@ Treat context files like any other design artifact: review them in code review w
   <div>
     <p>For normal projects, put <code>PRODUCT.md</code> and <code>DESIGN.md</code> in the project root.</p>
     <p>Skill commands look in the root first. If root context is missing, they also check <code>.agents/context/</code> and <code>docs/</code>.</p>
-    <p>The detector's design-system rules use the same root-first behavior for <code>DESIGN.md</code>. For generated design metadata, the primary path is <code>.impeccable/design.json</code>. Legacy <code>DESIGN.json</code> files are still accepted as fallbacks, but new projects should use <code>.impeccable/design.json</code>.</p>
+    <p>The detector's design-system rules use the same root-first behavior for <code>DESIGN.md</code>. For generated design metadata, the primary path is <code>.fk-skills/design.json</code>. Legacy <code>DESIGN.json</code> files are still accepted as fallbacks, but new projects should use <code>.fk-skills/design.json</code>.</p>
   </div>
 </details>
 
@@ -123,7 +123,7 @@ Treat context files like any other design artifact: review them in code review w
 <details class="docs-context-details">
   <summary>Which detector rules unlock when DESIGN.md exists</summary>
   <div>
-    <p>When <code>DESIGN.md</code> exists, <code>npx impeccable detect</code> and the design hook unlock design-system checks:</p>
+    <p>When <code>DESIGN.md</code> exists, <code>npx fk-skills detect</code> and the design hook unlock design-system checks:</p>
     <ul>
       <li><code>design-system-font</code> flags primary fonts not declared in <code>DESIGN.md</code> typography.</li>
       <li><code>design-system-color</code> flags literal colors outside the documented palette or sidecar ramps.</li>

@@ -4,7 +4,7 @@ tagline: "Purposeful motion that conveys state, not decoration."
 
 ## When to use it
 
-`/impeccable animate` is for interfaces that feel lifeless, where state changes are instant and jarring, where loading just pops in, where the user never quite trusts that their click registered. Use it to add the small motions that communicate what is happening: entrances, exits, feedback, transitions between states.
+`/fk animate` is for interfaces that feel lifeless, where state changes are instant and jarring, where loading just pops in, where the user never quite trusts that their click registered. Use it to add the small motions that communicate what is happening: entrances, exits, feedback, transitions between states.
 
 Do not use it to add bounces or elastic springs for the sake of energy. That is decoration, and this skill will not give it to you.
 
@@ -25,7 +25,7 @@ The skill animates `transform` and `opacity` only. If you find yourself animatin
 ## Try it
 
 ```
-/impeccable animate the sign-up flow
+/fk animate the sign-up flow
 ```
 
 Typical additions:

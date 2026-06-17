@@ -4,7 +4,7 @@ tagline: "Add strategic color to monochrome interfaces without going garish."
 
 ## When to use it
 
-`/impeccable colorize` is the counterweight to "everything is gray". Dashboards that read as a beige wall, forms with no accent, content pages that could be any SaaS product. Reach for it when the interface is functional but emotionally flat, and you want warmth without tipping into the AI color palette (purple-to-pink, cyan neon, dark mode glow).
+`/fk colorize` is the counterweight to "everything is gray". Dashboards that read as a beige wall, forms with no accent, content pages that could be any SaaS product. Reach for it when the interface is functional but emotionally flat, and you want warmth without tipping into the AI color palette (purple-to-pink, cyan neon, dark mode glow).
 
 ## How it works
 
@@ -20,7 +20,7 @@ Importantly, it uses OKLCH rather than HSL so that equal lightness steps look eq
 ## Try it
 
 ```
-/impeccable colorize the dashboard
+/fk colorize the dashboard
 ```
 
 Expected diff:
@@ -34,5 +34,5 @@ Expected diff:
 ## Pitfalls
 
 - **Running it without a brand hue.** Colorize needs a starting point. If `PRODUCT.md` does not specify one, it will ask. Do not let it pick from the AI color palette defaults.
-- **Expecting it to fix the AI color palette problem.** If your design already has purple gradients and cyan neon, you need `/impeccable quieter` first, then colorize can rebuild.
-- **Using it on already-colorful interfaces.** That is a `/impeccable quieter` job. Colorize adds, it does not subtract.
+- **Expecting it to fix the AI color palette problem.** If your design already has purple gradients and cyan neon, you need `/fk quieter` first, then colorize can rebuild.
+- **Using it on already-colorful interfaces.** That is a `/fk quieter` job. Colorize adds, it does not subtract.

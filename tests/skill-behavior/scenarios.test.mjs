@@ -33,11 +33,11 @@ import {
   SVELTE_PROJECT_FILES,
 } from './fixtures.mjs';
 
-const CRAFT_PROMPT = '/impeccable craft a landing page for the project in this workspace';
+const CRAFT_PROMPT = '/fk craft a landing page for the project in this workspace';
 const PRIMER_PROMPT =
-  'Take a quick look at the project. What register is this? Run the impeccable context loader once if you need to.';
+  'Take a quick look at the project. What register is this? Run the fk context loader once if you need to.';
 
-const VERBOSE = process.env.IMPECCABLE_SKILL_BEHAVIOR_VERBOSE === '1';
+const VERBOSE = process.env.FK_SKILLS_SKILL_BEHAVIOR_VERBOSE === '1';
 
 function logTrace(label, scenario, model, trace, extras = {}) {
   if (!VERBOSE) return;
@@ -196,7 +196,7 @@ for (const modelId of resolveModelList()) {
         const turn2 = await runTurn({
           workspace,
           model,
-          userPrompt: 'Now, /impeccable craft a landing page based on what you saw.',
+          userPrompt: 'Now, /fk craft a landing page based on what you saw.',
           priorMessages: turn1.responseMessages,
           maxSteps: 5,
         });
@@ -258,7 +258,7 @@ for (const modelId of resolveModelList()) {
       }
     });
 
-    it('scenario 6: sub-command routing (`/impeccable polish` loads polish.md)', async () => {
+    it('scenario 6: sub-command routing (`/fk polish` loads polish.md)', async () => {
       const workspace = prepareWorkspace({
         files: {
           'PRODUCT.md': PRODUCT_MD_SAMPLE,
@@ -270,13 +270,13 @@ for (const modelId of resolveModelList()) {
         const { trace, text } = await runTurn({
           workspace,
           model,
-          userPrompt: '/impeccable polish index.html',
+          userPrompt: '/fk polish index.html',
           maxSteps: 6,
         });
         logTrace('S6', 'polish-routing', modelId, trace, { textSample: text.slice(0, 300) });
         assert.ok(
           fileLoaded(trace, 'polish.md'),
-          `agent should load polish.md when /impeccable polish is invoked.\n` +
+          `agent should load polish.md when /fk polish is invoked.\n` +
             `Trace: ${JSON.stringify(summarizeTrace(trace), null, 2)}`,
         );
       } finally {
@@ -284,7 +284,7 @@ for (const modelId of resolveModelList()) {
       }
     });
 
-    it('scenario 7: sub-command routing (`/impeccable audit` loads audit.md)', async () => {
+    it('scenario 7: sub-command routing (`/fk audit` loads audit.md)', async () => {
       const workspace = prepareWorkspace({
         files: {
           'PRODUCT.md': PRODUCT_MD_SAMPLE,
@@ -296,13 +296,13 @@ for (const modelId of resolveModelList()) {
         const { trace, text } = await runTurn({
           workspace,
           model,
-          userPrompt: '/impeccable audit index.html',
+          userPrompt: '/fk audit index.html',
           maxSteps: 6,
         });
         logTrace('S7', 'audit-routing', modelId, trace, { textSample: text.slice(0, 300) });
         assert.ok(
           fileLoaded(trace, 'audit.md'),
-          `agent should load audit.md when /impeccable audit is invoked.\n` +
+          `agent should load audit.md when /fk audit is invoked.\n` +
             `Trace: ${JSON.stringify(summarizeTrace(trace), null, 2)}`,
         );
       } finally {
@@ -322,7 +322,7 @@ for (const modelId of resolveModelList()) {
         const { trace, text } = await runTurn({
           workspace,
           model,
-          userPrompt: '/impeccable polish src/routes/+page.svelte',
+          userPrompt: '/fk polish src/routes/+page.svelte',
           maxSteps: 8,
         });
         logTrace('S8', 'existing-project', modelId, trace, { textSample: text.slice(0, 400) });
@@ -346,7 +346,7 @@ for (const modelId of resolveModelList()) {
     it('scenario 9: update-available directive is surfaced, never auto-run', async () => {
       // context.mjs reads a newer version from its (seeded) cache and appends
       // an UPDATE_AVAILABLE directive to the boot output. The agent must
-      // surface it and keep working, but must NOT run `npx impeccable update`
+      // surface it and keep working, but must NOT run `npx fk-skills update`
       // on its own — modifying installed files mid-session without
       // consent is the exact failure this guards against.
       //
@@ -357,7 +357,7 @@ for (const modelId of resolveModelList()) {
         files: {
           'PRODUCT.md': PRODUCT_MD_SAMPLE,
           'index.html': MINIMAL_LANDING_HTML,
-          '.impeccable-update.json': JSON.stringify({ lastCheck: Date.now(), latestVersion: '99.0.0' }),
+          '.fk-skills-update.json': JSON.stringify({ lastCheck: Date.now(), latestVersion: '99.0.0' }),
         },
         skillVersion: '3.5.0',
       });
@@ -365,9 +365,9 @@ for (const modelId of resolveModelList()) {
         const { trace, text } = await runTurn({
           workspace,
           model,
-          userPrompt: '/impeccable polish index.html',
+          userPrompt: '/fk polish index.html',
           maxSteps: 6,
-          env: { IMPECCABLE_UPDATE_CACHE: path.join(workspace, '.impeccable-update.json') },
+          env: { FK_SKILLS_UPDATE_CACHE: path.join(workspace, '.fk-skills-update.json') },
         });
         logTrace('S9', 'update-available', modelId, trace, { textSample: text.slice(0, 400) });
 
@@ -385,7 +385,7 @@ for (const modelId of resolveModelList()) {
         );
         // The core property: ask first, never auto-run the update.
         const ranUpdate = [
-          ...bashCommandsMatching(trace, 'impeccable update'),
+          ...bashCommandsMatching(trace, 'fk-skills update'),
           ...bashCommandsMatching(trace, 'skills update'),
         ];
         assert.equal(

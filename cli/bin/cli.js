@@ -62,7 +62,7 @@ Compatibility:
     const { run } = await import('./commands/skills.mjs');
     await run(args);
   } else {
-    // Default: treat as detect arguments (allow `npx impeccable src/` shorthand)
+    // Default: treat as detect arguments (allow `npx fk-skills src/` shorthand)
     process.argv = [process.argv[0], process.argv[1], ...args];
     const { detectCli } = await import('../engine/detect-antipatterns.mjs');
     await detectCli();

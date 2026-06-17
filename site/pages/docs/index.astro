@@ -38,17 +38,17 @@ const session = [
 const startSteps = [
   {
     label: 'Install',
-    command: 'npx impeccable install',
+    command: 'npx fk-skills install',
     line: 'Run this from the project root, then reload your AI coding tool.',
   },
   {
     label: 'Set context',
-    command: '/impeccable init',
+    command: '/fk init',
     line: 'Answer the short setup interview. Say yes when it offers DESIGN.md.',
   },
   {
     label: 'Try it',
-    command: '/impeccable polish the pricing page',
+    command: '/fk polish the pricing page',
     line: 'Pick any page or component that already exists.',
   },
 ];
@@ -56,37 +56,37 @@ const startSteps = [
 const choices = [
   {
     need: 'Set up a project',
-    command: '/impeccable init',
+    command: '/fk init',
     href: '/docs/init',
     line: 'Create PRODUCT.md and DESIGN.md.',
   },
   {
     need: 'Improve an existing page',
-    command: '/impeccable polish',
+    command: '/fk polish',
     href: '/docs/polish',
     line: 'Fix spacing, type, states, copy, and consistency.',
   },
   {
     need: 'Find design issues',
-    command: '/impeccable critique',
+    command: '/fk critique',
     href: '/docs/critique',
     line: 'Get the highest-priority design problems.',
   },
   {
     need: 'Check implementation quality',
-    command: '/impeccable audit',
+    command: '/fk audit',
     href: '/docs/audit',
     line: 'Check accessibility, responsiveness, performance, and detector findings.',
   },
   {
     need: 'Point at UI in the browser',
-    command: '/impeccable live',
+    command: '/fk live',
     href: '/docs/live',
     line: 'Pick an element, generate variants, accept one into source.',
   },
   {
     need: 'Build a new feature',
-    command: '/impeccable craft',
+    command: '/fk craft',
     href: '/docs/craft',
     line: 'Plan, build, and visually check the feature.',
   },
@@ -102,19 +102,19 @@ const manualTopics = [
   {
     topic: 'Detector CLI',
     href: '/docs/detector',
-    label: 'npx impeccable detect',
+    label: 'npx fk-skills detect',
     line: 'Run deterministic checks on files, folders, stdin, and URLs.',
   },
   {
     topic: 'Design hooks',
     href: '/docs/hooks',
-    label: '/impeccable hooks',
+    label: '/fk hooks',
     line: 'Automatic detector feedback inside Claude Code, Codex, and Cursor.',
   },
   {
     topic: 'Config and ignores',
     href: '/docs/config',
-    label: '.impeccable/config.json',
+    label: '.fk-skills/config.json',
     line: 'Shared exceptions, private overrides, and design-system toggles.',
   },
 ].filter(topic => referenceEntries.some(entry => `/docs/${entry.id}` === topic.href));
@@ -248,7 +248,7 @@ const chains: { id: string; a: string; b: string; arrow: string; line: string }[
               <li class="docs-flow-step">
                 <a class="docs-flow-link" href={`/docs/${step.slug}`}>
                   <span class="docs-flow-verb">{step.verb}</span>
-                  <span class="docs-flow-cmd">/impeccable {step.slug}</span>
+                  <span class="docs-flow-cmd">/fk {step.slug}</span>
                   <span class="docs-flow-tag">{taglineFor(step.slug)}</span>
                 </a>
                 {i < session.length - 1 && (
@@ -261,7 +261,7 @@ const chains: { id: string; a: string; b: string; arrow: string; line: string }[
           </ol>
 
           <p class="docs-flow-alt">
-            Already shipped? Use <a href="/docs/polish">/impeccable polish</a> on the page that needs work, or <a href="/docs/audit">/impeccable audit</a> for checks.
+            Already shipped? Use <a href="/docs/polish">/fk polish</a> on the page that needs work, or <a href="/docs/audit">/fk audit</a> for checks.
           </p>
         </section>
 

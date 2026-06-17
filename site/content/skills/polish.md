@@ -4,7 +4,7 @@ tagline: "The meticulous final pass between good and great."
 
 ## When to use it
 
-`/impeccable polish` is the last thing you run before shipping. It hunts down the small details that separate a shipped feature from a polished one: half-pixel misalignments, inconsistent spacing, forgotten focus states, loading transitions that flash, copy that drifts in tone. It also aligns the feature with your design system, replacing hard-coded values with tokens, swapping custom components for shared ones, and fixing any drift from established patterns.
+`/fk polish` is the last thing you run before shipping. It hunts down the small details that separate a shipped feature from a polished one: half-pixel misalignments, inconsistent spacing, forgotten focus states, loading transitions that flash, copy that drifts in tone. It also aligns the feature with your design system, replacing hard-coded values with tokens, swapping custom components for shared ones, and fixing any drift from established patterns.
 
 Reach for it when the feature is functionally complete, nothing is broken, and something still feels off. Also reach for it when a feature has drifted from the design system and needs to be pulled back in line.
 
@@ -24,7 +24,7 @@ The skill is explicit about one thing: polish is the last step, not the first. I
 ## Try it
 
 ```
-/impeccable polish the pricing page
+/fk polish the pricing page
 ```
 
 A healthy run looks like:
@@ -41,6 +41,6 @@ Five small fixes, no rewrites. That is the shape of a good polish pass.
 
 ## Pitfalls
 
-- **Polishing work that is not done.** If there are TODOs in the code, you are not ready. Run `/impeccable polish` on finished features only.
-- **Treating polish as redesign.** Polish refines what exists. If you find yourself rearchitecting a layout, you needed `/impeccable critique` or `/impeccable layout` instead.
-- **Running `/impeccable polish` without `/impeccable audit` first.** Polish catches feel-based issues. Audit catches measurable ones. Use both.
+- **Polishing work that is not done.** If there are TODOs in the code, you are not ready. Run `/fk polish` on finished features only.
+- **Treating polish as redesign.** Polish refines what exists. If you find yourself rearchitecting a layout, you needed `/fk critique` or `/fk layout` instead.
+- **Running `/fk polish` without `/fk audit` first.** Polish catches feel-based issues. Audit catches measurable ones. Use both.

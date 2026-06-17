@@ -13,8 +13,8 @@ contract.
 
 ```bash
 bun run test:skill-behavior
-IMPECCABLE_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior   # dump per-scenario traces
-IMPECCABLE_SKILL_BEHAVIOR_MODELS=claude-sonnet-4-6 bun run test:skill-behavior   # scope to one model
+FK_SKILLS_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior   # dump per-scenario traces
+FK_SKILLS_SKILL_BEHAVIOR_MODELS=claude-sonnet-4-6 bun run test:skill-behavior   # scope to one model
 ```
 
 Requires `.env` at repo root with at least one of `ANTHROPIC_API_KEY`,
@@ -26,7 +26,7 @@ skipped, not failed.
 Each scenario:
 
 1. `prepareWorkspace()` mints a temp dir, symlinks the canonical skill
-   into `<workspace>/.claude/skills/impeccable`, and optionally writes
+   into `<workspace>/.claude/skills/fk`, and optionally writes
    `PRODUCT.md` / `DESIGN.md` fixtures.
 2. `runTurn()` inlines `SKILL.md` (placeholders neutralized) as the
    system prompt and runs Vercel AI SDK `generateText` with four
@@ -46,10 +46,10 @@ The trace is the source of truth, not the model's free-form reply.
 | 3 | PRODUCT.md + DESIGN.md (brand register) | runs `context.mjs` 1-3 times; loads `reference/brand.md`; consults the design system (DESIGN.md bundled in output, but CSS / tokens / directory listing also count) |
 | 4 | PRODUCT.md + DESIGN.md, context already loaded in turn 1 | turn 2 does **not** re-run `context.mjs`; `reference/brand.md` is loaded across turns 1+2 |
 | 5 | PRODUCT.md WITHOUT a `## Register` field; task cue says "landing page" | runs `context.mjs` (which emits a generic register directive); agent loads `reference/brand.md` via task-cue cascade |
-| 6 | PRODUCT.md + DESIGN.md + a minimal `index.html`; prompt is `/impeccable polish` | loads `reference/polish.md` |
-| 7 | same fixture; prompt is `/impeccable audit` | loads `reference/audit.md` |
-| 8 | PRODUCT.md + DESIGN.md + a SvelteKit scaffold (`src/app.css`, components, `+page.svelte`); prompt is `/impeccable polish src/routes/+page.svelte` | reads at least one project code file (CSS / component / page) — not just the skill's reference files |
-| 9 | PRODUCT.md + `index.html` + a seeded update cache with a newer version (`skillVersion` copy-mode so `context.mjs` has a `SKILL.md` to version-check against); prompt is `/impeccable polish index.html` | `context.mjs` runs and its output carries the `UPDATE_AVAILABLE` directive (proven via captured bash output); the agent does **not** auto-run `npx impeccable update` (it must ask first) |
+| 6 | PRODUCT.md + DESIGN.md + a minimal `index.html`; prompt is `/fk polish` | loads `reference/polish.md` |
+| 7 | same fixture; prompt is `/fk audit` | loads `reference/audit.md` |
+| 8 | PRODUCT.md + DESIGN.md + a SvelteKit scaffold (`src/app.css`, components, `+page.svelte`); prompt is `/fk polish src/routes/+page.svelte` | reads at least one project code file (CSS / component / page) — not just the skill's reference files |
+| 9 | PRODUCT.md + `index.html` + a seeded update cache with a newer version (`skillVersion` copy-mode so `context.mjs` has a `SKILL.md` to version-check against); prompt is `/fk polish index.html` | `context.mjs` runs and its output carries the `UPDATE_AVAILABLE` directive (proven via captured bash output); the agent does **not** auto-run `npx fk-skills update` (it must ask first) |
 
 Scenario 9 passed on all three current-lineup providers (`claude-sonnet-4-6`,
 `gpt-5.5`, `gemini-3.1-flash-lite`) on 2026-05-28.

@@ -5,7 +5,7 @@
 // Items that are fully complete and ready for public use
 // All others will show "Coming Soon"
 export const readySkills = [
-  'impeccable'  // Consolidated skill with all design domains
+  'fk'  // Consolidated skill with all design domains
 ];
 
 export const readyCommands = [
@@ -17,9 +17,9 @@ export const alphaCommands = [
   'live'
 ];
 
-// Consolidated impeccable skill with reference domains
+// Consolidated fk skill with reference domains
 export const skillFocusAreas = {
-  'impeccable': [
+  'fk': [
     { area: 'Typography', detail: 'Scale, rhythm, hierarchy, expression' },
     { area: 'Color & Contrast', detail: 'Accessibility, systems, theming' },
     { area: 'Spatial Design', detail: 'Layout, spacing, composition' },
@@ -33,7 +33,7 @@ export const skillFocusAreas = {
 // Slop tells we prevent in each discipline. Same seven categories, but the
 // detail line communicates what bad-default we catch — not what we teach.
 export const slopFocusAreas = {
-  'impeccable': [
+  'fk': [
     { area: 'Typography', detail: 'A type scale with real contrast, set in a face chosen on purpose, not Inter by reflex.' },
     { area: 'Color & Contrast', detail: 'Palettes that clear WCAG and commit to a hue. The purple-gradient default never ships.' },
     { area: 'Spatial Design', detail: 'Structure from spacing and rhythm, not a grid of identical cards nested in more cards.' },
@@ -55,7 +55,7 @@ export const dimensionGuidelineCounts = {
   'UX Writing': 32
 };
 
-// Reference domains within the impeccable skill
+// Reference domains within the fk skill
 export const skillReferenceDomains = [
   'typography',
   'color-and-contrast',
@@ -67,7 +67,7 @@ export const skillReferenceDomains = [
 ];
 
 export const commandProcessSteps = {
-  'impeccable': ['Direct', 'Design', 'Build', 'Refine'],
+  'fk': ['Direct', 'Design', 'Build', 'Refine'],
   'craft': ['Shape', 'Reference', 'Build', 'Iterate'],
   'shape': ['Interview', 'Synthesize', 'Brief', 'Confirm'],
   'overdrive': ['Assess', 'Choose', 'Build', 'Polish'],
@@ -95,7 +95,7 @@ export const commandProcessSteps = {
 
 export const commandCategories = {
   // CREATE - build something new
-  'impeccable': 'create',
+  'fk': 'create',
   'craft': 'create',
   'shape': 'create',
   // EVALUATE - review and assess
@@ -126,17 +126,17 @@ export const commandCategories = {
   'live': 'system'
 };
 
-// Skill relationships - now consolidated into impeccable skill
-// The impeccable skill contains all domains as reference files
+// Skill relationships - now consolidated into fk skill
+// The fk skill contains all domains as reference files
 export const skillRelationships = {
-  'impeccable': {
+  'fk': {
     description: 'Comprehensive design intelligence with progressive reference loading',
     referenceDomains: ['typography', 'color-and-contrast', 'spatial-design', 'responsive-design', 'interaction-design', 'motion-design', 'ux-writing']
   }
 };
 
 export const commandRelationships = {
-  'impeccable': { flow: 'Create: Freeform design with full design intelligence' },
+  'fk': { flow: 'Create: Freeform design with full design intelligence' },
   'craft': { flow: 'Create: Full shape-then-build flow with visual iteration' },
   'shape': { flow: 'Create: Plan UX and UI through structured discovery' },
   'critique': { leadsTo: ['polish', 'distill', 'bolder', 'quieter', 'typeset', 'layout'], flow: 'Evaluate: UX and design review with scoring' },

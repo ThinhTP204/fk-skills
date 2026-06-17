@@ -27,7 +27,7 @@ async function main() {
   // parent's value, not the value we are about to export for any child
   // processes the hook might ever spawn.
   const inheritedEnv = { ...process.env };
-  process.env.IMPECCABLE_HOOK_DEPTH = process.env.IMPECCABLE_HOOK_DEPTH || '1';
+  process.env.FK_SKILLS_HOOK_DEPTH = process.env.FK_SKILLS_HOOK_DEPTH || '1';
 
   let stdinJson = '';
   try { stdinJson = await readStdin(); } catch { /* fall through */ }
@@ -54,8 +54,8 @@ main().catch((err) => {
       error: String(err && err.message ? err.message : err),
     });
   } catch { /* swallow */ }
-  if (process.env.IMPECCABLE_HOOK_DEBUG) {
-    process.stderr.write(`[impeccable-hook] ${err}\n`);
+  if (process.env.FK_SKILLS_HOOK_DEBUG) {
+    process.stderr.write(`[fk-hook] ${err}\n`);
   }
   process.exit(0);
 });

@@ -25,10 +25,10 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = resolveLiveConfigPath({ cwd: process.cwd(), scriptsDir: __dirname });
-const MARKER_OPEN_TEXT = 'impeccable-live-start';
-const MARKER_CLOSE_TEXT = 'impeccable-live-end';
-const IGNORE_MARKER_OPEN = '# impeccable-live-ignore-start';
-const IGNORE_MARKER_CLOSE = '# impeccable-live-ignore-end';
+const MARKER_OPEN_TEXT = 'fk-live-start';
+const MARKER_CLOSE_TEXT = 'fk-live-end';
+const IGNORE_MARKER_OPEN = '# fk-live-ignore-start';
+const IGNORE_MARKER_CLOSE = '# fk-live-ignore-end';
 
 export const LIVE_IGNORE_PATTERNS = Object.freeze([
   '.fk-skills/hook.cache.json',
@@ -47,9 +47,9 @@ export const LIVE_IGNORE_PATTERNS = Object.freeze([
   '.fk-skills-live.json',
   '.fk-skills-live/',
   'node_modules/.fk-skills-live/',
-  'src/lib/impeccable/ImpeccableLiveRoot.svelte',
-  'src/lib/impeccable/__runtime.js',
-  'src/lib/impeccable/[0-9a-f]*/',
+  'src/lib/fk-skills/FkLiveRoot.svelte',
+  'src/lib/fk-skills/__runtime.js',
+  'src/lib/fk-skills/[0-9a-f]*/',
 ]);
 
 /**
@@ -427,8 +427,8 @@ function insertTag(content, config, port, filePath) {
  */
 function removeTag(content, _syntax) {
   const patterns = [
-    /([ \t]*)<!--\s*impeccable-live-start\s*-->[\s\S]*?<!--\s*impeccable-live-end\s*-->([ \t]*(?:\r\n|\n|\r|$)?)/,
-    /([ \t]*)\{\/\*\s*impeccable-live-start\s*\*\/\}[\s\S]*?\{\/\*\s*impeccable-live-end\s*\*\/\}([ \t]*(?:\r\n|\n|\r|$)?)/,
+    /([ \t]*)<!--\s*fk-live-start\s*-->[\s\S]*?<!--\s*fk-live-end\s*-->([ \t]*(?:\r\n|\n|\r|$)?)/,
+    /([ \t]*)\{\/\*\s*fk-live-start\s*\*\/\}[\s\S]*?\{\/\*\s*fk-live-end\s*\*\/\}([ \t]*(?:\r\n|\n|\r|$)?)/,
   ];
   for (const pat of patterns) {
     let changed = false;
@@ -454,7 +454,7 @@ function removeTag(content, _syntax) {
 // localhost:PORT) is blocked unless the CSP explicitly allows that origin.
 //
 // On insert: append `http://localhost:PORT` to `script-src` and `connect-src`,
-// and stash the original `content` value in a `data-impeccable-csp-original`
+// and stash the original `content` value in a `data-fk-csp-original`
 // attribute (base64) so revert is exact.
 //
 // On remove: detect the marker attribute, decode it, restore the original
@@ -466,7 +466,7 @@ function removeTag(content, _syntax) {
 // Only the in-source meta-tag form gets the auto-patch.
 // ---------------------------------------------------------------------------
 
-const CSP_MARKER_ATTR = 'data-impeccable-csp-original';
+const CSP_MARKER_ATTR = 'data-fk-csp-original';
 
 function findCspMetaTags(content) {
   const out = [];

@@ -141,9 +141,9 @@ describe('findElement', () => {
     assert.equal(result.startLine, 1); // skips the comment on line 0
   });
 
-  it('skips lines that contain data-impeccable-variant', () => {
+  it('skips lines that contain data-fk-variant', () => {
     const lines = [
-      '<div class="hero" data-impeccable-variant="original">Old</div>',
+      '<div class="hero" data-fk-variant="original">Old</div>',
       '<div class="hero">Real</div>',
     ];
     const result = findElement(lines, 'hero');
@@ -243,14 +243,14 @@ describe('wrapCli integration', () => {
 
     // Verify the file was modified correctly
     const modified = readFileSync(join(tmp, 'index.html'), 'utf-8');
-    assert.ok(modified.includes('data-impeccable-variants="test123"'));
-    assert.ok(modified.includes('data-impeccable-variant-count="3"'));
-    assert.ok(modified.includes('data-impeccable-variant="original"'));
+    assert.ok(modified.includes('data-fk-variants="test123"'));
+    assert.ok(modified.includes('data-fk-variant-count="3"'));
+    assert.ok(modified.includes('data-fk-variant="original"'));
     assert.ok(modified.includes('display: contents'));
-    assert.ok(modified.includes('impeccable-variants-start test123'));
-    assert.ok(modified.includes('impeccable-variants-end test123'));
+    assert.ok(modified.includes('fk-variants-start test123'));
+    assert.ok(modified.includes('fk-variants-end test123'));
     // Original should NOT be hidden (stays visible until variants arrive)
-    assert.ok(!modified.includes('data-impeccable-variant="original" style="display: none"'));
+    assert.ok(!modified.includes('data-fk-variant="original" style="display: none"'));
   });
 
   it('wraps a JSX element and uses JSX comment syntax', () => {
@@ -274,8 +274,8 @@ describe('wrapCli integration', () => {
     assert.equal(result.commentSyntax.close, '*/}');
 
     const modified = readFileSync(join(tmp, 'App.jsx'), 'utf-8');
-    assert.ok(modified.includes('{/* impeccable-variants-start jsx123'));
-    assert.ok(modified.includes('data-impeccable-variant-count="2"'));
+    assert.ok(modified.includes('{/* fk-variants-start jsx123'));
+    assert.ok(modified.includes('data-fk-variant-count="2"'));
   });
 
   it('finds element by ID when --element-id is used', () => {
@@ -293,7 +293,7 @@ describe('wrapCli integration', () => {
     ));
 
     const modified = readFileSync(join(tmp, 'page.html'), 'utf-8');
-    assert.ok(modified.includes('data-impeccable-variants="id123"'));
+    assert.ok(modified.includes('data-fk-variants="id123"'));
     // The original pricing div should be inside the wrapper
     assert.ok(modified.includes('id="pricing"'));
   });
@@ -329,7 +329,7 @@ describe('wrapCli integration', () => {
     const modified = readFileSync(join(tmp, 'preserve.html'), 'utf-8');
     assert.ok(modified.includes('class="before"'));
     assert.ok(modified.includes('class="after"'));
-    assert.ok(modified.includes('data-impeccable-variants="pres123"'));
+    assert.ok(modified.includes('data-fk-variants="pres123"'));
   });
 
   it('reports scoped CSS authoring as the default live style contract', () => {
@@ -346,7 +346,7 @@ describe('wrapCli integration', () => {
     assert.equal(result.styleMode, 'scoped');
     assert.equal(result.cssAuthoring.mode, 'scoped');
     assert.equal(result.cssAuthoring.strategy, 'scope-rule');
-    assert.equal(result.cssAuthoring.styleTag, '<style data-impeccable-css="SESSION_ID">');
+    assert.equal(result.cssAuthoring.styleTag, '<style data-fk-css="SESSION_ID">');
     assert.match(result.cssAuthoring.rulePattern, /@scope/);
     assert.ok(
       result.cssAuthoring.forbidden.some((item) => item.includes('is:inline')),
@@ -374,14 +374,14 @@ const title = 'Astro title';
       'event=live_wrap.astro_css_mode actor=agent operation=wrap_astro_file risk=astro_scopes_preview_css_away expected=styleMode astro-global-prefixed actual=' + result.styleMode + ' suggestion=inspect live-wrap output metadata for .astro files'
     );
     assert.deepEqual(result.cssSelectorPrefixExamples, [
-      '[data-impeccable-variant="1"]',
-      '[data-impeccable-variant="2"]',
-      '[data-impeccable-variant="3"]',
+      '[data-fk-variant="1"]',
+      '[data-fk-variant="2"]',
+      '[data-fk-variant="3"]',
     ]);
     assert.equal(result.cssAuthoring.mode, 'astro-global-prefixed');
     assert.equal(result.cssAuthoring.strategy, 'global-prefixed');
-    assert.equal(result.cssAuthoring.styleTag, '<style is:inline data-impeccable-css="SESSION_ID">');
-    assert.match(result.cssAuthoring.rulePattern, /^\[data-impeccable-variant="N"\]/);
+    assert.equal(result.cssAuthoring.styleTag, '<style is:inline data-fk-css="SESSION_ID">');
+    assert.match(result.cssAuthoring.rulePattern, /^\[data-fk-variant="N"\]/);
     assert.ok(
       result.cssAuthoring.forbidden.some((item) => item.includes('@scope')),
       'Astro-prefixed mode should explicitly reject @scope',
@@ -406,11 +406,11 @@ const title = 'Astro title';
 // ---------------------------------------------------------------------------
 
 // Integration tests share cwd=process.cwd() with the repo, so a leftover
-// .impeccable/live/pending-manual-edits.json from local dev tripped the
+// .fk-skills/live/pending-manual-edits.json from local dev tripped the
 // fail-loud check in live-wrap. Clear the buffer around each test.
 function clearManualEditsBuffer() {
   try {
-    const p = join(process.cwd(), '.impeccable/live/pending-manual-edits.json');
+    const p = join(process.cwd(), '.fk-skills/live/pending-manual-edits.json');
     rmSync(p, { force: true });
   } catch {}
 }
@@ -453,7 +453,7 @@ describe('live-wrap — JSX / TSX correctness', () => {
     const modified = readFileSync(join(tmp, 'page.tsx'), 'utf-8');
 
     // Wrapper landed somewhere.
-    assert.ok(modified.includes('impeccable-variants-start wrapA'), 'wrapper was created');
+    assert.ok(modified.includes('fk-variants-start wrapA'), 'wrapper was created');
 
     // Decoy section survives intact — all three of its lines still present in order.
     const decoyIntact =
@@ -462,7 +462,7 @@ describe('live-wrap — JSX / TSX correctness', () => {
     assert.ok(decoyIntact, 'decoy section opening tag was not mangled');
 
     // Target section sits inside the original variant wrapper.
-    const originalMatch = modified.match(/data-impeccable-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
     assert.ok(originalMatch, 'original variant wrapper exists');
     const inside = originalMatch[1];
     assert.ok(inside.includes('py-20 lg:py-24'), 'target section (with py-20 lg:py-24) is inside original wrapper');
@@ -521,7 +521,7 @@ describe('live-wrap — JSX / TSX correctness', () => {
 
     const modified = readFileSync(join(tmp, 'Page.tsx'), 'utf-8');
 
-    const originalMatch = modified.match(/data-impeccable-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
     assert.ok(originalMatch, 'original variant wrapper exists');
     const inside = originalMatch[1];
     assert.ok(inside.includes('shared-class target-marker'), 'correct target wrapped');
@@ -546,7 +546,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'App.jsx'), 'utf-8');
-    const originalMatch = modified.match(/data-impeccable-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
     assert.ok(originalMatch, 'original variant wrapper exists');
     assert.ok(originalMatch[1].includes('CSS Modules Fixture'), 'target content is wrapped');
   });
@@ -580,11 +580,11 @@ export default function App() {
     assert.ok(!modified.includes('<>'),  'no Fragment opener emitted');
     assert.ok(!modified.includes('</>'), 'no Fragment closer emitted');
 
-    // The outer wrapper <div data-impeccable-variants="..."> appears BEFORE
+    // The outer wrapper <div data-fk-variants="..."> appears BEFORE
     // both marker comments — markers are tucked inside.
-    const wrapperIdx = modified.indexOf('data-impeccable-variants="frag1"');
-    const startMarkerIdx = modified.indexOf('impeccable-variants-start frag1');
-    const endMarkerIdx = modified.indexOf('impeccable-variants-end frag1');
+    const wrapperIdx = modified.indexOf('data-fk-variants="frag1"');
+    const startMarkerIdx = modified.indexOf('fk-variants-start frag1');
+    const endMarkerIdx = modified.indexOf('fk-variants-end frag1');
     assert.ok(wrapperIdx !== -1 && startMarkerIdx !== -1 && endMarkerIdx !== -1, 'all markers present');
     assert.ok(wrapperIdx < startMarkerIdx, 'wrapper opens before start-marker comment');
     assert.ok(endMarkerIdx > startMarkerIdx, 'end marker follows start marker');
@@ -600,8 +600,8 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'page.html'), 'utf-8');
-    const wrapperIdx = modified.indexOf('data-impeccable-variants="htmlFrag"');
-    const startMarkerIdx = modified.indexOf('impeccable-variants-start htmlFrag');
+    const wrapperIdx = modified.indexOf('data-fk-variants="htmlFrag"');
+    const startMarkerIdx = modified.indexOf('fk-variants-start htmlFrag');
     assert.ok(startMarkerIdx < wrapperIdx, 'HTML start marker precedes wrapper div');
   });
 
@@ -636,7 +636,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'Page.tsx'), 'utf-8');
-    const originalMatch = modified.match(/data-impeccable-variant="original"[\s\S]*?<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[\s\S]*?<\/div>/);
     assert.ok(originalMatch, 'original wrapper present');
     const inside = originalMatch[0];
     assert.ok(inside.includes('Beta card'), 'wrapped the Beta card (the picked one)');
@@ -679,7 +679,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'Page.tsx'), 'utf-8');
-    const originalMatch = modified.match(/data-impeccable-variant="original"[\s\S]*?<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[\s\S]*?<\/div>/);
     assert.ok(originalMatch, 'original wrapper present');
     const inside = originalMatch[0];
     assert.ok(inside.includes('Hero Two'), 'wrapped Hero Two (the picked card)');
@@ -714,7 +714,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'Short.tsx'), 'utf-8');
-    assert.ok(modified.includes('data-impeccable-variants="short1"'),
+    assert.ok(modified.includes('data-fk-variants="short1"'),
       'short --text should still wrap (fallback to first-match), not fail with element_ambiguous');
   });
 
@@ -743,8 +743,8 @@ export default function App() {
     const modified = readFileSync(join(tmp, 'multi.html'), 'utf-8');
     const lines = modified.split('\n');
     // endLine is 1-indexed; lines[endLine - 1] should be the wrapper's last
-    // line (the impeccable-variants-end marker for HTML).
-    assert.match(lines[result.endLine - 1], /impeccable-variants-end ml1/,
+    // line (the fk-variants-end marker for HTML).
+    assert.match(lines[result.endLine - 1], /fk-variants-end ml1/,
       `endLine ${result.endLine} should point at the variants-end marker line. Got: ${JSON.stringify(lines[result.endLine - 1])}`);
     // And the line after the reported endLine should be `</main>` — proving
     // the entire wrapper was accounted for (no rows missing).
@@ -777,7 +777,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'Cards.tsx'), 'utf-8');
-    assert.ok(modified.includes('data-impeccable-variants="dyn1"'), 'wrapped (first-match fallback)');
+    assert.ok(modified.includes('data-fk-variants="dyn1"'), 'wrapped (first-match fallback)');
   });
 
   it('errors with element_ambiguous when --text matches multiple identical branches', () => {
@@ -832,7 +832,7 @@ export default function App() {
     );
 
     const modified = readFileSync(join(tmp, 'index.html'), 'utf-8');
-    const originalMatch = modified.match(/data-impeccable-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
+    const originalMatch = modified.match(/data-fk-variant="original"[^>]*>([\s\S]*?)\s*<\/div>/);
     assert.ok(originalMatch, 'original variant wrapper exists');
     const inside = originalMatch[1];
     assert.ok(inside.includes('<section'), 'section was wrapped');

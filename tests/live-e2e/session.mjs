@@ -39,8 +39,8 @@ export function stageFixture(name, fixture) {
   const tmp = mkdtempSync(join(tmpdir(), 'impeccable-e2e-'));
   cpSync(join(fixtureRoot, 'files'), tmp, { recursive: true });
   writeFileSync(join(tmp, '.gitignore'), gitignore);
-  mkdirSync(join(tmp, '.impeccable', 'live'), { recursive: true });
-  writeFileSync(join(tmp, '.impeccable', 'live', 'config.json'), JSON.stringify(fixture.config));
+  mkdirSync(join(tmp, '.fk-skills', 'live'), { recursive: true });
+  writeFileSync(join(tmp, '.fk-skills', 'live', 'config.json'), JSON.stringify(fixture.config));
 
   execFileSync('git', ['init', '-q'], { cwd: tmp });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tmp });
@@ -51,7 +51,7 @@ export function stageFixture(name, fixture) {
   return tmp;
 }
 
-export function runInstall(tmp, command, { timeoutMs = readTimeoutEnv('IMPECCABLE_E2E_INSTALL_TIMEOUT_MS', 180_000) } = {}) {
+export function runInstall(tmp, command, { timeoutMs = readTimeoutEnv('FK_SKILLS_E2E_INSTALL_TIMEOUT_MS', 180_000) } = {}) {
   const [cmd, ...args] = command;
   const installArgs = addNpmInstallDefaults(cmd, args);
   try {
@@ -140,7 +140,7 @@ export function startDevServer(tmp, runtime) {
 
   const ready = new Promise((resolve, reject) => {
     const readyTimeoutMs = readTimeoutEnv(
-      'IMPECCABLE_E2E_DEV_READY_TIMEOUT_MS',
+      'FK_SKILLS_E2E_DEV_READY_TIMEOUT_MS',
       runtime.readyTimeoutMs ?? 120_000,
     );
     const timeout = setTimeout(() => {

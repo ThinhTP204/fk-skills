@@ -66,34 +66,34 @@ tagline: "Generate a spec-compliant DESIGN.md that captures your visual system s
       </div>
     </div>
   </div>
-  <p class="docs-viz-caption">The six sections are fixed, in a fixed order, with fixed names. Alongside, <code>.impeccable/design.json</code> ships as a machine-readable sidecar for tools that need structured design metadata.</p>
+  <p class="docs-viz-caption">The six sections are fixed, in a fixed order, with fixed names. Alongside, <code>.fk-skills/design.json</code> ships as a machine-readable sidecar for tools that need structured design metadata.</p>
 </div>
 
 ## When to use it
 
-Run `/impeccable document` once you have enough of a visual system to document: colors, typography, at least a button and a card. The command scans your codebase, extracts the tokens and component patterns it finds, and writes a `DESIGN.md` at the project root that follows the [Google Stitch DESIGN.md format](https://stitch.withgoogle.com/docs/design-md/overview/), six sections in a fixed order, interoperable with every other DESIGN.md-aware tool.
+Run `/fk document` once you have enough of a visual system to document: colors, typography, at least a button and a card. The command scans your codebase, extracts the tokens and component patterns it finds, and writes a `DESIGN.md` at the project root that follows the [Google Stitch DESIGN.md format](https://stitch.withgoogle.com/docs/design-md/overview/), six sections in a fixed order, interoperable with every other DESIGN.md-aware tool.
 
 Reach for it when:
 
-- **You just ran `/impeccable init`** and `PRODUCT.md` now exists. Document is the matching visual-side file.
+- **You just ran `/fk init`** and `PRODUCT.md` now exists. Document is the matching visual-side file.
 - **A command nudged you toward it.** Live, craft, and polish all read DESIGN.md. If it is missing, the skill suggests running document first.
 - **The design has drifted** from an older DESIGN.md and the file no longer describes the live system.
 - **Before a large redesign**, to capture current state as a reference for the next direction.
 
-For projects with no code yet (fresh `init` run, nothing built), there is a seed mode: `/impeccable document --seed` asks five quick strategic questions (color strategy, type direction, motion style, references, anti-references) and writes a scaffold. Re-run in scan mode once there is code.
+For projects with no code yet (fresh `init` run, nothing built), there is a seed mode: `/fk document --seed` asks five quick strategic questions (color strategy, type direction, motion style, references, anti-references) and writes a scaffold. Re-run in scan mode once there is code.
 
 ## How it works
 
 The scan pass finds design assets in priority order: CSS custom properties, Tailwind config, CSS-in-JS themes, design token files, component source, the global stylesheet, and finally computed styles from the live rendered output if a browser is available. It auto-extracts everything it can, then asks one grouped question for the parts that need creative input: the **Creative North Star** (a single named metaphor for the whole system, like "The Editorial Sanctuary"), descriptive color names, the elevation philosophy, and the component character.
 
-Output is a DESIGN.md with exactly six sections: Overview, Colors, Typography, Elevation, Components, Do's and Don'ts. Headers are fixed character-for-character so the file is parseable by other tools. Alongside it, `.impeccable/design.json` is written as a machine-readable sidecar. That sidecar gives Live Mode and design-aware detector rules structured access to this project's actual palette, type, radii, component snippets, and narrative.
+Output is a DESIGN.md with exactly six sections: Overview, Colors, Typography, Elevation, Components, Do's and Don'ts. Headers are fixed character-for-character so the file is parseable by other tools. Alongside it, `.fk-skills/design.json` is written as a machine-readable sidecar. That sidecar gives Live Mode and design-aware detector rules structured access to this project's actual palette, type, radii, component snippets, and narrative.
 
-Every other command reads DESIGN.md on invocation. Variants, polishes, audits, and new features inherit the visual system without being told. See [Design Context](/docs/context) for how DESIGN.md relates to PRODUCT.md and `.impeccable/design.json`.
+Every other command reads DESIGN.md on invocation. Variants, polishes, audits, and new features inherit the visual system without being told. See [Design Context](/docs/context) for how DESIGN.md relates to PRODUCT.md and `.fk-skills/design.json`.
 
 ## Try it
 
 ```
-/impeccable document
+/fk document
 ```
 
 On a project with tokens already defined, this takes about two minutes: the scan finds your palette and type stack, you pick a North Star from 2 or 3 options, confirm descriptive color names ("Deep Muted Teal-Navy", not "blue-800"), and the file lands at the project root.
@@ -101,7 +101,7 @@ On a project with tokens already defined, this takes about two minutes: the scan
 On a fresh project:
 
 ```
-/impeccable document --seed
+/fk document --seed
 ```
 
 Five questions, about five minutes. The file is a scaffold, marked with a `<!-- SEED -->` comment so it is honest about what it is. Re-run without the flag once you have implemented tokens.

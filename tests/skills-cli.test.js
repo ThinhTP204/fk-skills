@@ -128,7 +128,7 @@ const WANT_CLI_REMOTE_E2E = process.env.IMPECCABLE_CLI_REMOTE_E2E === '1';
 let bundleReachable = false;
 if (WANT_CLI_REMOTE_E2E) {
   try {
-    execSync('curl -sfIL --max-time 10 https://impeccable.style/api/download/bundle/universal -o /dev/null', { stdio: 'pipe' });
+    execSync('curl -sfIL --max-time 10 https://fk.style/api/download/bundle/universal -o /dev/null', { stdio: 'pipe' });
     bundleReachable = true;
   } catch {}
 }

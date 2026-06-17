@@ -4,7 +4,7 @@ tagline: "Push an interface past conventional limits. Shaders, physics, 60fps, c
 
 ## When to use it
 
-`/impeccable overdrive` is for the moments where you want to impress. A hero that uses WebGL. A table that handles a million rows. A dialog that morphs out of its trigger element. A form that validates in real-time with streaming feedback. A page transition that feels cinematic. Use it when the project budget allows for technical ambition and the outcome needs to feel extraordinary.
+`/fk overdrive` is for the moments where you want to impress. A hero that uses WebGL. A table that handles a million rows. A dialog that morphs out of its trigger element. A form that validates in real-time with streaming feedback. A page transition that feels cinematic. Use it when the project budget allows for technical ambition and the outcome needs to feel extraordinary.
 
 Do not use it on operator tools, dashboards, or anything where reliability beats spectacle. Overdrive burns complexity for effect, and that trade-off is only worth it on moments that matter.
 
@@ -17,7 +17,7 @@ Overdrive output is announced with `──── ⚡ OVERDRIVE ────` so 
 ## Try it
 
 ```
-/impeccable overdrive the landing hero
+/fk overdrive the landing hero
 ```
 
 One concrete run might replace a static hero with a WebGL shader background driven by mouse position, a display headline that reveals with a mask on scroll using the Scroll Timeline API, and a View Transition on the CTA that morphs into the next page. Plus a reduced-motion fallback that swaps all of it for a clean static composition.

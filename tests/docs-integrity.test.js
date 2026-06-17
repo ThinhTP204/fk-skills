@@ -128,7 +128,7 @@ describe('docs integrity', () => {
       'README.npm.md',
       'site/pages/index.astro',
       'site/content/tutorials/getting-started.md',
-      'site/content/skills/impeccable.md',
+      'site/content/skills/fk.md',
       'site/public/llms.txt',
     ];
 

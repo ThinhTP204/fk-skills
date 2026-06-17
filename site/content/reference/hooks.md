@@ -13,21 +13,21 @@ The design hook runs Impeccable's detector automatically when an AI coding tool 
 Check hook state inside your AI tool:
 
 ```text
-/impeccable hooks status
+/fk hooks status
 ```
 
 Turn the hook on or off for this project:
 
 ```text
-/impeccable hooks on
-/impeccable hooks off
+/fk hooks on
+/fk hooks off
 ```
 
 Installer and updater commands can skip hook setup for one run:
 
 ```bash
-npx impeccable install --no-hooks
-npx impeccable update --no-hooks
+npx fk-skills install --no-hooks
+npx fk-skills update --no-hooks
 ```
 
 ## What it does
@@ -43,21 +43,21 @@ Plain `.ts` and `.js` files are scanned, but the hook stays quiet unless it find
 Persist an exception only after you confirm the finding is intentional. Prefer the narrowest exception:
 
 ```text
-/impeccable hooks ignore-value overused-font Inter --shared --reason "Brand font"
-/impeccable hooks ignore-file "src/legacy/Card.tsx"
-/impeccable hooks ignore-rule side-tab
+/fk hooks ignore-value overused-font Inter --shared --reason "Brand font"
+/fk hooks ignore-file "src/legacy/Card.tsx"
+/fk hooks ignore-rule side-tab
 ```
 
 For value-specific rules such as `overused-font`, use `ignore-value` for a specific font. Use `ignore-rule overused-font --all-values` only when you want to suppress the entire rule.
 
-The terminal equivalent is `npx impeccable ignores ...`, which writes the same detector config. See [Config and ignores](/docs/config).
+The terminal equivalent is `npx fk-skills ignores ...`, which writes the same detector config. See [Config and ignores](/docs/config).
 
 ## Details when the default path is not enough
 
 <details class="docs-prose-details">
   <summary>Supported harnesses and approval steps</summary>
   <div>
-    <p><code>npx impeccable install</code> and <code>npx impeccable update</code> install provider-native hook manifests for Claude Code, Codex, and Cursor.</p>
+    <p><code>npx fk-skills install</code> and <code>npx fk-skills update</code> install provider-native hook manifests for Claude Code, Codex, and Cursor.</p>
     <ul>
       <li>Claude Code: <code>.claude/settings.local.json</code> by default.</li>
       <li>Codex: <code>.codex/hooks.json</code>.</li>
@@ -79,15 +79,15 @@ The terminal equivalent is `npx impeccable ignores ...`, which writes the same d
 <details class="docs-prose-details">
   <summary>Config and environment overrides</summary>
   <div>
-    <p>Hook lifecycle settings live under <code>hook</code> in <code>.impeccable/config.json</code>:</p>
+    <p>Hook lifecycle settings live under <code>hook</code> in <code>.fk-skills/config.json</code>:</p>
     <pre><code>{
   "hook": {
     "enabled": true,
     "quiet": false,
-    "auditLog": ".impeccable/hook.ndjson"
+    "auditLog": ".fk-skills/hook.ndjson"
   }
 }</code></pre>
-    <p>Per-developer choices, including install consent, live in <code>.impeccable/config.local.json</code>.</p>
+    <p>Per-developer choices, including install consent, live in <code>.fk-skills/config.local.json</code>.</p>
     <p>Detector filters live under <code>detector</code>, not <code>hook</code>, because they are shared by the hook and the CLI detector.</p>
     <p>Environment variables still override config for one shell: <code>IMPECCABLE_HOOK_DISABLED</code>, <code>IMPECCABLE_HOOK_QUIET</code>, and <code>IMPECCABLE_HOOK_LOG</code>.</p>
   </div>
@@ -97,7 +97,7 @@ The terminal equivalent is `npx impeccable ignores ...`, which writes the same d
   <summary>Debugging hook behavior</summary>
   <div>
     <p>Start with status:</p>
-    <pre><code>/impeccable hooks status</code></pre>
+    <pre><code>/fk hooks status</code></pre>
     <p>It shows the shared and local config paths, current ignores, hook state, and relevant environment overrides.</p>
     <p>For invocation logs, set <code>hook.auditLog</code> or use <code>IMPECCABLE_HOOK_LOG</code>. The hook writes one NDJSON line per invocation. Leave audit logging off for normal work.</p>
     <p>If a manifest is malformed, install/update aborts by default. Re-run with <code>--force</code> only when you want Impeccable to back up the malformed file as <code>.bak</code> and replace it.</p>

@@ -4,7 +4,7 @@ tagline: "Small moments of personality that turn functional into memorable."
 
 ## When to use it
 
-`/impeccable delight` is for interfaces that work but do not feel like anything. Use it when the core experience is solid and you want to add the small human touches that make people remember it: a considered empty state, a loading message with a point of view, a success animation that feels earned, a microcopy moment that makes someone smile.
+`/fk delight` is for interfaces that work but do not feel like anything. Use it when the core experience is solid and you want to add the small human touches that make people remember it: a considered empty state, a loading message with a point of view, a success animation that feels earned, a microcopy moment that makes someone smile.
 
 It is a finishing skill. Never the first thing you run on a new build.
 
@@ -25,7 +25,7 @@ The rule is: every delight moment must still work perfectly if you delete the de
 ## Try it
 
 ```
-/impeccable delight the first-run experience
+/fk delight the first-run experience
 ```
 
 Expected additions:

@@ -87,7 +87,7 @@ describe('live-browser.js regression guards', () => {
     );
     assert.match(
       SOURCE,
-      /function shouldUseAncestorCropShaderProxy\(el\) \{[\s\S]{0,260}?window\.__IMPECCABLE_LIVE_ADAPTER__[\s\S]{0,280}?currentPreviewMode === 'svelte-component' \|\| svelteComponentSession[\s\S]{0,260}?dataset\?\.impeccablePreview === 'svelte-component';/,
+      /function shouldUseAncestorCropShaderProxy\(el\) \{[\s\S]{0,260}?window\.__FK_SKILLS_LIVE_ADAPTER__[\s\S]{0,280}?currentPreviewMode === 'svelte-component' \|\| svelteComponentSession[\s\S]{0,260}?dataset\?\.fkPreview === 'svelte-component';/,
       'ancestor crop proxy must be gated to the Svelte adapter / Svelte component previews',
     );
     assert.match(
@@ -399,7 +399,7 @@ describe('live-browser.js regression guards', () => {
   it('pick mode preference persists in localStorage', () => {
     assert.match(
       SOURCE,
-      /const INTERACTION_PREFS_KEY = 'impeccable-live-interaction';[\s\S]{0,3000}?function saveInteractionPrefs\(\)/,
+      /const INTERACTION_PREFS_KEY = 'fk-live-interaction';[\s\S]{0,3000}?function saveInteractionPrefs\(\)/,
       'pick/insert interaction prefs must persist in localStorage',
     );
     assert.match(
@@ -442,7 +442,7 @@ describe('live-browser.js regression guards', () => {
     );
     assert.match(
       SOURCE,
-      /window\.postMessage\(\{ source: 'impeccable-command', action: 'remove' \}, '\*'\);[\s\S]{0,80}?activeDetectScanId = null;[\s\S]{0,80}?pendingDetectScanId = null;/,
+      /window\.postMessage\(\{ source: 'fk-skills-command', action: 'remove' \}, '\*'\);[\s\S]{0,80}?activeDetectScanId = null;[\s\S]{0,80}?pendingDetectScanId = null;/,
       'turning Detect off must clear scan ids',
     );
   });
@@ -466,10 +466,10 @@ describe('live-browser.js regression guards', () => {
       'Accept button uses lacquer-deep text on kinpaku gold',
     );
     assert.match(SOURCE, /insertCreateDisabledReason/, 'disabled Create hover must explain why');
-    assert.match(SOURCE, /data-impeccable-insert-placeholder/, 'placeholder element must be marked');
+    assert.match(SOURCE, /data-fk-insert-placeholder/, 'placeholder element must be marked');
     assert.match(
       SOURCE,
-      /showHighlight\(el\)[\s\S]{0,120}?data-impeccable-insert-placeholder/,
+      /showHighlight\(el\)[\s\S]{0,120}?data-fk-insert-placeholder/,
       'pick highlight must not stack on insert placeholder',
     );
     assert.match(SOURCE, /border: '2px dotted ' \+ BP\.accent/, 'placeholder border matches insert line (dotted)');
@@ -490,7 +490,7 @@ describe('live-browser.js regression guards', () => {
     );
     assert.match(SOURCE, /function hitSiblingInsertGap\(/, 'insert mode detects gaps between siblings');
     assert.match(SOURCE, /function resolveInsertHover\(/, 'insert hover resolves axis-aware boundaries');
-    assert.match(SOURCE, /data-impeccable-placeholder-resize/, 'placeholder edge handles on annotation overlay');
+    assert.match(SOURCE, /data-fk-placeholder-resize/, 'placeholder edge handles on annotation overlay');
     assert.match(SOURCE, /resizeEdge && configureKind === 'insert'/, 'resize takes priority over draw');
     assert.match(SOURCE, /cursorForPlaceholderEdge\(spec\.edge\)/, 'edge handles use resize cursors');
     assert.match(

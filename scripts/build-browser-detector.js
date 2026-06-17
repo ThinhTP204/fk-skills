@@ -47,7 +47,7 @@ const output = `/**
  * Rebuild: node scripts/build-browser-detector.js
  *
  * Usage: <script src="detect-antipatterns-browser.js"></script>
- * Re-scan: window.impeccableScan()
+ * Re-scan: window.fkSkillsScan()
  */
 (function () {
 if (typeof window === 'undefined') return;

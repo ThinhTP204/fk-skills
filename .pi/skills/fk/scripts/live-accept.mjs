@@ -269,7 +269,7 @@ function handleDiscard(id, lines, targetFile) {
  * Build carbonize stitch-in lines. JSX targets occupy a single child slot
  * (ternary branch, return value, etc.) — the same constraint as live-wrap.
  * When isJsx, tuck markers + <style> + variant wrapper inside one outer
- * <div data-impeccable-carbonize> so the slot keeps a single root node.
+ * <div data-fk-carbonize> so the slot keeps a single root node.
  */
 function buildCarbonizeReplacement({
   indent,
@@ -293,26 +293,26 @@ function buildCarbonizeReplacement({
 
   const pushCarbonizeBody = (bodyIndent) => {
     const bodyRestored = reindentContent(restored, indent, bodyIndent + '  ');
-    lines.push(bodyIndent + commentSyntax.open + ' impeccable-carbonize-start ' + id + ' ' + commentSyntax.close);
-    lines.push(bodyIndent + '<style data-impeccable-css="' + id + '">' + (isJsx ? '{`' : ''));
+    lines.push(bodyIndent + commentSyntax.open + ' fk-carbonize-start ' + id + ' ' + commentSyntax.close);
+    lines.push(bodyIndent + '<style data-fk-css="' + id + '">' + (isJsx ? '{`' : ''));
     for (const cssLine of cssContent) {
       lines.push(bodyIndent + cssLine.trimStart());
     }
     lines.push(bodyIndent + (isJsx ? '`}</style>' : '</style>'));
     if (paramValues && Object.keys(paramValues).length > 0) {
       lines.push(
-        bodyIndent + commentSyntax.open + ' impeccable-param-values ' + id + ': ' + JSON.stringify(paramValues) + ' ' + commentSyntax.close,
+        bodyIndent + commentSyntax.open + ' fk-param-values ' + id + ': ' + JSON.stringify(paramValues) + ' ' + commentSyntax.close,
       );
     }
-    lines.push(bodyIndent + commentSyntax.open + ' impeccable-carbonize-end ' + id + ' ' + commentSyntax.close);
-    lines.push(bodyIndent + '<div data-impeccable-variant="' + variantNum + '" ' + variantStyleAttr + '>');
+    lines.push(bodyIndent + commentSyntax.open + ' fk-carbonize-end ' + id + ' ' + commentSyntax.close);
+    lines.push(bodyIndent + '<div data-fk-variant="' + variantNum + '" ' + variantStyleAttr + '>');
     lines.push(...bodyRestored);
     lines.push(bodyIndent + '</div>');
   };
 
   if (isJsx) {
     const wrapperStyle = 'style={{ display: "contents" }}';
-    lines.push(indent + '<div data-impeccable-carbonize="' + id + '" ' + wrapperStyle + '>');
+    lines.push(indent + '<div data-fk-carbonize="' + id + '" ' + wrapperStyle + '>');
     pushCarbonizeBody(indent + '  ');
     lines.push(indent + '</div>');
   } else {
@@ -355,7 +355,7 @@ function handleAccept(id, variantNum, lines, targetFile, paramValues) {
   // - CSS block exists, OR
   // - variant HTML contains helper classes/attributes that need cleanup
   const variantText = variantContent.join('\n');
-  const hasHelperAttrs = variantText.includes('data-impeccable-variant');
+  const hasHelperAttrs = variantText.includes('data-fk-variant');
   const needsCarbonize = !!(cssContent || hasHelperAttrs);
 
   const restored = deindentContent(variantContent, indent);
@@ -382,14 +382,14 @@ function handleAccept(id, variantNum, lines, targetFile, paramValues) {
 
 function readSourceShadowPreviewMeta(content, id) {
   const escaped = escapeRegExp(id);
-  const wrapperRe = new RegExp('<[^>]+data-impeccable-variants=(["\'])' + escaped + '\\1[^>]*>');
+  const wrapperRe = new RegExp('<[^>]+data-fk-variants=(["\'])' + escaped + '\\1[^>]*>');
   const match = String(content || '').match(wrapperRe);
   if (!match) return null;
   const tag = match[0];
-  if (readHtmlAttr(tag, 'data-impeccable-preview') !== 'source-shadow') return null;
-  const sourceFile = readHtmlAttr(tag, 'data-impeccable-source-file');
-  const sourceStartLine = Number(readHtmlAttr(tag, 'data-impeccable-source-start'));
-  const sourceEndLine = Number(readHtmlAttr(tag, 'data-impeccable-source-end'));
+  if (readHtmlAttr(tag, 'data-fk-preview') !== 'source-shadow') return null;
+  const sourceFile = readHtmlAttr(tag, 'data-fk-source-file');
+  const sourceStartLine = Number(readHtmlAttr(tag, 'data-fk-source-start'));
+  const sourceEndLine = Number(readHtmlAttr(tag, 'data-fk-source-end'));
   if (!sourceFile || !Number.isFinite(sourceStartLine) || !Number.isFinite(sourceEndLine)) return null;
   return { sourceFile, sourceStartLine, sourceEndLine };
 }
@@ -419,8 +419,8 @@ function decodeHtmlAttr(value) {
 function findMarkerBlock(id, lines) {
   let start = -1;
   let end = -1;
-  const startPattern = 'impeccable-variants-start ' + id;
-  const endPattern = 'impeccable-variants-end ' + id;
+  const startPattern = 'fk-variants-start ' + id;
+  const endPattern = 'fk-variants-end ' + id;
 
   for (let i = 0; i < lines.length; i++) {
     if (start === -1 && lines[i].includes(startPattern)) start = i;
@@ -433,13 +433,13 @@ function findMarkerBlock(id, lines) {
 /**
  * Compute the line range to REPLACE (vs. just the marker range to extract
  * from). For JSX/TSX wrappers, live-wrap places the marker comments INSIDE
- * the `<div data-impeccable-variants="ID">` outer wrapper so the picked
+ * the `<div data-fk-variants="ID">` outer wrapper so the picked
  * element's JSX slot keeps a single child — a Fragment `<></>` would have
  * solved the multi-sibling case but failed inside `asChild` / cloneElement
  * parents with "Invalid prop supplied to React.Fragment".
  *
  * That means the marker block is enclosed by the wrapper `<div>` opener
- * (with `data-impeccable-variants="ID"`) and its matching `</div>`. We
+ * (with `data-fk-variants="ID"`) and its matching `</div>`. We
  * walk back to the opener and forward to the closer so accept/discard
  * remove the entire scaffold, not just the inner markers.
  *
@@ -451,7 +451,7 @@ function expandReplaceRange(block, lines, isJsx) {
 
   let { start, end } = block;
 
-  // Walk back for the wrapper `<div data-impeccable-variants="..."` opener.
+  // Walk back for the wrapper `<div data-fk-variants="..."` opener.
   // The attr may sit on a continuation line of a multi-line opening tag, so
   // also walk to the line that actually contains `<div`.
   for (let i = start - 1; i >= 0; i--) {
@@ -504,18 +504,18 @@ function escapeRegExp(value) {
 }
 
 function isVariantEndMarkerLine(line, id) {
-  return new RegExp('impeccable-variants-end\\s+' + escapeRegExp(id) + '(?:\\s|--|\\*/|$)').test(line);
+  return new RegExp('fk-variants-end\\s+' + escapeRegExp(id) + '(?:\\s|--|\\*/|$)').test(line);
 }
 
 function hasVariantWrapperAttr(line, id) {
   const escaped = escapeRegExp(id);
-  return new RegExp(`data-impeccable-variants\\s*=\\s*(?:"${escaped}"|'${escaped}'|\\{["']${escaped}["']\\})`).test(line);
+  return new RegExp(`data-fk-variants\\s*=\\s*(?:"${escaped}"|'${escaped}'|\\{["']${escaped}["']\\})`).test(line);
 }
 
 /**
  * Join wrapper lines into a single string with `<style>` elements removed so
  * marker matching and div-depth tracking aren't confused by:
- *   - CSS `@scope ([data-impeccable-variant="N"])` strings that look like the
+ *   - CSS `@scope ([data-fk-variant="N"])` strings that look like the
  *     HTML marker we're searching for
  *   - JSX self-closing `<style ... />` (no separate `</style>` to close on)
  *   - Same-line `<style>…</style>` blocks
@@ -595,7 +595,7 @@ function extractInnerByAttr(text, attrMatch) {
  */
 function extractOriginal(lines, block) {
   const text = stripStyleAndJoin(lines, block);
-  const inner = extractInnerByAttr(text, 'data-impeccable-variant="original"');
+  const inner = extractInnerByAttr(text, 'data-fk-variant="original"');
   if (inner === null) return [];
   return inner.split('\n');
 }
@@ -606,7 +606,7 @@ function extractOriginal(lines, block) {
  */
 function extractVariant(lines, block, variantNum) {
   const text = stripStyleAndJoin(lines, block);
-  const inner = extractInnerByAttr(text, 'data-impeccable-variant="' + variantNum + '"');
+  const inner = extractInnerByAttr(text, 'data-fk-variant="' + variantNum + '"');
   if (inner === null) return null;
   const result = inner.split('\n');
   // Collapse a lone empty leading/trailing line (common after string splice).
@@ -619,14 +619,14 @@ function extractVariant(lines, block, variantNum) {
  * Extract the colocated <style> block content (between the style tags).
  * Returns an array of CSS lines, or null if no style block found.
  *
- * Handles three shapes of `<style data-impeccable-css="ID" ...>`:
+ * Handles three shapes of `<style data-fk-css="ID" ...>`:
  *   1. Self-closing: `<style ... />` — no body; return null (nothing to carbonize).
  *   2. Same-line open+close: `<style>...</style>` — return the inner content.
  *   3. Multi-line: `<style>` on one line, `</style>` on a later line — return
  *      the lines between them.
  */
 function extractCss(lines, block, id) {
-  const styleAttr = 'data-impeccable-css="' + id + '"';
+  const styleAttr = 'data-fk-css="' + id + '"';
   let inStyle = false;
   const content = [];
 
@@ -747,7 +747,7 @@ function detectCommentSyntax(filePath) {
 // ---------------------------------------------------------------------------
 
 function findSessionFile(id, cwd) {
-  const marker = 'impeccable-variants-start ' + id;
+  const marker = 'fk-variants-start ' + id;
   const searchDirs = ['src', 'app', 'pages', 'components', 'public', 'views', 'templates', '.'];
   const seen = new Set();
 

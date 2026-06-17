@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `/impeccable hooks <on|off|status|reset>` — manage the design hook runtime
+ * `/fk hooks <on|off|status|reset>` — manage the design hook runtime
  * via the `hook` key and shared detector ignores via the `detector` key in
  * .fk-skills/config.json / .fk-skills/config.local.json.
  *
@@ -163,7 +163,7 @@ function writeHookConfig(cwd, hookConfig, opts = {}) {
   const existing = existingRaw && typeof existingRaw === 'object' && !Array.isArray(existingRaw) ? existingRaw : {};
   const existingHook = stripDetectorKeys(hookSection(existing));
   // Merge over the existing hook object so fields the merge helpers don't manage
-  // (consent, quiet, auditLog) survive a `/impeccable hooks` edit.
+  // (consent, quiet, auditLog) survive a `/fk hooks` edit.
   const next = { ...existing, hook: { ...existingHook, ...hookConfig } };
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(next, null, 2) + '\n');
@@ -489,9 +489,9 @@ function parseIgnoreRuleArgs(args) {
 function addIgnoreRule(cwd, args) {
   const parsed = parseIgnoreRuleArgs(args);
   const rule = parsed.rule;
-  if (!rule) throw new Error('Pass a rule id, e.g. /impeccable hooks ignore-rule side-tab');
+  if (!rule) throw new Error('Pass a rule id, e.g. /fk hooks ignore-rule side-tab');
   if (rule === 'overused-font' && !parsed.allValues) {
-    throw new Error('overused-font is value-specific by default. Use /impeccable hooks ignore-value overused-font <font> for a confirmed font, or /impeccable hooks ignore-rule overused-font --all-values only when the user asked to ignore overused fonts generally.');
+    throw new Error('overused-font is value-specific by default. Use /fk hooks ignore-value overused-font <font> for a confirmed font, or /fk hooks ignore-rule overused-font --all-values only when the user asked to ignore overused fonts generally.');
   }
   const config = mergeDetectorConfig(readRawDetectorConfig(cwd));
   if (!config.ignoreRules.includes(rule)) config.ignoreRules.push(rule);
@@ -500,7 +500,7 @@ function addIgnoreRule(cwd, args) {
 }
 
 function addIgnoreFile(cwd, glob) {
-  if (!glob) throw new Error('Pass a glob, e.g. /impeccable hooks ignore-file "src/legacy/**"');
+  if (!glob) throw new Error('Pass a glob, e.g. /fk hooks ignore-file "src/legacy/**"');
   const config = mergeDetectorConfig(readRawDetectorConfig(cwd));
   if (!config.ignoreFiles.includes(glob)) config.ignoreFiles.push(glob);
   writeDetectorConfig(cwd, config);
@@ -545,7 +545,7 @@ function parseIgnoreValueArgs(args) {
 function addIgnoreValue(cwd, args) {
   const parsed = parseIgnoreValueArgs(args);
   if (!parsed.rule || !parsed.value) {
-    throw new Error('Pass a rule id and value, e.g. /impeccable hooks ignore-value overused-font Inter');
+    throw new Error('Pass a rule id and value, e.g. /fk hooks ignore-value overused-font Inter');
   }
 
   if (parsed.shared && parsed.local) {

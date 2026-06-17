@@ -2,7 +2,7 @@
  * CLI helper: find an element in source and wrap it in a variant container.
  *
  * Usage:
- *   npx impeccable wrap --id SESSION_ID --count N --query "hero-combined-left" [--file path]
+ *   npx fk-skills wrap --id SESSION_ID --count N --query "hero-combined-left" [--file path]
  *
  * Searches project files for the element matching the query (class name, ID, or
  * text snippet), wraps it with the variant scaffolding, and prints the file path
@@ -27,7 +27,7 @@ export async function wrapCli() {
   const args = process.argv.slice(2);
 
   if (args.includes('--help') || args.includes('-h')) {
-    console.log(`Usage: impeccable wrap [options]
+    console.log(`Usage: fk wrap [options]
 
 Find an element in source and wrap it in a variant container.
 
@@ -288,25 +288,25 @@ The agent should insert variant HTML at insertLine.`);
   // replacement range to include the wrapper's `<div>` open / close lines
   // so the entire scaffold gets removed cleanly.
   const wrapperLines = isJsx ? [
-    indent + '<div data-impeccable-variants="' + id + '" data-impeccable-variant-count="' + count + '" ' + styleContents + '>',
-    indent + '  ' + commentSyntax.open + ' impeccable-variants-start ' + id + ' ' + commentSyntax.close,
+    indent + '<div data-fk-variants="' + id + '" data-fk-variant-count="' + count + '" ' + styleContents + '>',
+    indent + '  ' + commentSyntax.open + ' fk-variants-start ' + id + ' ' + commentSyntax.close,
     indent + '  ' + commentSyntax.open + ' Original ' + commentSyntax.close,
-    indent + '  <div data-impeccable-variant="original">',
+    indent + '  <div data-fk-variant="original">',
     reindentOriginal('    '),
     indent + '  </div>',
     indent + '  ' + commentSyntax.open + ' Variants: insert below this line ' + commentSyntax.close,
-    indent + '  ' + commentSyntax.open + ' impeccable-variants-end ' + id + ' ' + commentSyntax.close,
+    indent + '  ' + commentSyntax.open + ' fk-variants-end ' + id + ' ' + commentSyntax.close,
     indent + '</div>',
   ] : [
-    indent + commentSyntax.open + ' impeccable-variants-start ' + id + ' ' + commentSyntax.close,
-    indent + '<div data-impeccable-variants="' + id + '" data-impeccable-variant-count="' + count + '" ' + styleContents + '>',
+    indent + commentSyntax.open + ' fk-variants-start ' + id + ' ' + commentSyntax.close,
+    indent + '<div data-fk-variants="' + id + '" data-fk-variant-count="' + count + '" ' + styleContents + '>',
     indent + '  ' + commentSyntax.open + ' Original ' + commentSyntax.close,
-    indent + '  <div data-impeccable-variant="original">',
+    indent + '  <div data-fk-variant="original">',
     originalIndented,
     indent + '  </div>',
     indent + '  ' + commentSyntax.open + ' Variants: insert below this line ' + commentSyntax.close,
     indent + '</div>',
-    indent + commentSyntax.open + ' impeccable-variants-end ' + id + ' ' + commentSyntax.close,
+    indent + commentSyntax.open + ' fk-variants-end ' + id + ' ' + commentSyntax.close,
   ];
 
   let outputFile = targetFile;
@@ -593,18 +593,18 @@ function detectStyleMode(filePath) {
   if (ext === '.astro') {
     return {
       mode: 'astro-global-prefixed',
-      styleTag: '<style is:inline data-impeccable-css="SESSION_ID">',
+      styleTag: '<style is:inline data-fk-css="SESSION_ID">',
     };
   }
   return {
     mode: 'scoped',
-    styleTag: '<style data-impeccable-css="SESSION_ID">',
+    styleTag: '<style data-fk-css="SESSION_ID">',
   };
 }
 
 function buildCssSelectorPrefixExamples(styleMode, count) {
   if (styleMode !== 'astro-global-prefixed') return [];
-  return Array.from({ length: count }, (_, i) => `[data-impeccable-variant="${i + 1}"]`);
+  return Array.from({ length: count }, (_, i) => `[data-fk-variant="${i + 1}"]`);
 }
 
 function buildCssAuthoring(styleMode, count) {
@@ -614,12 +614,12 @@ function buildCssAuthoring(styleMode, count) {
       mode: styleMode.mode,
       styleTag: styleMode.styleTag,
       strategy: 'global-prefixed',
-      rulePattern: '[data-impeccable-variant="N"] > .variant-class { ... }',
-      selectorExamples: variantNumbers.map((n) => `[data-impeccable-variant="${n}"] > .variant-class`),
+      rulePattern: '[data-fk-variant="N"] > .variant-class { ... }',
+      selectorExamples: variantNumbers.map((n) => `[data-fk-variant="${n}"] > .variant-class`),
       requirements: [
         'Use the styleTag exactly; the is:inline attribute is required for this file.',
         'Put raw CSS directly between the styleTag opening and a plain </style> close.',
-        'Prefix every preview selector with the matching [data-impeccable-variant="N"] selector.',
+        'Prefix every preview selector with the matching [data-fk-variant="N"] selector.',
         'Keep selectors anchored to the generated variant wrapper; do not rely on component CSS scoping for preview rules.',
       ],
       forbidden: [
@@ -633,15 +633,15 @@ function buildCssAuthoring(styleMode, count) {
     mode: styleMode.mode,
     styleTag: styleMode.styleTag,
     strategy: 'scope-rule',
-    rulePattern: '@scope ([data-impeccable-variant="N"]) { :scope > .variant-class { ... } }',
-    selectorExamples: variantNumbers.map((n) => `@scope ([data-impeccable-variant="${n}"]) { :scope > .variant-class { ... } }`),
+    rulePattern: '@scope ([data-fk-variant="N"]) { :scope > .variant-class { ... } }',
+    selectorExamples: variantNumbers.map((n) => `@scope ([data-fk-variant="${n}"]) { :scope > .variant-class { ... } }`),
     requirements: [
-      'Use @scope blocks keyed to each [data-impeccable-variant="N"] wrapper.',
+      'Use @scope blocks keyed to each [data-fk-variant="N"] wrapper.',
       'Inside each @scope block, make :scope rules step into the replacement element with a descendant combinator.',
       'Use the styleTag exactly; do not add framework-specific style attributes unless this object says to.',
     ],
     forbidden: [
-      'Do not use global [data-impeccable-variant="N"] selector prefixes for this styleMode.',
+      'Do not use global [data-fk-variant="N"] selector prefixes for this styleMode.',
       'Do not add is:inline to the style tag for this styleMode.',
     ],
   };
@@ -743,7 +743,7 @@ function findElement(lines, query, tag = null) {
     const stripped = lines[i].trim();
     if (stripped.startsWith('<!--') || stripped.startsWith('{/*') || stripped.startsWith('//')) continue;
     // Skip lines already inside a variant wrapper
-    if (lines[i].includes('data-impeccable-variant')) continue;
+    if (lines[i].includes('data-fk-variant')) continue;
 
     const openerLine = findOpenerLine(lines, i, tag);
     if (openerLine === -1) continue;
@@ -769,7 +769,7 @@ function findAllElements(lines, query, tag = null) {
     if (!lines[i].includes(query)) continue;
     const stripped = lines[i].trim();
     if (stripped.startsWith('<!--') || stripped.startsWith('{/*') || stripped.startsWith('//')) continue;
-    if (lines[i].includes('data-impeccable-variant')) continue;
+    if (lines[i].includes('data-fk-variant')) continue;
     const openerLine = findOpenerLine(lines, i, tag);
     if (openerLine === -1) continue;
     if (seen.has(openerLine)) continue; // multiple matches inside the same element

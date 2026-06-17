@@ -11,14 +11,14 @@
     {
       "name": "wraps hero title through Svelte component preview",
       "args": { "classes": "hero-title", "tag": "h1" },
-      "expectedFile": "node_modules/.impeccable-live/wraptest0/manifest.json",
+      "expectedFile": "node_modules/.fk-skills-live/wraptest0/manifest.json",
       "expectedSourceFile": "src/routes/+page.svelte",
       "expectedPreviewMode": "svelte-component"
     },
     {
       "name": "wraps stateful expense row through Svelte component preview",
       "args": { "classes": "expense-row", "tag": "article" },
-      "expectedFile": "node_modules/.impeccable-live/wraptest1/manifest.json",
+      "expectedFile": "node_modules/.fk-skills-live/wraptest1/manifest.json",
       "expectedSourceFile": "src/routes/+page.svelte",
       "expectedPreviewMode": "svelte-component"
     }

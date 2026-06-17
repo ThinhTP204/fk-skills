@@ -272,7 +272,7 @@ describe('live-browser source contracts', () => {
   it('keeps sendEvent fire-and-forget by default while accept/discard opt into rejection', () => {
     assert.match(
       SOURCE,
-      /function sendEvent\(msg, opts\)[\s\S]*if \(opts && opts\.throwOnError\) \{[\s\S]*console\.error\('\[impeccable\] Failed to send event:', err\);[\s\S]*throw err;[\s\S]*\}[\s\S]*console\.debug\('\[impeccable\] Dropped optional live event:', err\);[\s\S]*return null;/,
+      /function sendEvent\(msg, opts\)[\s\S]*if \(opts && opts\.throwOnError\) \{[\s\S]*console\.error\('\[fk\] Failed to send event:', err\);[\s\S]*throw err;[\s\S]*\}[\s\S]*console\.debug\('\[fk\] Dropped optional live event:', err\);[\s\S]*return null;/,
       'event=live_browser.send_event_contract actor=browser operation=send_event_failure risk=fire_and_forget_callers_get_unhandled_rejections expected=default swallow with opt-in throw actual=missing',
     );
     assert.match(SOURCE, /if \(res\.ok\) return res;[\s\S]*const body = await res\.json\(\)\.catch\(\(\) => \(\{\}\)\);[\s\S]*handleFailure\(new Error\(body\.error \|\| \('HTTP ' \+ res\.status \+ ' ' \+ res\.statusText\)\)\)/);
@@ -336,12 +336,12 @@ describe('live-browser source contracts', () => {
     );
     assert.match(
       SOURCE,
-      /function acceptedDomAlreadyClean\(pending\)[\s\S]*?matches\.length > 0[\s\S]*?matches\.every[\s\S]*?data-impeccable-carbonize/,
+      /function acceptedDomAlreadyClean\(pending\)[\s\S]*?matches\.length > 0[\s\S]*?matches\.every[\s\S]*?data-fk-carbonize/,
       'accepted DOM should not be considered clean while any matching root is still inside a carbonize wrapper',
     );
     assert.match(
       SOURCE,
-      /function findAcceptedRuntimeWrappers\(sessionId\)[\s\S]*?querySelectorAll\('\[data-impeccable-variants=[\s\S]*?querySelectorAll\('\[data-impeccable-carbonize=/,
+      /function findAcceptedRuntimeWrappers\(sessionId\)[\s\S]*?querySelectorAll\('\[data-fk-variants=[\s\S]*?querySelectorAll\('\[data-fk-carbonize=/,
       'post-cleanup fallback should remove every stale variants/carbonize wrapper left by React HMR after accept',
     );
     assert.match(

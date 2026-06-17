@@ -6,7 +6,7 @@ tagline: "Five-dimension technical quality check with P0 to P3 severity."
   <div class="docs-viz-report">
     <div class="docs-viz-report-head">
       <div>
-        <div class="docs-viz-report-title">/impeccable audit the checkout flow</div>
+        <div class="docs-viz-report-title">/fk audit the checkout flow</div>
         <div class="docs-viz-report-target">src/checkout/**</div>
       </div>
       <div class="docs-viz-report-score">
@@ -48,12 +48,12 @@ tagline: "Five-dimension technical quality check with P0 to P3 severity."
       <span class="docs-viz-report-sev docs-viz-report-sev--p3">P3<span class="docs-viz-report-sev-n">14</span></span>
     </div>
   </div>
-  <p class="docs-viz-caption">Five dimensions scored 0 to 4, each finding tagged P0 (blocks release) to P3 (polish). Audit documents; it doesn't fix. Route the findings into <code>/impeccable harden</code>, <code>/impeccable polish</code>, or <code>/impeccable optimize</code>.</p>
+  <p class="docs-viz-caption">Five dimensions scored 0 to 4, each finding tagged P0 (blocks release) to P3 (polish). Audit documents; it doesn't fix. Route the findings into <code>/fk harden</code>, <code>/fk polish</code>, or <code>/fk optimize</code>.</p>
 </div>
 
 ## When to use it
 
-`/impeccable audit` is the technical counterpart to `/impeccable critique`. Where `/impeccable critique` asks "does this feel right", `/impeccable audit` asks "does this hold up". It runs accessibility, performance, theming, responsive design, and anti-pattern checks against the implementation, scores each dimension 0 to 4, and produces a plan with P0 to P3 severity ratings.
+`/fk audit` is the technical counterpart to `/fk critique`. Where `/fk critique` asks "does this feel right", `/fk audit` asks "does this hold up". It runs accessibility, performance, theming, responsive design, and anti-pattern checks against the implementation, scores each dimension 0 to 4, and produces a plan with P0 to P3 severity ratings.
 
 Use it before shipping, during a quality sprint, or whenever a tech lead says "we should really look at accessibility".
 
@@ -69,12 +69,12 @@ The skill scans your code across five dimensions:
 
 Each dimension gets a 0 to 4 score. Each finding gets a severity: P0 blocks the release, P1 should fix this sprint, P2 is next cycle, P3 is polish. You get back a single document you can paste into a ticket tracker.
 
-Audit does not fix anything. It documents. Route the findings to `/impeccable polish`, `/impeccable harden`, or `/impeccable optimize` depending on the category.
+Audit does not fix anything. It documents. Route the findings to `/fk polish`, `/fk harden`, or `/fk optimize` depending on the category.
 
 ## Try it
 
 ```
-/impeccable audit the checkout flow
+/fk audit the checkout flow
 ```
 
 Expected output:
@@ -90,10 +90,10 @@ Performance: 3/4 (good)
   ...
 ```
 
-Hand the P0s to `/impeccable harden`, the theming and typography P1s to `/impeccable typeset` and `/impeccable polish`, the rest to `/impeccable polish`.
+Hand the P0s to `/fk harden`, the theming and typography P1s to `/fk typeset` and `/fk polish`, the rest to `/fk polish`.
 
 ## Pitfalls
 
-- **Confusing it with `/impeccable critique`.** Audit is implementation quality. Critique is design quality. Run both for a full picture.
+- **Confusing it with `/fk critique`.** Audit is implementation quality. Critique is design quality. Run both for a full picture.
 - **Fixing P3s before P0s.** The severity scale exists for a reason. Start at the top.
 - **Skipping the dimensions you think are fine.** Theming and responsive are the ones most people assume are fine until they are not.

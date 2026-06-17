@@ -4,7 +4,7 @@ tagline: "Push safe designs toward impact without sliding into chaos."
 
 ## When to use it
 
-Reach for `/impeccable bolder` when the interface looks like every other interface. Generic sans, medium weights, soft shadows, modest accent color, reasonable spacing, forgettable. The design is not wrong, it is just safe. Use bolder when a project can handle presence and the current state is not bringing any.
+Reach for `/fk bolder` when the interface looks like every other interface. Generic sans, medium weights, soft shadows, modest accent color, reasonable spacing, forgettable. The design is not wrong, it is just safe. Use bolder when a project can handle presence and the current state is not bringing any.
 
 Do not use it on dashboards people stare at for hours. Boldness earns its place on marketing pages, hero moments, and content features. Not in operator tools.
 
@@ -22,7 +22,7 @@ The skill does not add more. It amplifies what is already there. If the design h
 ## Try it
 
 ```
-/impeccable bolder the landing page hero
+/fk bolder the landing page hero
 ```
 
 Expected changes:
@@ -35,6 +35,6 @@ Expected changes:
 
 ## Pitfalls
 
-- **Running it on the wrong page.** Product dashboards, settings, and forms should not be bold. They should be legible. Use `/impeccable layout` or `/impeccable polish` instead.
-- **Confusing bold with loud.** Bold means committed and confident. Loud means shouting. Bolder is the former. If the result feels aggressive, follow up with `/impeccable quieter`.
-- **Pairing it with `/impeccable delight` in the same pass.** Delight works best against a stable visual baseline. Bold first, stabilize, then delight.
+- **Running it on the wrong page.** Product dashboards, settings, and forms should not be bold. They should be legible. Use `/fk layout` or `/fk polish` instead.
+- **Confusing bold with loud.** Bold means committed and confident. Loud means shouting. Bolder is the former. If the result feels aggressive, follow up with `/fk quieter`.
+- **Pairing it with `/fk delight` in the same pass.** Delight works best against a stable visual baseline. Bold first, stabilize, then delight.

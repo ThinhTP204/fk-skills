@@ -9,7 +9,7 @@ const ROOT = process.cwd();
 describe('live reference authoring contract', () => {
   it('keeps the live prompt focused on the foreground poll loop', () => {
     const liveMd = readFileSync(join(ROOT, 'skill/reference/live.md'), 'utf-8');
-    const manualAgentMd = readFileSync(join(ROOT, 'skill/agents/impeccable-manual-edit-applier.md'), 'utf-8');
+    const manualAgentMd = readFileSync(join(ROOT, 'skill/agents/fk-manual-edit-applier.md'), 'utf-8');
     const openingContract = liveMd.split('\n').slice(0, 60).join('\n');
 
     assert.match(liveMd, /1\. `live\.mjs`: boot\./);
@@ -17,7 +17,7 @@ describe('live reference authoring contract', () => {
     assert.match(openingContract, /## Poll loop/);
     assert.match(openingContract, /No step skipped, no step reordered\./);
     assert.doesNotMatch(liveMd, /live-copy-edits\.md/);
-    assert.doesNotMatch(liveMd, /IMPECCABLE_LIVE_COPY_AGENT|mock/);
+    assert.doesNotMatch(liveMd, /FK_SKILLS_LIVE_COPY_AGENT|mock/);
     assert.match(liveMd, /"manual_edit_apply" → Handle Manual Edit Apply/);
     assert.match(liveMd, /## Handle `manual_edit_apply`/);
     assert.ok(
@@ -139,7 +139,7 @@ describe('live reference authoring contract', () => {
     );
     assert.doesNotMatch(
       llmAgent,
-      /with @scope \(\[data-impeccable-variant=/,
+      /with @scope \(\[data-fk-variant=/,
       'real-LLM E2E prompt should not hard-code @scope as the universal CSS contract',
     );
   });

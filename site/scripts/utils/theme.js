@@ -2,7 +2,7 @@
 // "auto" (the default) inherits from the OS via prefers-color-scheme and is only
 // overridden once the user clicks the toggle. Clicking cycles auto → light → dark → auto.
 
-const STORAGE_KEY = 'impeccable-theme';
+const STORAGE_KEY = 'fk-skills-theme';
 
 export function getStoredPref() {
   const v = localStorage.getItem(STORAGE_KEY);

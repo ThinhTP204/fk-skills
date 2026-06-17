@@ -48,7 +48,7 @@ tagline: "Iterate on UI in the browser. Pick an element, drop a comment, get thr
 
 ## When to use it
 
-Reach for `/impeccable live` when you want to iterate on something visually the way you would in a design tool, but keep production code as the output. The canvas-like flow of Figma without the round trip to an implementation step.
+Reach for `/fk live` when you want to iterate on something visually the way you would in a design tool, but keep production code as the output. The canvas-like flow of Figma without the round trip to an implementation step.
 
 Use it for:
 
@@ -56,7 +56,7 @@ Use it for:
 - **Polishing a piece of UI that is almost right.** You know what feels off but cannot quite say it. Pick the element, scribble "more playful" or draw a stroke through the bit that bugs you, hit Go.
 - **A quick A/B between two directions your team is debating.** Generate variants, accept nothing, walk away. The point was the comparison.
 
-It is NOT for new greenfield features (reach for `/impeccable craft`) or whole-page redesigns (reach for `/impeccable` or a specialized refine command).
+It is NOT for new greenfield features (reach for `/fk craft`) or whole-page redesigns (reach for `/fk` or a specialized refine command).
 
 ## How it works
 
@@ -69,7 +69,7 @@ It supports Vite, Next.js (including monorepos), SvelteKit, Astro, Nuxt, and pla
 ## Try it
 
 ```
-/impeccable live
+/fk live
 ```
 
 Open your dev server URL, pick the newsletter signup card, click the `delight` chip, hit Go. You will get three variants that vary across personality dimensions (a stamp-and-postcard feel, a typographic-surprise version, an illustrated-accent one), not three riffs on the same treatment.
@@ -81,6 +81,6 @@ Stop live mode when you are done: say "stop live mode", close the tab, or hit th
 ## Pitfalls
 
 - **Running it on a page that is still half-written.** Live variant generation needs context. If the element has placeholder copy, generic Lorem ipsum, or pre-stylesheet default formatting, variants will reflect that. Fill the content first.
-- **Expecting it to make macro decisions.** Live mode iterates on a single picked element. For "redo the entire pricing page", reach for `/impeccable` or `/impeccable craft` instead.
+- **Expecting it to make macro decisions.** Live mode iterates on a single picked element. For "redo the entire pricing page", reach for `/fk` or `/fk craft` instead.
 - **Ignoring the fallback messages.** If the element lives in a generated file (a compiled template, a build output), the picker says so explicitly and offers to route the accept into true source. Do not force the accept into the generated file: the next build will wipe it.
-- **Running it without PRODUCT.md or DESIGN.md when you care about brand fit.** Live will still generate, but the variants will lean toward generic defaults. Run `/impeccable init` and `/impeccable document` first if the result needs to sound like your product.
+- **Running it without PRODUCT.md or DESIGN.md when you care about brand fit.** Live will still generate, but the variants will lean toward generic defaults. Run `/fk init` and `/fk document` first if the result needs to sound like your product.

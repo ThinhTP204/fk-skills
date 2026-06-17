@@ -12,8 +12,8 @@
  * Primary provider/model: Anthropic + Claude Haiku 4.5. DeepSeek V4 Flash is
  * a secondary cheap fallback used only when ANTHROPIC_API_KEY is absent and
  * DEEPSEEK_API_KEY is present, or when explicitly forced with
- * IMPECCABLE_E2E_LLM_PROVIDER=deepseek. Override the model via { model } when
- * constructing, or via IMPECCABLE_E2E_LLM_MODEL at the call site.
+ * FK_SKILLS_E2E_LLM_PROVIDER=deepseek. Override the model via { model } when
+ * constructing, or via FK_SKILLS_E2E_LLM_MODEL at the call site.
  *
  * Prompt caching: live.md (the live-mode skill spec) is the bulk of the
  * system prompt and is stable across calls. We mark a cache_control breakpoint
@@ -69,7 +69,7 @@ export const VARIANT_SYSTEM_INSTRUCTIONS = [
   'REQUIREMENTS',
   '- Replace mode: each variant.innerHtml must be a single top-level HTML element using the EXACT same tag as the picked element.',
   '- Insert mode (`event.mode === "insert"`): each variant.innerHtml must be net-new content that honors event.freeformPrompt. It does NOT replace the anchor and does NOT need to use the anchor tag or preserve anchor copy.',
-  '- Insert mode variants must contain visible inserted content. Do not return empty roots, placeholder-only roots, inline style= attributes, or test hooks like <div data-impeccable-e2e-variant="1"></div>.',
+  '- Insert mode variants must contain visible inserted content. Do not return empty roots, placeholder-only roots, inline style= attributes, or test hooks like <div data-fk-e2e-variant="1"></div>.',
   '- Replace mode: the single top-level element is the replacement root itself. If the picked element is <section class="hero-copy">...</section>, emit <section class="hero-copy">...</section> with edited children directly; do not wrap a duplicate <section class="hero-copy"> inside another root.',
   '- Replace mode: PRESERVE the original element\'s className verbatim. If the picked element\'s outerHTML contains class="hero-title", every variant\'s innerHtml MUST contain exactly class="hero-title"; do not add, remove, or rename classes. This is a hard requirement — mapped-list fixtures depend on the class string staying stable across the variant set.',
   '- Replace mode: PRESERVE all existing visible copy exactly. GO variants change presentation, hierarchy, and styling; they must not rewrite titles, paragraphs, button labels, or user-applied manual copy edits.',
@@ -77,15 +77,15 @@ export const VARIANT_SYSTEM_INSTRUCTIONS = [
   '- Replace mode: for bare text elements, keep the full visible copy in one editable text node. If you add child markup for styling, wrap the entire copy; never split the copy across sibling text nodes.',
   '- Replace mode: PRESERVE existing class-bearing descendant elements in place. If the picked element contains <h1 class="hero-title"> and <p class="hero-hook">, keep those elements/classes as direct descendants of the replacement root; do not wrap them in a new structural div such as <div class="hero-inner">.',
   '- Replace mode: Do not return source-identical variants. For a bare text element, preserve the root tag/class/copy but add a small child span or styling hook so Accept persists a real source change.',
-  '- Replace mode: for non-bare elements where the existing children must stay in place, add a harmless root attribute such as data-impeccable-e2e-variant="1" or another non-copy styling hook so the markup is materially changed without changing visible text.',
+  '- Replace mode: for non-bare elements where the existing children must stay in place, add a harmless root attribute such as data-fk-e2e-variant="1" or another non-copy styling hook so the markup is materially changed without changing visible text.',
   '- Generate exactly event.count variants — no more, no fewer.',
   '- Mix the param kinds across the variant set: include at least one range, one steps, and one toggle when count >= 3.',
   '- The scopedCss must follow wrapInfo.cssAuthoring exactly: use its selector strategy, rulePattern, requirements, and forbidden patterns.',
   '- Wire scopedCss rules against the params you emit (CSS vars for range/toggle, attribute selectors for steps/toggle).',
   '- Put visual styling in scopedCss, not style= attributes inside variant.innerHtml.',
   '- Use HTML attribute syntax in innerHtml (class=, not className=). The orchestrator translates per file syntax.',
-  '- Do NOT emit the wrapping <div data-impeccable-variant="N">. The orchestrator wraps your content.',
-  '- Do NOT emit the outer <style data-impeccable-css> tag. Only its contents go in scopedCss.',
+  '- Do NOT emit the wrapping <div data-fk-variant="N">. The orchestrator wraps your content.',
+  '- Do NOT emit the outer <style data-fk-css> tag. Only its contents go in scopedCss.',
   '- Do NOT include any <!-- comments --> in scopedCss; CSS comments use /* */.',
   '',
   'CONTEXT — full live-mode skill spec follows. Use it as the source of truth for any nuance in the variant format.',
@@ -93,7 +93,7 @@ export const VARIANT_SYSTEM_INSTRUCTIONS = [
 
 export const MANUAL_EDIT_SYSTEM_INSTRUCTIONS = [
   '<role>',
-  'You are an automated source-edit planner for one Impeccable live manual_edit_apply batch or chunk.',
+  'You are an automated source-edit planner for one FK live manual_edit_apply batch or chunk.',
   '</role>',
   '',
   '<workflow>',
@@ -129,7 +129,7 @@ export const MANUAL_EDIT_SYSTEM_INSTRUCTIONS = [
   '- When the user changes visible copy back to a plain number and evidence shows the source model was numeric, restore the numeric value without quotes.',
   '- If a dependency is ambiguous or broad, fail that entry and leave no sourceEdits for it.',
   '- Mark an entry applied only when sourceEdits cover every op in that entry. Never return sourceEdits for failed, omitted, or unreported entries.',
-  '- Never copy live runtime scaffolding into sourceEdits: no contenteditable, data-impeccable-* attributes, variant wrappers, live markers, <style>, <script>, comments, or generated browser attributes.',
+  '- Never copy live runtime scaffolding into sourceEdits: no contenteditable, data-fk-* attributes, variant wrappers, live markers, <style>, <script>, comments, or generated browser attributes.',
   '</source_edit_rules>',
   '',
   'OUTPUT CONTRACT — return ONLY a JSON object with this exact shape. No prose, no code fences, no commentary:',
@@ -179,7 +179,7 @@ const STEER_SYSTEM_INSTRUCTIONS = [
   '- Use exact find strings copied from context.sourceExcerpt or context.tagLine. Do not guess whitespace.',
   '- Prefer a single edit on the hero opening tag (h1 with the hero class). Preserve all existing classes and inner content.',
   '- file must match context.targetFile unless the excerpt clearly shows a different path is wrong.',
-  '- Never edit temporary preview or scratch paths such as node_modules/.impeccable-live; Steer edits must land in the real app source file.',
+  '- Never edit temporary preview or scratch paths such as node_modules/.fk-skills-live; Steer edits must land in the real app source file.',
   '- edits must be non-empty; find must match exactly once in the file.',
   '',
   'CONTEXT — live-mode skill spec follows for steer semantics (Handle steer section).',
@@ -187,7 +187,7 @@ const STEER_SYSTEM_INSTRUCTIONS = [
 
 /**
  * @typedef {object} LlmAgentOptions
- * @property {'anthropic' | 'deepseek'=} provider Override IMPECCABLE_E2E_LLM_PROVIDER.
+ * @property {'anthropic' | 'deepseek'=} provider Override FK_SKILLS_E2E_LLM_PROVIDER.
  * @property {string=} apiKey  Override the selected provider's API key env var.
  * @property {string=} model   Override the selected provider's default model.
  * @property {string=} baseURL Override the provider API base URL.
@@ -201,7 +201,7 @@ export function resolveLlmAgentConfig(opts = {}, env = process.env) {
   if (provider === 'anthropic') {
     return {
       provider,
-      model: opts.model || env.IMPECCABLE_E2E_LLM_MODEL || DEFAULT_ANTHROPIC_MODEL,
+      model: opts.model || env.FK_SKILLS_E2E_LLM_MODEL || DEFAULT_ANTHROPIC_MODEL,
       apiKey: opts.apiKey || env.ANTHROPIC_API_KEY,
       requiredEnv: 'ANTHROPIC_API_KEY',
       baseURL: opts.baseURL || env.ANTHROPIC_BASE_URL,
@@ -211,18 +211,18 @@ export function resolveLlmAgentConfig(opts = {}, env = process.env) {
   if (provider === 'deepseek') {
     return {
       provider,
-      model: opts.model || env.IMPECCABLE_E2E_LLM_MODEL || DEFAULT_DEEPSEEK_MODEL,
+      model: opts.model || env.FK_SKILLS_E2E_LLM_MODEL || DEFAULT_DEEPSEEK_MODEL,
       apiKey: opts.apiKey || env.DEEPSEEK_API_KEY,
       requiredEnv: 'DEEPSEEK_API_KEY',
       baseURL: opts.baseURL || env.DEEPSEEK_API_BASE_URL || DEFAULT_DEEPSEEK_API_BASE_URL,
     };
   }
 
-  throw new Error(`Unsupported IMPECCABLE_E2E_LLM_PROVIDER: ${provider}`);
+  throw new Error(`Unsupported FK_SKILLS_E2E_LLM_PROVIDER: ${provider}`);
 }
 
 function resolveProvider(opts, env) {
-  const explicit = opts.provider || env.IMPECCABLE_E2E_LLM_PROVIDER;
+  const explicit = opts.provider || env.FK_SKILLS_E2E_LLM_PROVIDER;
   if (explicit) return String(explicit).trim().toLowerCase();
   if (env.ANTHROPIC_API_KEY) return 'anthropic';
   if (env.DEEPSEEK_API_KEY) return 'deepseek';
@@ -347,7 +347,7 @@ export async function createLlmAgent(opts = {}) {
             validationError,
             `The inserted content must visibly satisfy this prompt: "${event.freeformPrompt || ''}"`,
             'Do not preserve or copy the anchor text unless the prompt asks for it. This is net-new content inserted near the anchor.',
-            'Do not use data-impeccable-* attributes or empty test-hook-only roots.',
+            'Do not use data-fk-* attributes or empty test-hook-only roots.',
             'Do not use inline style= attributes; put all visual rules in scopedCss.',
             'Return corrected JSON only.',
           ].join('\n');
@@ -463,7 +463,7 @@ export async function createLlmAgent(opts = {}) {
           }
           throw err;
         }
-        if (process.env.IMPECCABLE_E2E_DEBUG) {
+        if (process.env.FK_SKILLS_E2E_DEBUG) {
           log(`manual_apply parsed=${JSON.stringify(parsed)}`);
         }
         const appliedEntryIds = parsed.appliedEntryIds || [];
@@ -810,7 +810,7 @@ function validateVariantInnerHtml(html) {
   if (/\bclassName\s*=/.test(html)) return 'must use HTML class= attributes, not JSX className=';
   if (/\bstyle\s*=\s*\{\{/.test(html)) return 'must use HTML style="..." syntax, not JSX style={{...}}';
   if (/\{[^}]+\}/.test(html)) return 'must use literal visible copy, not framework template expressions such as {name}';
-  if (/\bdata-impeccable-variants?\s*=/.test(html)) return 'must not include Impeccable wrapper attributes';
+  if (/\bdata-fk-variants?\s*=/.test(html)) return 'must not include Impeccable wrapper attributes';
   if (/<\/?>/.test(html)) return 'must not use JSX fragments';
   return null;
 }
@@ -832,8 +832,8 @@ export function validateVariantVisibleCopy(parsed, element) {
 export function validateInsertVariantOutput(parsed, event = {}) {
   for (const [i, variant] of parsed.variants.entries()) {
     const html = variant.innerHtml || '';
-    if (/\bdata-impeccable-[\w-]*\s*=/.test(html)) {
-      return `insert variant ${i} contains preview-only data-impeccable attributes`;
+    if (/\bdata-fk-[\w-]*\s*=/.test(html)) {
+      return `insert variant ${i} contains preview-only data-fk attributes`;
     }
     if (/\sstyle\s*=/.test(html)) {
       return `insert variant ${i} uses inline style attributes; put CSS in scopedCss`;

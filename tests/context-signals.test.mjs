@@ -1,6 +1,6 @@
 /**
  * Tests for context-signals.mjs — the signal gatherer behind the
- * context-aware bare `/impeccable` (no-argument) path.
+ * context-aware bare `/fk` (no-argument) path.
  *
  * The script collects deterministic project signals and emits JSON; it does
  * not score or rank (the agent reasons over the raw signals). These tests
@@ -66,9 +66,9 @@ describe('gatherSignals', () => {
   });
 
   it('reads the newest critique snapshot score', async () => {
-    write('.impeccable/critique/2026-05-01T10-00-00Z__home.md',
+    write('.fk-skills/critique/2026-05-01T10-00-00Z__home.md',
       '---\nslug: home\nscore: 6\np0: 1\np1: 3\ntimestamp: 2026-05-01T10-00-00Z\n---\nbody\n');
-    write('.impeccable/critique/2026-05-02T10-00-00Z__home.md',
+    write('.fk-skills/critique/2026-05-02T10-00-00Z__home.md',
       '---\nslug: home\nscore: 8\np0: 0\np1: 1\ntimestamp: 2026-05-02T10-00-00Z\n---\nbody\n');
     const s = await gatherSignals(scratch);
     assert.equal(s.critique.latest.score, 8); // newest by timestamp prefix

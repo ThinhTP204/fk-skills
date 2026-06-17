@@ -81,12 +81,12 @@ export function getModel(modelId) {
  * Default model lineup. Production-tier on Anthropic and OpenAI to match what
  * users actually run; gemini stays on the flash-lite tier. The test is about
  * routing/loading behavior, not design output quality.
- * Override with IMPECCABLE_SKILL_BEHAVIOR_MODELS=claude-foo,gpt-bar.
+ * Override with FK_SKILLS_SKILL_BEHAVIOR_MODELS=claude-foo,gpt-bar.
  */
 export const DEFAULT_MODELS = ['claude-sonnet-4-6', 'gpt-5.5', 'gemini-3.1-flash-lite'];
 
 export function resolveModelList() {
-  const override = process.env.IMPECCABLE_SKILL_BEHAVIOR_MODELS;
+  const override = process.env.FK_SKILLS_SKILL_BEHAVIOR_MODELS;
   if (override && override.trim()) {
     return override.split(',').map((s) => s.trim()).filter(Boolean);
   }

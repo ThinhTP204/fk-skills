@@ -4,7 +4,7 @@ tagline: "Design first-run experiences, empty states, and paths to value."
 
 ## When to use it
 
-`/impeccable onboard` is for the moments that decide whether a new user sticks around: the first screen, the empty state, the setup flow, the product tour, the "what do I do now" gap. Reach for it when activation is weak, when new users drop off before reaching value, or when your product has empty states that say "no items yet" and stop there.
+`/fk onboard` is for the moments that decide whether a new user sticks around: the first screen, the empty state, the setup flow, the product tour, the "what do I do now" gap. Reach for it when activation is weak, when new users drop off before reaching value, or when your product has empty states that say "no items yet" and stop there.
 
 ## How it works
 
@@ -23,7 +23,7 @@ The command resists two common failure modes: over-tutorialized onboarding where
 ## Try it
 
 ```
-/impeccable onboard the editor
+/fk onboard the editor
 ```
 
 Typical output:
@@ -36,5 +36,5 @@ Typical output:
 ## Pitfalls
 
 - **Adding a product tour as the default answer.** Most products do not need a tour. They need a better first screen. Tours are a crutch.
-- **Designing onboarding without defining the aha moment.** If you cannot say in one sentence what the user should feel in the first 60 seconds, go back to `/impeccable shape` first.
+- **Designing onboarding without defining the aha moment.** If you cannot say in one sentence what the user should feel in the first 60 seconds, go back to `/fk shape` first.
 - **Running onboard on a broken flow.** Fix the flow first. Onboarding cannot rescue a product where the core action is broken.

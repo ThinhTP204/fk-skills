@@ -128,19 +128,19 @@ async function captureVisualContrastCandidate(page, candidate, viewport) {
       style = document.createElement('style');
       style.id = 'impeccable-visual-contrast-hide-style';
       style.textContent = [
-        '[data-impeccable-visual-contrast-target] {',
+        '[data-fk-visual-contrast-target] {',
         '  color: transparent !important;',
         '  -webkit-text-fill-color: transparent !important;',
         '  text-shadow: none !important;',
         '}',
-        '[data-impeccable-visual-contrast-target][data-impeccable-bgclip-text="true"] {',
+        '[data-fk-visual-contrast-target][data-fk-bgclip-text="true"] {',
         '  background-image: none !important;',
         '}',
       ].join('\n');
       document.head.appendChild(style);
     }
-    el.setAttribute('data-impeccable-visual-contrast-target', token);
-    if (backgroundClipText) el.setAttribute('data-impeccable-bgclip-text', 'true');
+    el.setAttribute('data-fk-visual-contrast-target', token);
+    if (backgroundClipText) el.setAttribute('data-fk-bgclip-text', 'true');
     return true;
   }, {
     selector: candidate.selector,
@@ -161,8 +161,8 @@ async function captureVisualContrastCandidate(page, candidate, viewport) {
       try {
         const el = document.querySelector(selector);
         if (el) {
-          el.removeAttribute('data-impeccable-visual-contrast-target');
-          el.removeAttribute('data-impeccable-bgclip-text');
+          el.removeAttribute('data-fk-visual-contrast-target');
+          el.removeAttribute('data-fk-bgclip-text');
         }
       } catch {
         // Ignore invalid or stale selectors during cleanup.

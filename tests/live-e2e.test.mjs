@@ -77,22 +77,22 @@ function listRuntimeFixtures() {
 const allFixtures = listRuntimeFixtures();
 
 // During development of the full-cycle test, a fixture subset is much faster
-// to iterate on. Set IMPECCABLE_E2E_ONLY=<name>[,<name>...] to scope the run.
-const onlyNames = parseFixtureFilter(process.env.IMPECCABLE_E2E_ONLY);
+// to iterate on. Set FK_SKILLS_E2E_ONLY=<name>[,<name>...] to scope the run.
+const onlyNames = parseFixtureFilter(process.env.FK_SKILLS_E2E_ONLY);
 const fixtures = onlyNames.size > 0
   ? allFixtures.filter((f) => onlyNames.has(f.name))
   : allFixtures;
 const missingOnlyNames = [...onlyNames].filter((name) => !allFixtures.some((f) => f.name === name));
 if (missingOnlyNames.length > 0) {
-  throw new Error(`Unknown IMPECCABLE_E2E_ONLY fixture(s): ${missingOnlyNames.join(', ')}`);
+  throw new Error(`Unknown FK_SKILLS_E2E_ONLY fixture(s): ${missingOnlyNames.join(', ')}`);
 }
 
-const manualOnly = process.env.IMPECCABLE_E2E_MANUAL_ONLY === '1'
-  || process.env.IMPECCABLE_E2E_MANUAL_ONLY === 'true';
-const reloadVariants = process.env.IMPECCABLE_E2E_RELOAD_VARIANTS === '1'
-  || process.env.IMPECCABLE_E2E_RELOAD_VARIANTS === 'true';
-const scenarioNames = parseFixtureFilter(process.env.IMPECCABLE_E2E_SCENARIOS);
-const liveE2eTestTimeoutMs = readPositiveIntEnv('IMPECCABLE_E2E_TEST_TIMEOUT_MS');
+const manualOnly = process.env.FK_SKILLS_E2E_MANUAL_ONLY === '1'
+  || process.env.FK_SKILLS_E2E_MANUAL_ONLY === 'true';
+const reloadVariants = process.env.FK_SKILLS_E2E_RELOAD_VARIANTS === '1'
+  || process.env.FK_SKILLS_E2E_RELOAD_VARIANTS === 'true';
+const scenarioNames = parseFixtureFilter(process.env.FK_SKILLS_E2E_SCENARIOS);
+const liveE2eTestTimeoutMs = readPositiveIntEnv('FK_SKILLS_E2E_TEST_TIMEOUT_MS');
 const liveE2eTestOptions = liveE2eTestTimeoutMs ? { timeout: liveE2eTestTimeoutMs } : {};
 
 if (fixtures.length === 0) {
@@ -164,7 +164,7 @@ for (const { name, fixture } of fixtures) {
         t.skip('scenario filter excludes core');
         return;
       }
-      if (manualOnly || process.env.IMPECCABLE_E2E_MANUAL_SCENARIO) {
+      if (manualOnly || process.env.FK_SKILLS_E2E_MANUAL_SCENARIO) {
         t.skip('manual scenario filter is active');
         return;
       }
@@ -175,23 +175,23 @@ for (const { name, fixture } of fixtures) {
       // the limitation is visible in the run output.
       const knownLimitation = fixture.runtime.knownLimitation;
 
-      // Pick the agent. `IMPECCABLE_E2E_AGENT=llm` opts into Claude first,
+      // Pick the agent. `FK_SKILLS_E2E_AGENT=llm` opts into Claude first,
       // with DeepSeek as the secondary fallback/override; everything else
       // uses the deterministic fake. Skip rather than fail when LLM is
       // requested but the selected provider key is missing so default suite
       // runs in unauthenticated environments still pass.
-      const agentMode = process.env.IMPECCABLE_E2E_AGENT || 'fake';
+      const agentMode = process.env.FK_SKILLS_E2E_AGENT || 'fake';
       let agent;
       if (agentMode === 'llm') {
         const llmConfig = resolveLlmAgentConfig({
-          model: process.env.IMPECCABLE_E2E_LLM_MODEL,
+          model: process.env.FK_SKILLS_E2E_LLM_MODEL,
         });
         agent = await createLlmAgent({
           config: llmConfig,
           log: (m) => t.diagnostic('[llm] ' + m),
         });
         if (!agent) {
-          t.skip(`IMPECCABLE_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
+          t.skip(`FK_SKILLS_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
           return;
         }
         t.diagnostic(`Using LLM agent (provider=${llmConfig.provider} model=${llmConfig.model})`);
@@ -222,10 +222,10 @@ for (const { name, fixture } of fixtures) {
         : pickSelector;
       const usesSvelteComponentPreview = fixtureUsesSvelteKitAdapter(fixture);
       const variantContentSelector = isInsert
-        ? (usesSvelteComponentPreview ? '.inserted-copy' : '[data-impeccable-variant="2"] .inserted-copy')
+        ? (usesSvelteComponentPreview ? '.inserted-copy' : '[data-fk-variant="2"] .inserted-copy')
         : usesSvelteComponentPreview
         ? pickSelector
-        : '[data-impeccable-variant="2"] > :first-child';
+        : '[data-fk-variant="2"] > :first-child';
       let stateProbeBaseline = null;
       let sourceFile = null;
 
@@ -273,9 +273,9 @@ for (const { name, fixture } of fixtures) {
           t.diagnostic(`Picking ${pickSelector}`);
           await pickElement(page, pickSelector);
 
-          if (process.env.IMPECCABLE_E2E_DEBUG) {
+          if (process.env.FK_SKILLS_E2E_DEBUG) {
             const barText = await page.evaluate(() => {
-              const bar = document.querySelector('#impeccable-live-bar');
+              const bar = document.querySelector('#fk-live-bar');
               return bar ? { display: bar.style.display, text: bar.textContent || '', html: bar.innerHTML.slice(0, 500) } : null;
             });
             t.diagnostic(`Bar after pick: ${JSON.stringify(barText)}`);
@@ -330,16 +330,16 @@ for (const { name, fixture } of fixtures) {
           } else {
             assert.match(variantBody, new RegExp(`<${svelteComponentSession.expectedTag}\\b`), 'Svelte variant component contains target element');
           }
-          assert.doesNotMatch(routeBody, /data-impeccable-variants="/, 'Svelte route source is not edited during generation');
+          assert.doesNotMatch(routeBody, /data-fk-variants="/, 'Svelte route source is not edited during generation');
         } else {
-          assert.match(after, /data-impeccable-variants="/, 'wrapper inserted');
+          assert.match(after, /data-fk-variants="/, 'wrapper inserted');
         }
         if (isInsert) {
           if (svelteComponentSession) {
             assert.equal(svelteComponentSession.manifest.mode, 'insert', 'Svelte insert uses component preview mode');
           } else {
-            assert.match(after, /data-impeccable-mode="insert"/, 'insert mode wrapper');
-            assert.doesNotMatch(after, /data-impeccable-variant="original"/, 'insert has no original variant');
+            assert.match(after, /data-fk-mode="insert"/, 'insert mode wrapper');
+            assert.doesNotMatch(after, /data-fk-variant="original"/, 'insert has no original variant');
           }
           if (insertCfg.assertAnchorContains) {
             const anchorSource = svelteComponentSession
@@ -351,18 +351,18 @@ for (const { name, fixture } of fixtures) {
         if (svelteComponentSession) {
           assert.match(readFileSync(join(tmp, svelteComponentSession.manifest.componentDir, 'v2.svelte'), 'utf-8'), /<style>/, 'Svelte component variant has scoped style block');
         } else if (sourceFile.endsWith('.astro')) {
-          assert.match(after, /<style is:inline data-impeccable-css="/, 'Astro live CSS uses an inline compiler-bypassing style block');
+          assert.match(after, /<style is:inline data-fk-css="/, 'Astro live CSS uses an inline compiler-bypassing style block');
           assert.match(
             after,
-            /\[data-impeccable-variant="1"\]\s*>\s*(?:h1|\.[\w-]+)/,
+            /\[data-fk-variant="1"\]\s*>\s*(?:h1|\.[\w-]+)/,
             'event=live_e2e.astro_css_prefix actor=agent operation=write_variants risk=astro_scopes_preview_css_away expected=variant-prefixed global selector actual=missing suggestion=inspect fake agent styleMode handling',
           );
-          assert.doesNotMatch(after, /@scope \(\[data-impeccable-variant="1"\]\)/, 'Astro live CSS does not use raw @scope');
+          assert.doesNotMatch(after, /@scope \(\[data-fk-variant="1"\]\)/, 'Astro live CSS does not use raw @scope');
         } else {
-          assert.match(after, /<style data-impeccable-css="/, 'colocated <style> block present');
-          assert.match(after, /@scope \(\[data-impeccable-variant="1"\]\)/, 'scoped CSS for variant 1');
-          assert.match(after, /@scope \(\[data-impeccable-variant="2"\]\)/, 'scoped CSS for variant 2');
-          assert.match(after, /@scope \(\[data-impeccable-variant="3"\]\)/, 'scoped CSS for variant 3');
+          assert.match(after, /<style data-fk-css="/, 'colocated <style> block present');
+          assert.match(after, /@scope \(\[data-fk-variant="1"\]\)/, 'scoped CSS for variant 1');
+          assert.match(after, /@scope \(\[data-fk-variant="2"\]\)/, 'scoped CSS for variant 2');
+          assert.match(after, /@scope \(\[data-fk-variant="3"\]\)/, 'scoped CSS for variant 3');
         }
         // Param manifest assertions are scoped to fake-agent mode. The fake
         // agent deterministically emits one param per variant covering all
@@ -372,7 +372,7 @@ for (const { name, fixture } of fixtures) {
           const paramsSource = svelteComponentSession
             ? readFileSync(join(tmp, svelteComponentSession.manifest.componentDir, 'params.json'), 'utf-8')
             : after;
-          assert.match(paramsSource, svelteComponentSession ? /"1"\s*:/ : /data-impeccable-params=/, 'params manifest emitted');
+          assert.match(paramsSource, svelteComponentSession ? /"1"\s*:/ : /data-fk-params=/, 'params manifest emitted');
           for (const kind of ['range', 'steps', 'toggle']) {
             assert.match(paramsSource, new RegExp(`"kind"\\s*:\\s*"${kind}"`), `param kind ${kind} present`);
           }
@@ -399,14 +399,14 @@ for (const { name, fixture } of fixtures) {
           assert.equal(visible, targetVariant, `variant ${targetVariant} visible`);
           if (agentMode === 'fake' && targetVariant === 2 && !checkedVariantTwoStyle) {
             await page.waitForFunction((sel) => {
-              const query = window.__impeccableLiveQuery || ((s) => document.querySelector(s));
+              const query = window.__fkSkillsLiveQuery || ((s) => document.querySelector(s));
               const el = query(sel) || document.querySelector(sel);
               return el && getComputedStyle(el).fontWeight === '900';
             }, variantContentSelector, { timeout: 5_000 }).catch(() => {});
             const variantWeight = await evaluatePageWithTimeout(
               page,
               (sel) => {
-                const query = window.__impeccableLiveQuery || ((s) => document.querySelector(s));
+                const query = window.__fkSkillsLiveQuery || ((s) => document.querySelector(s));
                 const el = query(sel) || document.querySelector(sel);
                 return el ? getComputedStyle(el).fontWeight : null;
               },
@@ -418,9 +418,9 @@ for (const { name, fixture } of fixtures) {
               const styleSnapshot = await evaluatePageWithTimeout(
                 page,
                 (sel) => {
-                  const query = window.__impeccableLiveQuery || ((s) => document.querySelector(s));
+                  const query = window.__fkSkillsLiveQuery || ((s) => document.querySelector(s));
                   const el = query(sel) || document.querySelector(sel);
-                  const styleEl = document.querySelector('style[data-impeccable-css]');
+                  const styleEl = document.querySelector('style[data-fk-css]');
                   const rules = [];
                   for (const sheet of [...document.styleSheets]) {
                     if (sheet.ownerNode !== styleEl) continue;
@@ -538,18 +538,18 @@ for (const { name, fixture } of fixtures) {
         const final = await waitForSourceClean(sourceFile, 20_000, { svelteComponentTarget });
         if (svelteComponentTarget) {
           assert.equal(existsSync(svelteComponentTarget.manifestPath), false, 'Svelte temp preview session removed after accept');
-          const snapshotPath = join(tmp, '.impeccable/live/sessions', `${svelteComponentTarget.manifest.id}.snapshot.json`);
+          const snapshotPath = join(tmp, '.fk-skills/live/sessions', `${svelteComponentTarget.manifest.id}.snapshot.json`);
           const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
           assert.equal(snapshot.phase, 'completed');
           assert.equal(snapshot.sourceFile, svelteComponentTarget.manifest.sourceFile);
-          assert.doesNotMatch(snapshot.sourceFile, /node_modules\/\.impeccable-live/);
+          assert.doesNotMatch(snapshot.sourceFile, /node_modules\/\.fk-live/);
         }
-        assert.doesNotMatch(final, /data-impeccable-variants="/,    'variants wrapper removed');
-        assert.doesNotMatch(final, /impeccable-variants-start/,      'variants-start marker removed');
-        assert.doesNotMatch(final, /impeccable-carbonize-start/,     'carbonize-start marker removed');
-        assert.doesNotMatch(final, /impeccable-carbonize-end/,       'carbonize-end marker removed');
-        assert.doesNotMatch(final, /data-impeccable-carbonize=/,     'carbonize wrapper removed');
-        assert.doesNotMatch(final, /data-impeccable-variant="/,      'no leftover variant scaffolding');
+        assert.doesNotMatch(final, /data-fk-variants="/,    'variants wrapper removed');
+        assert.doesNotMatch(final, /fk-variants-start/,      'variants-start marker removed');
+        assert.doesNotMatch(final, /fk-carbonize-start/,     'carbonize-start marker removed');
+        assert.doesNotMatch(final, /fk-carbonize-end/,       'carbonize-end marker removed');
+        assert.doesNotMatch(final, /data-fk-carbonize=/,     'carbonize wrapper removed');
+        assert.doesNotMatch(final, /data-fk-variant="/,      'no leftover variant scaffolding');
         if (isInsert) {
           if (agentMode === 'fake') {
             assert.match(final, /inserted-strip/, 'accepted insert content survives');
@@ -650,7 +650,7 @@ for (const { name, fixture } of fixtures) {
     });
 
     if (shouldRunScenario('manual') && Array.isArray(fixture.runtime.manualEditScenarios) && fixture.runtime.manualEditScenarios.length > 0) {
-      const manualScenarioFilter = process.env.IMPECCABLE_E2E_MANUAL_SCENARIO || '';
+      const manualScenarioFilter = process.env.FK_SKILLS_E2E_MANUAL_SCENARIO || '';
       for (const scenario of fixture.runtime.manualEditScenarios) {
         if (manualScenarioFilter && !scenario.name.includes(manualScenarioFilter)) continue;
         it(`Edit copy → Save → Apply/commit: ${scenario.name}`, liveE2eTestOptions, async (t) => {
@@ -692,23 +692,23 @@ for (const { name, fixture } of fixtures) {
 
     if (shouldRunScenario('annotations') && fixture.runtime.liveChrome?.annotations) {
       it('uploads annotations with generate and still accepts the variant', liveE2eTestOptions, async (t) => {
-        if (manualOnly || process.env.IMPECCABLE_E2E_MANUAL_SCENARIO) {
+        if (manualOnly || process.env.FK_SKILLS_E2E_MANUAL_SCENARIO) {
           t.skip('manual scenario filter is active');
           return;
         }
-        const agentMode = process.env.IMPECCABLE_E2E_AGENT || 'fake';
+        const agentMode = process.env.FK_SKILLS_E2E_AGENT || 'fake';
         const recordedGenerateEvents = [];
         let baseAgent;
         if (agentMode === 'llm') {
           const llmConfig = resolveLlmAgentConfig({
-            model: process.env.IMPECCABLE_E2E_LLM_MODEL,
+            model: process.env.FK_SKILLS_E2E_LLM_MODEL,
           });
           baseAgent = await createLlmAgent({
             config: llmConfig,
             log: (m) => t.diagnostic('[llm] ' + m),
           });
           if (!baseAgent) {
-            t.skip(`IMPECCABLE_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
+            t.skip(`FK_SKILLS_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
             return;
           }
           t.diagnostic(`Using LLM agent (provider=${llmConfig.provider} model=${llmConfig.model})`);
@@ -744,7 +744,7 @@ for (const { name, fixture } of fixtures) {
           const generateEvent = recordedGenerateEvents.at(-1);
           await assertAnnotationUploadEvent(generateEvent);
           assert.ok(existsSync(generateEvent.screenshotPath), 'annotation screenshot file exists');
-          assert.match(generateEvent.screenshotPath, /\.impeccable\/live\/annotations\//, 'annotation screenshot is stored under live annotations');
+          assert.match(generateEvent.screenshotPath, /\.fk-skills\/live\/annotations\//, 'annotation screenshot is stored under live annotations');
 
           const sourceFile = await locateSessionFile(session.tmp);
           const svelteComponentTarget = svelteComponentTargetFor(sourceFile);
@@ -761,7 +761,7 @@ for (const { name, fixture } of fixtures) {
 
     if (shouldRunScenario('exit') && fixture.runtime.liveChrome?.bottomBar) {
       it('Exit removes live chrome cleanly', liveE2eTestOptions, async (t) => {
-        if (manualOnly || process.env.IMPECCABLE_E2E_MANUAL_SCENARIO) {
+        if (manualOnly || process.env.FK_SKILLS_E2E_MANUAL_SCENARIO) {
           t.skip('manual scenario filter is active');
           return;
         }
@@ -799,7 +799,7 @@ function recordGenerateEvents(agent, events) {
 }
 
 async function captureLiveE2eFailure({ name, fixture, session, sourceFile, error, log = () => {} }) {
-  const root = process.env.IMPECCABLE_E2E_ARTIFACT_DIR;
+  const root = process.env.FK_SKILLS_E2E_ARTIFACT_DIR;
   if (!root || !session?.tmp) return;
 
   try {
@@ -827,8 +827,8 @@ async function captureLiveE2eFailure({ name, fixture, session, sourceFile, error
     }
 
     for (const file of walkSources(tmp)) copyFileFromTmp(tmp, file, join(dir, 'sources'));
-    copyDirIfExists(join(tmp, '.impeccable', 'live'), join(dir, 'impeccable-live'));
-    copyDirIfExists(join(tmp, 'node_modules', '.impeccable-live'), join(dir, 'impeccable-live-preview'));
+    copyDirIfExists(join(tmp, '.fk-skills', 'live'), join(dir, 'fk-live'));
+    copyDirIfExists(join(tmp, 'node_modules', '.fk-live'), join(dir, 'fk-live-preview'));
 
     if (session.page) {
       const html = await withCaptureTimeout(session.page.content(), 5_000, 'page content').catch((err) => `capture failed: ${err.message}`);
@@ -882,7 +882,7 @@ function withCaptureTimeout(promise, timeoutMs, label) {
 }
 
 async function createManualScenarioAgent(t, scenario = {}) {
-  const requested = (process.env.IMPECCABLE_E2E_MANUAL_AGENT || process.env.IMPECCABLE_E2E_AGENT || 'auto')
+  const requested = (process.env.FK_SKILLS_E2E_MANUAL_AGENT || process.env.FK_SKILLS_E2E_AGENT || 'auto')
     .trim()
     .toLowerCase();
   if (requested === 'fake' || requested === 'mock') {
@@ -900,7 +900,7 @@ async function createManualScenarioAgent(t, scenario = {}) {
   }
 
   const llmConfig = resolveLlmAgentConfig({
-    model: process.env.IMPECCABLE_E2E_LLM_MODEL,
+    model: process.env.FK_SKILLS_E2E_LLM_MODEL,
   });
   const agent = await createLlmAgent({
     config: llmConfig,
@@ -917,7 +917,7 @@ async function createManualScenarioAgent(t, scenario = {}) {
   }
 
   if (requested === 'llm') {
-    t.skip(`IMPECCABLE_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
+    t.skip(`FK_SKILLS_E2E_AGENT=llm with provider=${llmConfig.provider} requires ${llmConfig.requiredEnv}`);
     return null;
   }
 
@@ -949,7 +949,7 @@ function maybeWrapMalformedAckProbe(agent, scenario, probeState, t) {
         assert.match(output, /--reply EVENT_ID done|must be the event id|Missing reply status/);
         probeState.malformedAckRejected = true;
       }
-      const buffer = JSON.parse(readFileSync(join(context.tmp, '.impeccable/live/pending-manual-edits.json'), 'utf-8'));
+      const buffer = JSON.parse(readFileSync(join(context.tmp, '.fk-skills/live/pending-manual-edits.json'), 'utf-8'));
       assert.ok(buffer.entries.length > 0, 'malformed ack must not clear staged manual edits');
       t.diagnostic(`Malformed manual Apply ack rejected for ${event.id}; continuing with correct reply`);
       return agent.applyManualEdits(event, context);
@@ -1185,7 +1185,7 @@ async function waitForAcceptedSelectionReady(page, selector, { timeout }) {
       const all = document.querySelectorAll(sel);
       if (all.length < 1) return false;
       for (const el of all) {
-        if (el.closest('[data-impeccable-variants],[data-impeccable-variant]')) return false;
+        if (el.closest('[data-fk-variants],[data-fk-variant]')) return false;
       }
       return true;
     },
@@ -1196,7 +1196,7 @@ async function waitForAcceptedSelectionReady(page, selector, { timeout }) {
 
 async function readLiveSessionStorage(page) {
   return page.evaluate(() => {
-    const raw = localStorage.getItem('impeccable-live-session');
+    const raw = localStorage.getItem('fk-live-session');
     return raw ? JSON.parse(raw) : null;
   });
 }
@@ -1205,8 +1205,8 @@ async function waitForVariantCounter(page, variant, count, { timeout = 15_000 } 
   try {
     await page.waitForFunction(
       ({ variant, count }) => {
-        const query = window.__impeccableLiveQuery || ((sel) => document.querySelector(sel));
-        const bar = query('#impeccable-live-bar');
+        const query = window.__fkSkillsLiveQuery || ((sel) => document.querySelector(sel));
+        const bar = query('#fk-live-bar');
         const text = bar?.textContent || '';
         return text.includes(`${variant}/${count}`);
       },
@@ -1215,14 +1215,14 @@ async function waitForVariantCounter(page, variant, count, { timeout = 15_000 } 
     );
   } catch (err) {
     const snapshot = await page.evaluate(() => {
-      const query = window.__impeccableLiveQuery || ((sel) => document.querySelector(sel));
-      const bar = query('#impeccable-live-bar');
-      const wrapper = document.querySelector('[data-impeccable-variants]');
+      const query = window.__fkSkillsLiveQuery || ((sel) => document.querySelector(sel));
+      const bar = query('#fk-live-bar');
+      const wrapper = document.querySelector('[data-fk-variants]');
       return {
         barText: bar?.textContent || null,
-        debugState: window.__IMPECCABLE_LIVE_CHROME_CORE__?.debugState?.() || null,
-        storage: localStorage.getItem('impeccable-live-session'),
-        wrapper: wrapper ? { preview: wrapper.dataset.impeccablePreview, count: wrapper.dataset.impeccableVariantCount, html: wrapper.outerHTML.slice(0, 500) } : null,
+        debugState: window.__FK_SKILLS_LIVE_CHROME_CORE__?.debugState?.() || null,
+        storage: localStorage.getItem('fk-live-session'),
+        wrapper: wrapper ? { preview: wrapper.dataset.fkPreview, count: wrapper.dataset.fkVariantCount, html: wrapper.outerHTML.slice(0, 500) } : null,
       };
     }).catch((snapErr) => ({ error: snapErr.message }));
     console.error('--- waitForVariantCounter snapshot ---\n' + JSON.stringify(snapshot, null, 2));
@@ -1234,10 +1234,10 @@ async function waitForVariantCounter(page, variant, count, { timeout = 15_000 } 
 async function waitForRecoverableVariantSession(page, variant, count, { timeout = 15_000 } = {}) {
   await page.waitForFunction(
     ({ variant, count }) => {
-      const query = window.__impeccableLiveQuery || ((sel) => document.querySelector(sel));
-      const bar = query('#impeccable-live-bar');
+      const query = window.__fkSkillsLiveQuery || ((sel) => document.querySelector(sel));
+      const bar = query('#fk-live-bar');
       const text = bar?.textContent || '';
-      const raw = localStorage.getItem('impeccable-live-session');
+      const raw = localStorage.getItem('fk-live-session');
       let saved = null;
       try { saved = raw ? JSON.parse(raw) : null; } catch {}
       return Boolean(
@@ -1259,9 +1259,9 @@ async function waitForAcceptedDom(page, selector, { allowVariantRoot = false, ti
       const all = document.querySelectorAll(sel);
       if (all.length < 1) return false;
       for (const el of all) {
-        if (el.closest('[data-impeccable-variants]')) return false;
-        if (el.closest('[data-impeccable-carbonize]')) return false;
-        if (!allowVariantRoot && el.closest('[data-impeccable-variant]')) return false;
+        if (el.closest('[data-fk-variants]')) return false;
+        if (el.closest('[data-fk-carbonize]')) return false;
+        if (!allowVariantRoot && el.closest('[data-fk-variant]')) return false;
       }
       return true;
     },
@@ -1426,11 +1426,11 @@ async function waitForSourceClean(filePath, timeoutMs, { svelteComponentTarget: 
     last = readFileSync(filePath, 'utf-8');
     const dirty =
       (svelteTarget && existsSync(svelteTarget.manifestPath)) ||
-      last.includes('data-impeccable-variants=') ||
-      last.includes('impeccable-variants-start') ||
-      last.includes('impeccable-carbonize-start') ||
-      last.includes('data-impeccable-carbonize=') ||
-      last.includes('data-impeccable-variant=');
+      last.includes('data-fk-variants=') ||
+      last.includes('fk-variants-start') ||
+      last.includes('fk-carbonize-start') ||
+      last.includes('data-fk-carbonize=') ||
+      last.includes('data-fk-variant=');
     if (!dirty) return last;
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -1440,11 +1440,11 @@ async function waitForSourceClean(filePath, timeoutMs, { svelteComponentTarget: 
 function sourceShadowTargetFor(filePath) {
   let body;
   try { body = readFileSync(filePath, 'utf-8'); } catch { return null; }
-  if (!body.includes('data-impeccable-preview="source-shadow"')) return null;
-  const match = body.match(/\bdata-impeccable-source-file=(["'])(.*?)\1/);
+  if (!body.includes('data-fk-preview="source-shadow"')) return null;
+  const match = body.match(/\bdata-fk-source-file=(["'])(.*?)\1/);
   if (!match) return null;
-  const root = filePath.includes('/.impeccable/')
-    ? filePath.slice(0, filePath.indexOf('/.impeccable/'))
+  const root = filePath.includes('/.fk-skills/')
+    ? filePath.slice(0, filePath.indexOf('/.fk-skills/'))
     : dirname(filePath);
   return join(root, decodeHtmlAttr(match[2]));
 }
@@ -1456,8 +1456,8 @@ function svelteComponentTargetFor(filePath) {
   if (manifest.previewMode !== 'svelte-component' || !manifest.sourceFile || !manifest.componentDir) return null;
   const sep = pathSepFor(filePath);
   const markers = [
-    `${sep}node_modules${sep}.impeccable-live${sep}`,
-    `${sep}src${sep}lib${sep}impeccable${sep}`,
+    `${sep}node_modules${sep}.fk-live${sep}`,
+    `${sep}src${sep}lib${sep}fk-skills${sep}`,
   ];
   const marker = markers.find((candidate) => filePath.includes(candidate));
   const idx = marker ? filePath.indexOf(marker) : -1;
@@ -1540,9 +1540,9 @@ async function locateSessionFile(tmp) {
   for (const f of candidates) {
     const body = readFileSync(f, 'utf-8');
     if (
-      body.includes('data-impeccable-variants=') ||
-      body.includes('impeccable-carbonize-start') ||
-      body.includes('impeccable-variants-start')
+      body.includes('data-fk-variants=') ||
+      body.includes('fk-carbonize-start') ||
+      body.includes('fk-variants-start')
     ) {
       return f;
     }
@@ -1557,8 +1557,8 @@ async function locateSessionFile(tmp) {
 function walkSvelteComponentManifests(root) {
   const results = [];
   const stack = [
-    join(root, 'node_modules/.impeccable-live'),
-    join(root, 'src/lib/impeccable'),
+    join(root, 'node_modules/.fk-skills-live'),
+    join(root, 'src/lib/fk-skills'),
   ];
   while (stack.length) {
     const dir = stack.pop();

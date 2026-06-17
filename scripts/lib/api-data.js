@@ -25,7 +25,7 @@ export function generateApiData(outDir, skills, patterns, rootDir) {
   fs.writeFileSync(path.join(apiDir, 'skills.json'), JSON.stringify(skillsData));
 
   // commands.json - after v3.0 consolidation, commands are sub-commands of
-  // /impeccable. Load them from command-metadata.json and include the root
+  // /fk. Load them from command-metadata.json and include the root
   // impeccable skill itself so UI surfaces like the cheatsheet can list them.
   // Each entry also picks up a short `tagline` from its editorial file
   // (site/content/skills/<id>.md) when one exists. Taglines are used by UI
@@ -73,7 +73,7 @@ export function generateApiData(outDir, skills, patterns, rootDir) {
   fs.writeFileSync(path.join(apiDir, 'patterns.json'), JSON.stringify(patterns));
 
   // version.json - a tiny endpoint the installed skill polls on boot
-  // (skill/scripts/context.mjs) to nudge users toward `npx impeccable skills
+  // (skill/scripts/context.mjs) to nudge users toward `npx fk-skills skills
   // update`. Kept deliberately small so the boot-time check is cheap, unlike
   // the full bundle download `skills check` performs. The skills version is
   // the canonical one in the Claude plugin manifest.

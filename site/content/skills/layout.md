@@ -4,7 +4,7 @@ tagline: "Fix layout, spacing, and visual rhythm."
 
 ## When to use it
 
-`/impeccable layout` is for pages where nothing is technically wrong but nothing is breathing either. Equal padding everywhere, monotonous card grids, content that runs edge to edge, hierarchy that relies on size alone. Reach for it when a layout "feels off" and you cannot articulate why.
+`/fk layout` is for pages where nothing is technically wrong but nothing is breathing either. Equal padding everywhere, monotonous card grids, content that runs edge to edge, hierarchy that relies on size alone. Reach for it when a layout "feels off" and you cannot articulate why.
 
 Good triggers: "everything feels crowded", "it reads like a wall", "I do not know where to look first".
 
@@ -23,7 +23,7 @@ Fixes usually involve rebuilding the spacing scale, introducing asymmetry, colla
 ## Try it
 
 ```
-/impeccable layout the settings page
+/fk layout the settings page
 ```
 
 Typical changes:
@@ -36,6 +36,6 @@ Typical changes:
 
 ## Pitfalls
 
-- **Confusing arrange with distill.** If the problem is too many things, run `/impeccable distill` first. Layout is for arranging what is already the right set.
+- **Confusing arrange with distill.** If the problem is too many things, run `/fk distill` first. Layout is for arranging what is already the right set.
 - **Expecting it to rescue a broken grid.** If the page has no grid at all, arrange will build one. Just know that the diff is going to be larger than you expect.
 - **Ignoring the hierarchy verdict.** If arrange says "nothing is primary", no amount of spacing work fixes that. You need a content decision, not a layout tweak.

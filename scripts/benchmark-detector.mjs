@@ -407,11 +407,11 @@ async function runBrowserBenchmarks(args) {
           await page.setViewport({ width: 1280, height: 800 });
           await page.goto(url, { waitUntil: 'load', timeout: 30000 });
           await new Promise(resolve => setTimeout(resolve, 100));
-          await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+          await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
           await page.evaluate(browserScript);
           const pureStarted = nowMs();
           findings = await page.evaluate(() => {
-            const serialized = window.impeccableDetect({ decorate: false, serialize: true });
+            const serialized = window.fkSkillsDetect({ decorate: false, serialize: true });
             return serialized.flatMap(({ findings }) => findings.map(f => ({ id: f.type, snippet: f.detail })));
           });
           addEvent(profile, {
@@ -423,7 +423,7 @@ async function runBrowserBenchmarks(args) {
             findings: findings.length,
           });
           const overlayStarted = nowMs();
-          const overlayGroupCount = await page.evaluate(() => window.impeccableScan().length);
+          const overlayGroupCount = await page.evaluate(() => window.fkSkillsScan().length);
           addEvent(profile, {
             engine: 'browser',
             phase: 'scan',

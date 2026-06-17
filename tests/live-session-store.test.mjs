@@ -253,7 +253,7 @@ describe('live-session-store', () => {
     assert.equal(repaired.sourceFile, 'src/pages/index.astro');
   });
 
-  it('recovers legacy journals from .impeccable-live/sessions', () => {
+  it('recovers legacy journals from .fk-live/sessions', () => {
     const legacyDir = getLegacyLiveSessionsDir(tmp);
     mkdirSync(legacyDir, { recursive: true });
     appendFileSync(join(legacyDir, 'legacy-session.jsonl'), JSON.stringify({

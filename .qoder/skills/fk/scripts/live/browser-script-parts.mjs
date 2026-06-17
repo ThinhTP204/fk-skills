@@ -34,15 +34,15 @@ export function readLiveBrowserScriptParts(parts, readFile = (filePath) => fs.re
 
 export function assembleLiveBrowserScript({ token, port, vocabulary, parts }) {
   const prelude =
-    `window.__IMPECCABLE_TOKEN__ = '${token}';\n` +
-    `window.__IMPECCABLE_PORT__ = ${port};\n` +
+    `window.__FK_SKILLS_TOKEN__ = '${token}';\n` +
+    `window.__FK_SKILLS_PORT__ = ${port};\n` +
     // Canonical command vocabulary (values + labels + icons). live-browser.js
     // builds its action picker from this instead of an inline copy.
-    `window.__IMPECCABLE_VOCAB__ = ${JSON.stringify(vocabulary)};\n`;
+    `window.__FK_SKILLS_VOCAB__ = ${JSON.stringify(vocabulary)};\n`;
 
   const body = parts.map((part) => {
     const file = part.file || path.basename(part.path || '');
-    return `// --- impeccable live script part: ${part.name} (${file}) ---\n${part.source}`;
+    return `// --- fk live script part: ${part.name} (${file}) ---\n${part.source}`;
   }).join('\n');
 
   return prelude + body;

@@ -2,11 +2,11 @@
 
 Manage the **design detector hook** for the current project.
 
-The hook runs the impeccable design detector on direct file edits to design-relevant files (`.tsx`, `.jsx`, `.html`, `.vue`, `.svelte`, `.astro`, `.css`, `.scss`, `.sass`, `.less`, `.ts`, `.js`). Claude Code and Codex use `PostToolUse` and push a short system reminder into the agent's context after the edit; findings get a correction prompt, pending issues get a re-nudge, and clean UI-ish files get a short ack unless quiet mode is on (`hook.quiet` in config). Plain `.ts` and `.js` files are still scanned, but stay quiet unless the detector finds something. Cursor uses `preToolUse` to block bad proposed writes before they land and stays silent when it allows a clean write.
+The hook runs the fk design detector on direct file edits to design-relevant files (`.tsx`, `.jsx`, `.html`, `.vue`, `.svelte`, `.astro`, `.css`, `.scss`, `.sass`, `.less`, `.ts`, `.js`). Claude Code and Codex use `PostToolUse` and push a short system reminder into the agent's context after the edit; findings get a correction prompt, pending issues get a re-nudge, and clean UI-ish files get a short ack unless quiet mode is on (`hook.quiet` in config). Plain `.ts` and `.js` files are still scanned, but stay quiet unless the detector finds something. Cursor uses `preToolUse` to block bad proposed writes before they land and stays silent when it allows a clean write.
 
-This command toggles the hook **per project** by editing `.impeccable/config.json` (the unified Impeccable config; hook runtime settings live under its `hook` key, and shared detector ignores live under `detector`). Per-developer overrides, including the install consent decision (`hook.consent`) the CLI records, live in the gitignored `.impeccable/config.local.json`. Set `hook.enabled: false` to turn the hook off, `hook.quiet: true` to silence the clean/pending acks, or `hook.auditLog` to a file path for an NDJSON log. The legacy `IMPECCABLE_HOOK_DISABLED`, `IMPECCABLE_HOOK_QUIET`, and `IMPECCABLE_HOOK_LOG` env vars are still honored and override these config values when set.
+This command toggles the hook **per project** by editing `.fk-skills/config.json` (the unified FK Skills config; hook runtime settings live under its `hook` key, and shared detector ignores live under `detector`). Per-developer overrides, including the install consent decision (`hook.consent`) the CLI records, live in the gitignored `.fk-skills/config.local.json`. Set `hook.enabled: false` to turn the hook off, `hook.quiet: true` to silence the clean/pending acks, or `hook.auditLog` to a file path for an NDJSON log. The legacy `FK_SKILLS_HOOK_DISABLED`, `IMPECCABLE_HOOK_DISABLED`, `FK_SKILLS_HOOK_QUIET`, `IMPECCABLE_HOOK_QUIET`, `FK_SKILLS_HOOK_LOG`, and `IMPECCABLE_HOOK_LOG` env vars are still honored and override these config values when set.
 
-Manual `npx impeccable detect` scans use the same project filter config by default: `detector.ignoreRules`, `detector.ignoreFiles`, `detector.ignoreValues`, and `detector.designSystem.enabled`. `hook.enabled` only controls automatic hook execution, not manual CLI scans. Use `npx impeccable detect --no-config ...` for a raw detector run that ignores project config/context. Use `npx impeccable ignores ...` for direct CLI CRUD on the same detector ignores.
+Manual `npx fk-skills detect` scans use the same project filter config by default: `detector.ignoreRules`, `detector.ignoreFiles`, `detector.ignoreValues`, and `detector.designSystem.enabled`. `hook.enabled` only controls automatic hook execution, not manual CLI scans. Use `npx fk-skills detect --no-config ...` for a raw detector run that ignores project config/context. Use `npx fk-skills ignores ...` for direct CLI CRUD on the same detector ignores.
 
 Supported harnesses: Claude Code (`.claude/settings.local.json` in the project, which is gitignored so the hook stays machine-local; a hook you move into the shared `settings.json` is honored in place too), Codex (`.codex/hooks.json` in the project), and Cursor (`.cursor/hooks.json` in the project).
 
@@ -19,12 +19,12 @@ The first argument is the action. Defaults to `status`.
 | Action | What it does |
 |---|---|
 | `status` | Print current state, shared/local config paths, ignored rules / files / values, env override. |
-| `on` | Set `enabled: true` in `.impeccable/config.json`, record local hook consent as accepted, and install/repair provider hook manifests when the skill is installed. |
-| `off` | Set `enabled: false` in `.impeccable/config.json`. |
+| `on` | Set `enabled: true` in `.fk-skills/config.json`, record local hook consent as accepted, and install/repair provider hook manifests when the skill is installed. |
+| `off` | Set `enabled: false` in `.fk-skills/config.json`. |
 | `ignore-rule <id>` | Append `<id>` to `detector.ignoreRules`; for `overused-font`, requires `--all-values`. |
 | `ignore-file <glob>` | Append `<glob>` to `detector.ignoreFiles`. |
-| `ignore-value <id> <value> [--shared] [--reason "..."]` | Append a rule/value suppression to shared `.impeccable/config.json`. |
-| `ignore-value <id> <value> --local [--reason "..."]` | Append a private rule/value suppression to `.impeccable/config.local.json`. |
+| `ignore-value <id> <value> [--shared] [--reason "..."]` | Append a rule/value suppression to shared `.fk-skills/config.json`. |
+| `ignore-value <id> <value> --local [--reason "..."]` | Append a private rule/value suppression to `.fk-skills/config.local.json`. |
 | `reset` | Delete the project config, dedup cache, and Cursor pending queue. |
 
 ## Flow
@@ -38,7 +38,7 @@ The first argument is the action. Defaults to `status`.
 
 3. If `<action>` is `off`, follow up with a one-line note: "Done. New edits will not trigger the design hook in this project until you run `/fk hooks on`."
 4. If `<action>` is `on`, follow up with: "Done. The design hook will fire after the next Edit/Write/MultiEdit on a UI file."
-5. If `<action>` is `ignore-value`, `ignore-file`, or `ignore-rule`, just print the script output. The default scope is shared `.impeccable/config.json`; add `--local` only when the user explicitly asks for a private exception.
+5. If `<action>` is `ignore-value`, `ignore-file`, or `ignore-rule`, just print the script output. The default scope is shared `.fk-skills/config.json`; add `--local` only when the user explicitly asks for a private exception.
 6. If `<action>` is `status`, just print the script output. Do not add commentary unless the user asked a follow-up question.
 
 ## Intentional findings
@@ -47,7 +47,7 @@ The hook itself never writes ignore config. Persist an exception only after the 
 
 Prefer the narrowest exception:
 
-- If the finding line shows an exact `ignore-value` command, run that command. This writes shared `.impeccable/config.json` by default.
+- If the finding line shows an exact `ignore-value` command, run that command. This writes shared `.fk-skills/config.json` by default.
 - For value-specific findings such as `overused-font` and `bounce-easing`, use `ignore-value` when the user confirms the specific value. Do not use `ignore-rule overused-font` for a specific font.
 - If the finding has no value-specific command, such as `side-tab`, prefer `ignore-file <path>` for the current file.
 - Use `ignore-rule <id>` only when the user asks to suppress that whole rule across the project. For broad overused-font suppression, use `ignore-rule overused-font --all-values` only when the user asks to ignore overused fonts generally.
@@ -79,12 +79,12 @@ node .qoder/skills/fk/scripts/hook-admin.mjs ignore-file "src/legacy/Card.tsx"
 
 ## Constraints
 
-- Never modify `.impeccable/config.json` or `.impeccable/config.local.json` by hand from this command. Always go through `hook-admin.mjs` so writes stay validated and the file shape stays consistent.
+- Never modify `.fk-skills/config.json` or `.fk-skills/config.local.json` by hand from this command. Always go through `hook-admin.mjs` so writes stay validated and the file shape stays consistent.
 - Do not edit the hook scripts themselves (`hook.mjs`, `hook-lib.mjs`, `hook-before-edit.mjs`) from this flow. Those are skill plumbing.
 - Cursor can block a proposed write when the detector finds a real issue. Claude Code and Codex do not block the edit; they emit a post-edit reminder instead. Disabling stops both blocking and reminders.
 - The hook is bundled with the Impeccable skill and installed through project-local manifests: `.claude/settings.local.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. On Codex, the user must approve the hook via `/hooks` the first time. On Cursor, confirm hooks are enabled under Settings -> Hooks.
 
 ## Failure modes
 
-- If `.impeccable/config.json` or `.impeccable/config.local.json` is unreadable or malformed, the hook ignores that file and uses the remaining valid config/defaults. `hook-admin.mjs status` will show malformed files as ignored.
+- If `.fk-skills/config.json` or `.fk-skills/config.local.json` is unreadable or malformed, the hook ignores that file and uses the remaining valid config/defaults. `hook-admin.mjs status` will show malformed files as ignored.
 - If the user asks to "disable the hook" globally, lead with `/fk hooks off` (persistent for this project; writes `hook.enabled: false` to config). The legacy `IMPECCABLE_HOOK_DISABLED=1` env var also works as a one-shot override that follows the shell.

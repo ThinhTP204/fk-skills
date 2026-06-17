@@ -19,7 +19,7 @@ function runInject(cwd, configPath, args) {
     const out = execFileSync('node', [INJECT, ...args], {
       cwd,
       encoding: 'utf-8',
-      env: { ...process.env, IMPECCABLE_LIVE_CONFIG: configPath },
+      env: { ...process.env, FK_SKILLS_LIVE_CONFIG: configPath },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     return JSON.parse(out.trim());
@@ -34,7 +34,7 @@ function runInjectDefault(cwd, args) {
     const out = execFileSync('node', [INJECT, ...args], {
       cwd,
       encoding: 'utf-8',
-      env: { ...process.env, IMPECCABLE_LIVE_CONFIG: '' },
+      env: { ...process.env, FK_SKILLS_LIVE_CONFIG: '' },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     return JSON.parse(out.trim());
@@ -49,15 +49,15 @@ describe('live-inject — insert/remove round-trip preserves file bytes', () => 
   beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'impeccable-inject-test-')); });
   afterEach(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-  it('reports .impeccable/live/config.json as the default missing config path', () => {
+  it('reports .fk-skills/live/config.json as the default missing config path', () => {
     const result = runInjectDefault(tmp, ['--check']);
 
     assert.equal(result.ok, false);
     assert.equal(result.error, 'config_missing');
-    assert.equal(result.path, join(realpathSync(tmp), '.impeccable', 'live', 'config.json'));
+    assert.equal(result.path, join(realpathSync(tmp), '.fk-skills', 'live', 'config.json'));
   });
 
-  it('uses .impeccable/live/config.json without an environment override', () => {
+  it('uses .fk-skills/live/config.json without an environment override', () => {
     const original = `<html>
   <body>
     <p>Content</p>
@@ -65,7 +65,7 @@ describe('live-inject — insert/remove round-trip preserves file bytes', () => 
 </html>
 `;
     writeFileSync(join(tmp, 'index.html'), original);
-    const configDir = join(tmp, '.impeccable', 'live');
+    const configDir = join(tmp, '.fk-skills', 'live');
     mkdirSync(configDir, { recursive: true });
     writeFileSync(join(configDir, 'config.json'), JSON.stringify({
       files: ['index.html'],
@@ -209,7 +209,7 @@ describe('live-inject — insert/remove round-trip preserves file bytes', () => 
   it('round-trips through CSP-meta patch and revert (insert mutates the meta tag, remove restores it)', () => {
     // Mirrors a Vite app that ships a CSP meta tag in index.html. live-inject
     // appends `http://localhost:PORT` to script-src / connect-src on insert
-    // and stashes the original directives in `data-impeccable-csp-original`.
+    // and stashes the original directives in `data-fk-csp-original`.
     // --remove must restore the meta tag's original `content` exactly.
     const original = `<!DOCTYPE html>
 <html>
@@ -295,9 +295,9 @@ const title = 'Test';
 <html>
   <body>
     <h1>{title}</h1>
-    <!-- impeccable-live-start -->
+    <!-- fk-live-start -->
     <script src="http://localhost:8400/live.js"></script>
-    <!-- impeccable-live-end --></body>
+    <!-- fk-live-end --></body>
 </html>
 `;
     const file = join(tmp, 'Layout.astro');
@@ -313,7 +313,7 @@ const title = 'Test';
     runInject(tmp, cfgPath, ['--port', '8400']);
     const afterInject = readFileSync(file, 'utf-8');
 
-    assert.equal((afterInject.match(/impeccable-live-start/g) || []).length, 1, 'reinjection should leave one live block');
+    assert.equal((afterInject.match(/fk-live-start/g) || []).length, 1, 'reinjection should leave one live block');
     assert.match(afterInject, /<script is:inline src="http:\/\/localhost:8400\/live\.js"><\/script>/, 'astro reinject should restore is:inline');
     assert.doesNotMatch(afterInject, /<script src="http:\/\/localhost:8400\/live\.js"><\/script>/, 'bare astro live script must not survive');
   });
@@ -358,7 +358,7 @@ const title = 'Test';
     const afterInject = readFileSync(file, 'utf-8');
 
     assert.ok(
-      afterInject.includes('<!-- impeccable-live-end -->\nX</head>'),
+      afterInject.includes('<!-- fk-live-end -->\nX</head>'),
       `the character immediately after <head> must survive injection, got:\n${afterInject}`
     );
   });
@@ -380,7 +380,7 @@ const title = 'Test';
 
     assert.ok(
       afterInject.includes(
-        '<head>\r\n<!-- impeccable-live-start -->\r\n<script src="http://localhost:8400/live.js"></script>\r\n<!-- impeccable-live-end -->\r\n  <title>X</title>'
+        '<head>\r\n<!-- fk-live-start -->\r\n<script src="http://localhost:8400/live.js"></script>\r\n<!-- fk-live-end -->\r\n  <title>X</title>'
       ),
       `CRLF insertAfter should keep CRLF boundaries around the injected block, got:\n${JSON.stringify(afterInject)}`
     );

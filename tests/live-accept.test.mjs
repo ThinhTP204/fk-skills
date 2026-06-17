@@ -36,27 +36,27 @@ describe('live-accept — style-element edge cases', () => {
 
   // Historical bug: extractVariant flipped into "inStyle" mode on <style and
   // scanned for </style> line-by-line. JSX self-closing <style ... /> has no
-  // separate closer, so it got stuck forever and missed data-impeccable-variant
+  // separate closer, so it got stuck forever and missed data-fk-variant
   // divs that came after.
   it('finds the accepted variant after a JSX self-closing <style /> block', () => {
     const html = `<body>
-  <!-- impeccable-variants-start SELFC -->
-  <div data-impeccable-variants="SELFC" data-impeccable-variant-count="3" style="display: contents">
-    <div data-impeccable-variant="original">
+  <!-- fk-variants-start SELFC -->
+  <div data-fk-variants="SELFC" data-fk-variant-count="3" style="display: contents">
+    <div data-fk-variant="original">
       <p class="hook">original text</p>
     </div>
-    <style data-impeccable-css="SELFC" dangerouslySetInnerHTML={{ __html: '@scope ([data-impeccable-variant="1"]) { .hook { color: red; } }' }} />
-    <div data-impeccable-variant="1">
+    <style data-fk-css="SELFC" dangerouslySetInnerHTML={{ __html: '@scope ([data-fk-variant="1"]) { .hook { color: red; } }' }} />
+    <div data-fk-variant="1">
       <p class="hook">variant one</p>
     </div>
-    <div data-impeccable-variant="2" style="display: none">
+    <div data-fk-variant="2" style="display: none">
       <p class="hook">variant two</p>
     </div>
-    <div data-impeccable-variant="3" style="display: none">
+    <div data-fk-variant="3" style="display: none">
       <p class="hook">variant three</p>
     </div>
   </div>
-  <!-- impeccable-variants-end SELFC -->
+  <!-- fk-variants-end SELFC -->
 </body>`;
     writeFileSync(join(tmp, 'page.html'), html);
 
@@ -65,9 +65,9 @@ describe('live-accept — style-element edge cases', () => {
 
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
     // Self-closing style has no extractable CSS body, so there's nothing to carbonize —
-    // no carbonize block, no data-impeccable-variant wrapper (it would serve no purpose).
-    assert.ok(!after.includes('impeccable-carbonize-start'), 'no carbonize block (self-closing style has no body)');
-    assert.ok(!after.includes('impeccable-variants-start'), 'variant markers removed');
+    // no carbonize block, no data-fk-variant wrapper (it would serve no purpose).
+    assert.ok(!after.includes('fk-carbonize-start'), 'no carbonize block (self-closing style has no body)');
+    assert.ok(!after.includes('fk-variants-start'), 'variant markers removed');
     assert.ok(after.includes('variant two'), 'variant 2 content kept');
     assert.ok(!after.includes('variant three'), 'other variant content dropped');
     assert.ok(!after.includes('variant one'), 'other variant content dropped');
@@ -78,15 +78,15 @@ describe('live-accept — style-element edge cases', () => {
   // single skipped unit; the line has both open and close tags.
   it('finds the accepted variant after a single-line <style>…</style> block', () => {
     const html = `<body>
-  <!-- impeccable-variants-start ONELINE -->
-  <div data-impeccable-variants="ONELINE" data-impeccable-variant-count="3" style="display: contents">
-    <div data-impeccable-variant="original"><p class="hook">original</p></div>
-    <style data-impeccable-css="ONELINE">@scope ([data-impeccable-variant="1"]) { .hook { color: red; } }</style>
-    <div data-impeccable-variant="1"><p class="hook">variant one</p></div>
-    <div data-impeccable-variant="2" style="display: none"><p class="hook">variant two</p></div>
-    <div data-impeccable-variant="3" style="display: none"><p class="hook">variant three</p></div>
+  <!-- fk-variants-start ONELINE -->
+  <div data-fk-variants="ONELINE" data-fk-variant-count="3" style="display: contents">
+    <div data-fk-variant="original"><p class="hook">original</p></div>
+    <style data-fk-css="ONELINE">@scope ([data-fk-variant="1"]) { .hook { color: red; } }</style>
+    <div data-fk-variant="1"><p class="hook">variant one</p></div>
+    <div data-fk-variant="2" style="display: none"><p class="hook">variant two</p></div>
+    <div data-fk-variant="3" style="display: none"><p class="hook">variant three</p></div>
   </div>
-  <!-- impeccable-variants-end ONELINE -->
+  <!-- fk-variants-end ONELINE -->
 </body>`;
     writeFileSync(join(tmp, 'page.html'), html);
 
@@ -94,7 +94,7 @@ describe('live-accept — style-element edge cases', () => {
     assert.equal(result.handled, true, `accept should succeed: ${JSON.stringify(result)}`);
 
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
-    assert.ok(after.includes('data-impeccable-variant="3"'), 'accepted wrapper for variant 3 present');
+    assert.ok(after.includes('data-fk-variant="3"'), 'accepted wrapper for variant 3 present');
     assert.ok(after.includes('variant three'), 'variant 3 content kept');
     assert.ok(!after.includes('variant two'), 'other variant content dropped');
   });
@@ -102,17 +102,17 @@ describe('live-accept — style-element edge cases', () => {
   // Baseline: the standard multi-line <style>...</style> case must keep working.
   it('finds the accepted variant after a multi-line <style>…</style> block (regression baseline)', () => {
     const html = `<body>
-  <!-- impeccable-variants-start MULTI -->
-  <div data-impeccable-variants="MULTI" data-impeccable-variant-count="3" style="display: contents">
-    <div data-impeccable-variant="original"><p class="hook">original</p></div>
-    <style data-impeccable-css="MULTI">
-      @scope ([data-impeccable-variant="1"]) { .hook { color: red; } }
-      @scope ([data-impeccable-variant="2"]) { .hook { color: green; } }
+  <!-- fk-variants-start MULTI -->
+  <div data-fk-variants="MULTI" data-fk-variant-count="3" style="display: contents">
+    <div data-fk-variant="original"><p class="hook">original</p></div>
+    <style data-fk-css="MULTI">
+      @scope ([data-fk-variant="1"]) { .hook { color: red; } }
+      @scope ([data-fk-variant="2"]) { .hook { color: green; } }
     </style>
-    <div data-impeccable-variant="1"><p class="hook">variant one</p></div>
-    <div data-impeccable-variant="2" style="display: none"><p class="hook">variant two</p></div>
+    <div data-fk-variant="1"><p class="hook">variant one</p></div>
+    <div data-fk-variant="2" style="display: none"><p class="hook">variant two</p></div>
   </div>
-  <!-- impeccable-variants-end MULTI -->
+  <!-- fk-variants-end MULTI -->
 </body>`;
     writeFileSync(join(tmp, 'page.html'), html);
 
@@ -120,7 +120,7 @@ describe('live-accept — style-element edge cases', () => {
     assert.equal(result.handled, true, `accept should succeed: ${JSON.stringify(result)}`);
 
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
-    assert.ok(after.includes('data-impeccable-variant="1"'), 'accepted wrapper for variant 1 present');
+    assert.ok(after.includes('data-fk-variant="1"'), 'accepted wrapper for variant 1 present');
     assert.ok(after.includes('variant one'), 'variant 1 content kept');
   });
 
@@ -135,19 +135,19 @@ describe('live-accept — style-element edge cases', () => {
       `  return (\n` +
       `    <main>\n` +
       `      <>\n` +
-      `        {/* impeccable-variants-start TPL */}\n` +
-      `        <div data-impeccable-variants="TPL" data-impeccable-variant-count="2" style={{ display: 'contents' }}>\n` +
-      `          <div data-impeccable-variant="original"><p className="hook">orig</p></div>\n` +
-      `          <style data-impeccable-css="TPL">\n` +
+      `        {/* fk-variants-start TPL */}\n` +
+      `        <div data-fk-variants="TPL" data-fk-variant-count="2" style={{ display: 'contents' }}>\n` +
+      `          <div data-fk-variant="original"><p className="hook">orig</p></div>\n` +
+      `          <style data-fk-css="TPL">\n` +
       "            {`\n" +
-      `              @scope ([data-impeccable-variant="1"]) { .hook { color: red; } }\n` +
-      `              @scope ([data-impeccable-variant="2"]) { .hook { color: green; } }\n` +
+      `              @scope ([data-fk-variant="1"]) { .hook { color: red; } }\n` +
+      `              @scope ([data-fk-variant="2"]) { .hook { color: green; } }\n` +
       "            `}\n" +
       `          </style>\n` +
-      `          <div data-impeccable-variant="1"><p className="hook">variant one</p></div>\n` +
-      `          <div data-impeccable-variant="2" style={{ display: 'none' }}><p className="hook">variant two</p></div>\n` +
+      `          <div data-fk-variant="1"><p className="hook">variant one</p></div>\n` +
+      `          <div data-fk-variant="2" style={{ display: 'none' }}><p className="hook">variant two</p></div>\n` +
       `        </div>\n` +
-      `        {/* impeccable-variants-end TPL */}\n` +
+      `        {/* fk-variants-end TPL */}\n` +
       `      </>\n` +
       `    </main>\n` +
       `  );\n` +
@@ -159,7 +159,7 @@ describe('live-accept — style-element edge cases', () => {
 
     const after = readFileSync(join(tmp, 'App.tsx'), 'utf-8');
     // Exactly one `{` opener after the carbonized <style ...> tag — not two.
-    const carbonStyleMatch = after.match(/<style data-impeccable-css="TPL">([\s\S]*?)<\/style>/);
+    const carbonStyleMatch = after.match(/<style data-fk-css="TPL">([\s\S]*?)<\/style>/);
     assert.ok(carbonStyleMatch, 'carbonize <style> block present');
     const inner = carbonStyleMatch[1];
     // Inner must open with one `{` ... and end with one ` `` ... — no nesting.
@@ -168,10 +168,10 @@ describe('live-accept — style-element edge cases', () => {
     assert.equal(openCount, 1, `expected exactly one {\` opener, got ${openCount}`);
     assert.equal(closeCount, 1, `expected exactly one \`} closer, got ${closeCount}`);
     // CSS content survived intact.
-    assert.ok(inner.includes('@scope ([data-impeccable-variant="1"])'), 'variant-1 scope kept');
+    assert.ok(inner.includes('@scope ([data-fk-variant="1"])'), 'variant-1 scope kept');
     assert.match(
       after,
-      /\n          <div data-impeccable-variant="1" style=\{\{ display: 'contents' \}\}>\n            <p className="hook">variant one<\/p>\n          <\/div>/,
+      /\n          <div data-fk-variant="1" style=\{\{ display: 'contents' \}\}>\n            <p className="hook">variant one<\/p>\n          <\/div>/,
       'accepted JSX content is indented inside the temporary carbonize variant wrapper',
     );
   });
@@ -183,17 +183,17 @@ describe('live-accept — style-element edge cases', () => {
       `  return (\n` +
       `    <main>\n` +
       `      <>\n` +
-      `        {/* impeccable-variants-start INLINE */}\n` +
-      `        <div data-impeccable-variants="INLINE" data-impeccable-variant-count="2" style={{ display: 'contents' }}>\n` +
-      `          <div data-impeccable-variant="original"><p className="hook">orig</p></div>\n` +
-      `          <style data-impeccable-css="INLINE">\n` +
-      "            {`@scope ([data-impeccable-variant=\"1\"]) { .hook { color: red; } }\n" +
-      "             @scope ([data-impeccable-variant=\"2\"]) { .hook { color: green; } }`}\n" +
+      `        {/* fk-variants-start INLINE */}\n` +
+      `        <div data-fk-variants="INLINE" data-fk-variant-count="2" style={{ display: 'contents' }}>\n` +
+      `          <div data-fk-variant="original"><p className="hook">orig</p></div>\n` +
+      `          <style data-fk-css="INLINE">\n` +
+      "            {`@scope ([data-fk-variant=\"1\"]) { .hook { color: red; } }\n" +
+      "             @scope ([data-fk-variant=\"2\"]) { .hook { color: green; } }`}\n" +
       `          </style>\n` +
-      `          <div data-impeccable-variant="1"><p className="hook">variant one</p></div>\n` +
-      `          <div data-impeccable-variant="2" style={{ display: 'none' }}><p className="hook">variant two</p></div>\n` +
+      `          <div data-fk-variant="1"><p className="hook">variant one</p></div>\n` +
+      `          <div data-fk-variant="2" style={{ display: 'none' }}><p className="hook">variant two</p></div>\n` +
       `        </div>\n` +
-      `        {/* impeccable-variants-end INLINE */}\n` +
+      `        {/* fk-variants-end INLINE */}\n` +
       `      </>\n` +
       `    </main>\n` +
       `  );\n` +
@@ -204,34 +204,34 @@ describe('live-accept — style-element edge cases', () => {
     assert.equal(result.handled, true, `accept should succeed: ${JSON.stringify(result)}`);
 
     const after = readFileSync(join(tmp, 'App.tsx'), 'utf-8');
-    const inner = after.match(/<style data-impeccable-css="INLINE">([\s\S]*?)<\/style>/)[1];
+    const inner = after.match(/<style data-fk-css="INLINE">([\s\S]*?)<\/style>/)[1];
     const openCount = (inner.match(/\{`/g) || []).length;
     const closeCount = (inner.match(/`\}/g) || []).length;
     assert.equal(openCount, 1, `expected one {\` opener, got ${openCount}`);
     assert.equal(closeCount, 1, `expected one \`} closer, got ${closeCount}`);
-    assert.ok(inner.includes('@scope ([data-impeccable-variant="1"])'), 'variant-1 scope kept');
+    assert.ok(inner.includes('@scope ([data-fk-variant="1"])'), 'variant-1 scope kept');
   });
 
   it('carbonize preserves nested JSX indentation when the wrapper starts at column 0', () => {
-    const tsx = `<div data-impeccable-variants="ROOTIND" data-impeccable-variant-count="2" style={{ display: 'contents' }}>
-  {/* impeccable-variants-start ROOTIND */}
-  <div data-impeccable-variant="original">
+    const tsx = `<div data-fk-variants="ROOTIND" data-fk-variant-count="2" style={{ display: 'contents' }}>
+  {/* fk-variants-start ROOTIND */}
+  <div data-fk-variant="original">
     <section className="hook">
       <span>original</span>
     </section>
   </div>
-  <style data-impeccable-css="ROOTIND">{\`@scope ([data-impeccable-variant="1"]) { .hook { color: red; } }\`}</style>
-  <div data-impeccable-variant="1">
+  <style data-fk-css="ROOTIND">{\`@scope ([data-fk-variant="1"]) { .hook { color: red; } }\`}</style>
+  <div data-fk-variant="1">
     <section className="hook">
       <span>nested text</span>
     </section>
   </div>
-  <div data-impeccable-variant="2" style={{ display: 'none' }}>
+  <div data-fk-variant="2" style={{ display: 'none' }}>
     <section className="hook">
       <span>variant two</span>
     </section>
   </div>
-  {/* impeccable-variants-end ROOTIND */}
+  {/* fk-variants-end ROOTIND */}
 </div>
 `;
     writeFileSync(join(tmp, 'Root.tsx'), tsx);
@@ -242,7 +242,7 @@ describe('live-accept — style-element edge cases', () => {
     const after = readFileSync(join(tmp, 'Root.tsx'), 'utf-8');
     assert.match(
       after,
-      /<div data-impeccable-variant="1" style=\{\{ display: 'contents' \}\}>\n    <section className="hook">\n      <span>nested text<\/span>\n    <\/section>\n  <\/div>/,
+      /<div data-fk-variant="1" style=\{\{ display: 'contents' \}\}>\n    <section className="hook">\n      <span>nested text<\/span>\n    <\/section>\n  <\/div>/,
       'column-0 JSX accept preserves relative indentation inside the carbonize variant wrapper',
     );
   });
@@ -326,11 +326,11 @@ describe('live-accept — style-element edge cases', () => {
     const after = readFileSync(join(tmp, 'App.tsx'), 'utf-8');
     // The wrapper scaffold must be fully gone — no orphan </div> from
     // the outer wrapper, and no impeccable markers/data attributes.
-    assert.ok(!after.includes('data-impeccable-variants'),
+    assert.ok(!after.includes('data-fk-variants'),
       `outer wrapper div must be fully removed; got:\n${after}`);
-    assert.ok(!after.includes('data-impeccable-variant'),
+    assert.ok(!after.includes('data-fk-variant'),
       `original-div wrapper must be fully removed; got:\n${after}`);
-    assert.ok(!after.includes('impeccable-variants-start'),
+    assert.ok(!after.includes('fk-variants-start'),
       `start marker must be removed; got:\n${after}`);
     // The unrelated <div className="next-card">After</div> sibling
     // must survive intact — Bugbot's worst-case scenario was the depth
@@ -351,20 +351,20 @@ describe('live-accept — style-element edge cases', () => {
       <div
         className="impeccable-preview-shell"
 ${extraAttrs}
-        data-impeccable-variants="LONGOPEN"
-        data-impeccable-variant-count="2"
+        data-fk-variants="LONGOPEN"
+        data-fk-variant-count="2"
         style={{ display: 'contents' }}
       >
-        {/* impeccable-variants-start LONGOPEN */}
+        {/* fk-variants-start LONGOPEN */}
         {/* Original */}
-        <div data-impeccable-variant="original">
+        <div data-fk-variant="original">
           <aside className="card">
             <h1>Original</h1>
           </aside>
         </div>
         {/* Variants: insert below this line */}
-        <div data-impeccable-variant="1"><aside className="card"><h1>Variant</h1></aside></div>
-        {/* impeccable-variants-end LONGOPEN */}
+        <div data-fk-variant="1"><aside className="card"><h1>Variant</h1></aside></div>
+        {/* fk-variants-end LONGOPEN */}
       </div>
       <div className="next-card">After</div>
     </main>
@@ -376,8 +376,8 @@ ${extraAttrs}
     assert.equal(result.handled, true, `discard should succeed: ${JSON.stringify(result)}`);
 
     const after = readFileSync(join(tmp, 'App.tsx'), 'utf-8');
-    assert.doesNotMatch(after, /data-impeccable-variants/);
-    assert.doesNotMatch(after, /impeccable-variants-start/);
+    assert.doesNotMatch(after, /data-fk-variants/);
+    assert.doesNotMatch(after, /fk-variants-start/);
     assert.match(after, /<aside className="card">\s*<h1>Original<\/h1>\s*<\/aside>/m);
     assert.ok(after.includes('<div className="next-card">After</div>'));
   });
@@ -386,20 +386,20 @@ ${extraAttrs}
     const tsx = `export default function App() {
   return (
     <main>
-      <div data-impeccable-variants="ACTIVE" data-impeccable-variant-count="2" style={{ display: 'contents' }}>
+      <div data-fk-variants="ACTIVE" data-fk-variant-count="2" style={{ display: 'contents' }}>
         <div className="historical-marker-note">
-          {/* impeccable-variants-end OLD */}
+          {/* fk-variants-end OLD */}
         </div>
-        {/* impeccable-variants-start ACTIVE */}
+        {/* fk-variants-start ACTIVE */}
         {/* Original */}
-        <div data-impeccable-variant="original">
+        <div data-fk-variant="original">
           <aside className="card">
             <h1>Original</h1>
           </aside>
         </div>
         {/* Variants: insert below this line */}
-        <div data-impeccable-variant="1"><aside className="card"><h1>Variant</h1></aside></div>
-        {/* impeccable-variants-end ACTIVE */}
+        <div data-fk-variant="1"><aside className="card"><h1>Variant</h1></aside></div>
+        {/* fk-variants-end ACTIVE */}
       </div>
       <div className="next-card">After</div>
     </main>
@@ -411,9 +411,9 @@ ${extraAttrs}
     assert.equal(result.handled, true, `discard should succeed: ${JSON.stringify(result)}`);
 
     const after = readFileSync(join(tmp, 'App.tsx'), 'utf-8');
-    assert.doesNotMatch(after, /data-impeccable-variants/);
-    assert.doesNotMatch(after, /impeccable-variants-start ACTIVE/);
-    assert.doesNotMatch(after, /impeccable-variants-end OLD/);
+    assert.doesNotMatch(after, /data-fk-variants/);
+    assert.doesNotMatch(after, /fk-variants-start ACTIVE/);
+    assert.doesNotMatch(after, /fk-variants-end OLD/);
     assert.match(after, /<aside className="card">\s*<h1>Original<\/h1>\s*<\/aside>/m);
     assert.ok(after.includes('<div className="next-card">After</div>'));
   });
@@ -425,17 +425,17 @@ ${extraAttrs}
     const tsx = `export default function App() {
   return (
     <main>
-      <div data-impeccable-variants="INDENTACC" data-impeccable-variant-count="3" style={{ display: "contents" }}>
-        {/* impeccable-variants-start INDENTACC */}
+      <div data-fk-variants="INDENTACC" data-fk-variant-count="3" style={{ display: "contents" }}>
+        {/* fk-variants-start INDENTACC */}
         {/* Original */}
-        <div data-impeccable-variant="original">
+        <div data-fk-variant="original">
           <aside className="card">
             <h1 className="hero-title">Hero</h1>
           </aside>
         </div>
         {/* Variants: insert below this line */}
-        <div data-impeccable-variant="1"><aside className="card variant-one"><h1 className="hero-title">Hero</h1></aside></div>
-        {/* impeccable-variants-end INDENTACC */}
+        <div data-fk-variant="1"><aside className="card variant-one"><h1 className="hero-title">Hero</h1></aside></div>
+        {/* fk-variants-end INDENTACC */}
       </div>
     </main>
   );
@@ -454,14 +454,14 @@ ${extraAttrs}
   // proving extractOriginal also survives the style pattern.
   it('discard restores the original element after a JSX self-closing <style />', () => {
     const html = `<body>
-  <!-- impeccable-variants-start DISC -->
-  <div data-impeccable-variants="DISC" data-impeccable-variant-count="2" style="display: contents">
-    <div data-impeccable-variant="original"><p class="hook">ORIGINAL CONTENT</p></div>
-    <style data-impeccable-css="DISC" dangerouslySetInnerHTML={{ __html: '@scope ([data-impeccable-variant="1"]) { .hook { color: red; } }' }} />
-    <div data-impeccable-variant="1"><p class="hook">variant one</p></div>
-    <div data-impeccable-variant="2" style="display: none"><p class="hook">variant two</p></div>
+  <!-- fk-variants-start DISC -->
+  <div data-fk-variants="DISC" data-fk-variant-count="2" style="display: contents">
+    <div data-fk-variant="original"><p class="hook">ORIGINAL CONTENT</p></div>
+    <style data-fk-css="DISC" dangerouslySetInnerHTML={{ __html: '@scope ([data-fk-variant="1"]) { .hook { color: red; } }' }} />
+    <div data-fk-variant="1"><p class="hook">variant one</p></div>
+    <div data-fk-variant="2" style="display: none"><p class="hook">variant two</p></div>
   </div>
-  <!-- impeccable-variants-end DISC -->
+  <!-- fk-variants-end DISC -->
 </body>`;
     writeFileSync(join(tmp, 'page.html'), html);
 
@@ -470,7 +470,7 @@ ${extraAttrs}
 
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
     assert.ok(after.includes('ORIGINAL CONTENT'), 'original restored');
-    assert.ok(!after.includes('impeccable-variants-start'), 'wrapper markers gone');
+    assert.ok(!after.includes('fk-variants-start'), 'wrapper markers gone');
     assert.ok(!after.includes('variant one'), 'variants dropped');
   });
 });
@@ -482,14 +482,14 @@ describe('live-accept — insert sessions', () => {
 
   const insertHtml = (id) => `<main>
   <section class="hero">Hero block</section>
-  <!-- impeccable-variants-start ${id} -->
-  <div data-impeccable-variants="${id}" data-impeccable-mode="insert" data-impeccable-variant-count="2" style="display: contents">
+  <!-- fk-variants-start ${id} -->
+  <div data-fk-variants="${id}" data-fk-mode="insert" data-fk-variant-count="2" style="display: contents">
     <!-- Variants: insert below this line -->
-    <style data-impeccable-css="${id}">@scope ([data-impeccable-variant="1"]) { .cta { color: red; } }</style>
-    <div data-impeccable-variant="1"><p class="cta">Variant one</p></div>
-    <div data-impeccable-variant="2" style="display: none"><p class="cta">Variant two</p></div>
+    <style data-fk-css="${id}">@scope ([data-fk-variant="1"]) { .cta { color: red; } }</style>
+    <div data-fk-variant="1"><p class="cta">Variant one</p></div>
+    <div data-fk-variant="2" style="display: none"><p class="cta">Variant two</p></div>
   </div>
-  <!-- impeccable-variants-end ${id} -->
+  <!-- fk-variants-end ${id} -->
   <section class="footer">Footer</section>
 </main>`;
 
@@ -500,7 +500,7 @@ describe('live-accept — insert sessions', () => {
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
     assert.ok(after.includes('Hero block'));
     assert.ok(after.includes('Footer'));
-    assert.ok(!after.includes('impeccable-variants-start'));
+    assert.ok(!after.includes('fk-variants-start'));
     assert.ok(!after.includes('Variant one'));
   });
 
@@ -511,7 +511,7 @@ describe('live-accept — insert sessions', () => {
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
     assert.ok(after.includes('Variant two'));
     assert.ok(!after.includes('Variant one'));
-    assert.ok(!after.includes('impeccable-variants-start'));
+    assert.ok(!after.includes('fk-variants-start'));
     assert.ok(after.includes('Hero block'));
     assert.ok(after.includes('Footer'));
   });

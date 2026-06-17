@@ -41,7 +41,7 @@ import { pathToFileURL, fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const ENVELOPE_PREFIX = '[impeccable@1]';
+export const ENVELOPE_PREFIX = '[fk@1]';
 
 export const ALLOWED_EXTS = new Set([
   '.tsx', '.jsx', '.html', '.htm', '.vue', '.svelte', '.astro',
@@ -86,8 +86,8 @@ export const HOOK_LOCAL_IGNORE_PATTERNS = Object.freeze([
   '.fk-skills/config.local.json',
 ]);
 
-const HOOK_IGNORE_MARKER_OPEN = '# impeccable-hook-ignore-start';
-const HOOK_IGNORE_MARKER_CLOSE = '# impeccable-hook-ignore-end';
+const HOOK_IGNORE_MARKER_OPEN = '# fk-skills-hook-ignore-start';
+const HOOK_IGNORE_MARKER_CLOSE = '# fk-skills-hook-ignore-end';
 const CACHE_MAX_SESSIONS = 8;
 export const EDIT_COUNT_THRESHOLD = 6;
 
@@ -556,7 +556,7 @@ export function bumpEditCount(cache, sessionId, filePath) {
 }
 
 export function suppressionNotice(filePath) {
-  return `${ENVELOPE_PREFIX} Suppressing further design hints on ${filePath}. More than ${EDIT_COUNT_THRESHOLD} edits in this session reached. Run /impeccable audit to revisit.`;
+  return `${ENVELOPE_PREFIX} Suppressing further design hints on ${filePath}. More than ${EDIT_COUNT_THRESHOLD} edits in this session reached. Run /fk audit to revisit.`;
 }
 
 // Glob → RegExp. Supports `**`, `*`, `?`, and `{a,b}` alternation.
@@ -770,7 +770,7 @@ export function renderTemplate(findings, filePath, config, opts = {}) {
   const header = `${ENVELOPE_PREFIX} Design hook findings requiring review in ${display} (${total} issue(s)):`;
   const lines = shown.map((f) => formatFindingLine(f));
   const more = remaining > 0
-    ? `... and ${remaining} more (see /impeccable audit).`
+    ? `... and ${remaining} more (see /fk audit).`
     : null;
   const footer = directiveFooter(display);
 
@@ -814,7 +814,7 @@ function renderGroupedTemplate(groups, config, opts = {}) {
     shownCount += shown.length;
     const hidden = group.findings.length - shown.length;
     if (hidden > 0) {
-      lines.push(`- ... ${hidden} more in ${display} (see /impeccable audit).`);
+      lines.push(`- ... ${hidden} more in ${display} (see /fk audit).`);
     }
   }
 
@@ -830,7 +830,7 @@ function clampGroupedToBudget(header, lines, footer, maxChars) {
   const assemble = (linesArr, omitted) => [
     header,
     ...linesArr,
-    ...(omitted ? ['... and more (see /impeccable audit).'] : []),
+    ...(omitted ? ['... and more (see /fk audit).'] : []),
     '',
     footer,
   ].join('\n');
@@ -863,7 +863,7 @@ function clampToBudget(header, lines, more, footer, maxChars) {
   let assembled = assemble(working, moreText);
   while (assembled.length > maxChars && working.length > 1) {
     working.pop();
-    moreText = '... and more (see /impeccable audit).';
+    moreText = '... and more (see /fk audit).';
     assembled = assemble(working, moreText);
   }
   if (assembled.length > maxChars) {
@@ -895,7 +895,7 @@ function formatFindingIgnoreCommand(finding) {
   const value = extractFindingIgnoreValueRaw(finding);
   const valueArg = quoteCommandArg(value);
   const reason = quoteCommandArg(`User confirmed ${value} is intentional`);
-  return `/impeccable hooks ignore-value ${rule} ${valueArg} --shared --reason ${reason}`;
+  return `/fk hooks ignore-value ${rule} ${valueArg} --shared --reason ${reason}`;
 }
 
 function quoteCommandArg(value) {
@@ -1252,16 +1252,16 @@ export function appendDesignSystemNote(text, scanOptions) {
 //      raw envelope. Asking the model to surface the resolution in its
 //      reply is the cheapest way to make the feedback loop visible.
 function directiveFooter(display, opts = {}) {
-  const ignoreFileCommand = `/impeccable hooks ignore-file ${quoteCommandArg(display)}`;
+  const ignoreFileCommand = `/fk hooks ignore-file ${quoteCommandArg(display)}`;
   const fileIgnoreGuidance = opts.grouped
-    ? 'run `/impeccable hooks ignore-file <path>` for the specific file'
+    ? 'run `/fk hooks ignore-file <path>` for the specific file'
     : `run \`${ignoreFileCommand}\``;
   return [
     'Handle these before finalizing: fix findings that are real design problems, or explicitly classify contextually intentional findings as false positives. Acknowledge what you changed or why you are leaving a finding unchanged.',
     '',
     'Use context judgment before editing. A finding is not automatically a defect; literal or domain-appropriate motion, intentional demos or fixtures, documentation of bad design, and user-confirmed choices can be valid as-is.',
     '',
-    `Do not change intentional design just to satisfy the hook. Do not add source comments such as \`impeccable: ignore\`; those pollute the code and do not suppress hook findings. Persist hook ignores only after the user explicitly confirms the finding is intentional. Prefer the narrowest persisted exception: run the exact \`/impeccable hooks ignore-value ... --shared\` command shown next to a value-specific finding. For \`overused-font\`, use \`ignore-value\` for a specific font and use \`/impeccable hooks ignore-rule overused-font --all-values\` only when the user asks to ignore overused fonts generally. For file-specific findings without an ignore-value command, ${fileIgnoreGuidance}; use \`/impeccable hooks ignore-rule <id>\` only when the user asks to suppress the whole non-value-specific rule. Run /impeccable audit for the full pass.`,
+    `Do not change intentional design just to satisfy the hook. Do not add source comments such as \`fk: ignore\`; those pollute the code and do not suppress hook findings. Persist hook ignores only after the user explicitly confirms the finding is intentional. Prefer the narrowest persisted exception: run the exact \`/fk hooks ignore-value ... --shared\` command shown next to a value-specific finding. For \`overused-font\`, use \`ignore-value\` for a specific font and use \`/fk hooks ignore-rule overused-font --all-values\` only when the user asks to ignore overused fonts generally. For file-specific findings without an ignore-value command, ${fileIgnoreGuidance}; use \`/fk hooks ignore-rule <id>\` only when the user asks to suppress the whole non-value-specific rule. Run /fk audit for the full pass.`,
   ].join('\n');
 }
 
@@ -1277,7 +1277,7 @@ export async function runHook({ stdinJson, env = {}, cwd = process.cwd(), now = 
 
   try {
     // Re-entrancy guard.
-    if (depthIsSet(env.IMPECCABLE_HOOK_DEPTH) || depthIsSet(env.CLAUDE_HOOK_DEPTH)) {
+    if (depthIsSet(env.FK_SKILLS_HOOK_DEPTH) || depthIsSet(env.CLAUDE_HOOK_DEPTH)) {
       return result({ reentrant: true, durationMs: 0 });
     }
 

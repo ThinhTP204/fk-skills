@@ -23,7 +23,7 @@ Resolve one stable target, run two independent assessments, synthesize a design 
    node {{scripts_path}}/critique-storage.mjs slug "<resolved-path-or-url>"
    ```
    Keep it. If the command exits non-zero, skip persistence and trend for this run, but continue the critique.
-3. **Read `.impeccable/critique/ignore.md`** if it exists. Drop matching findings silently; it is the only prior-run input critique consumes.
+3. **Read `.fk-skills/critique/ignore.md`** if it exists. Drop matching findings silently; it is the only prior-run input critique consumes.
 
 ### Assessment Orchestration
 
@@ -186,7 +186,7 @@ Codex Run Notes are final-chat only. Do not include this section in the persiste
 
 ### Persist the Snapshot
 
-Once the report above is finalized, write it to `.impeccable/critique/` so the user can refer back, and so `{{command_prefix}}fk polish` can pick up the priority issues without a copy-paste.
+Once the report above is finalized, write it to `.fk-skills/critique/` so the user can refer back, and so `{{command_prefix}}fk polish` can pick up the priority issues without a copy-paste.
 
 Skip this step if the Setup slug was null (vague or root-level target).
 
@@ -196,9 +196,9 @@ Skip this step if the Setup slug was null (vague or root-level target).
    Codex: exclude Run Notes from the temp body file; Run Notes are final-chat only because persistence, trend read, and temp cleanup happen after the snapshot write.
    </codex>
 
-2. **Pass the structured metadata** through `IMPECCABLE_CRITIQUE_META` (JSON), then run the write command:
+2. **Pass the structured metadata** through `FK_SKILLS_CRITIQUE_META` (JSON), then run the write command:
    ```bash
-   IMPECCABLE_CRITIQUE_META='{"target":"<user phrasing>","total_score":<n>,"p0_count":<n>,"p1_count":<n>}' \
+   FK_SKILLS_CRITIQUE_META='{"target":"<user phrasing>","total_score":<n>,"p0_count":<n>,"p1_count":<n>}' \
      node {{scripts_path}}/critique-storage.mjs write <slug> <body-file>
    ```
    The helper prints the absolute path it wrote.
@@ -214,7 +214,7 @@ Skip this step if the Setup slug was null (vague or root-level target).
 5. **Append a single line to the user-visible output**, after the report and before the questions:
 
    > **Trend for `<slug>` (last 5 runs): 24 → 28 → 32 → 29 → 32**
-   > Wrote `.impeccable/critique/<filename>`.
+   > Wrote `.fk-skills/critique/<filename>`.
 
    If this is the first run for the slug, the trend is just one score; say so: "First run for this target, no trend yet."
 

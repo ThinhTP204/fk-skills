@@ -978,7 +978,7 @@
 
 /* In the command palette the section accent (--spread-accent) carries the whole
    category identity: the kicker, the skill name (big title + active list item),
-   and the divider. The slash before /impeccable is demoted to the namespace's
+   and the divider. The slash before /fk is demoted to the namespace's
    muted ink — it's punctuation, not identity. (Light mode re-applies these accent
    colors in light-mode.css to clear that file's :is() eyebrow rule.) */
 .home-kinpaku .magazine-container :is(.spread-command-name, .spread-category-label, .fisheye-item.is-active) {

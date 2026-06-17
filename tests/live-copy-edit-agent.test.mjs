@@ -47,7 +47,7 @@ describe('live-copy-edit-agent', () => {
     assert.match(prompt, /site\/scripts\/data\.js/);
     assert.match(prompt, /Preserve numeric, boolean, array, and object model data/);
     assert.match(prompt, /do not replace the underlying typed model declaration/);
-    assert.match(prompt, /impeccable:manual-edit-validate/);
+    assert.match(prompt, /fk:manual-edit-validate/);
     assert.match(prompt, /Return ONLY JSON/);
   });
 
@@ -89,10 +89,10 @@ describe('live-copy-edit-agent', () => {
     try {
       fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
       fs.writeFileSync(path.join(tmp, 'src', 'bad.js'), 'const value = ;\n');
-      fs.writeFileSync(path.join(tmp, 'src', 'page.html'), '<!-- impeccable-carbonize-end abcdef12 -->\n<h1>Hi</h1>\n');
+      fs.writeFileSync(path.join(tmp, 'src', 'page.html'), '<!-- fk-carbonize-end abcdef12 -->\n<h1>Hi</h1>\n');
       const checks = runCopyEditPostApplyChecks({ cwd: tmp, files: ['src/bad.js', 'src/page.html'] });
       assert.equal(checks.ok, false);
-      assert.equal(checks.failures.some((item) => item.reason === 'leftover_impeccable_marker'), true);
+      assert.equal(checks.failures.some((item) => item.reason === 'leftover_fk_marker'), true);
       assert.equal(checks.failures.some((item) => item.reason === 'invalid_js'), true);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
@@ -132,9 +132,9 @@ describe('live-copy-edit-agent', () => {
       fs.writeFileSync(
         path.join(tmp, 'src', 'live-helper.js'),
         [
-          'const words = "impeccable-carbonize- data-impeccable-variant IMPECCABLE_VARIANT impeccable-live-variant";',
-          'const selector = "[data-impeccable-variant=\\"1\\"]";',
-          'const example = "<div data-impeccable-variant=\\"1\\">demo</div>";',
+          'const words = "impeccable-carbonize- data-fk-variant IMPECCABLE_VARIANT fk-live-variant";',
+          'const selector = "[data-fk-variant=\\"1\\"]";',
+          'const example = "<div data-fk-variant=\\"1\\">demo</div>";',
           'export { words, selector, example };',
           '',
         ].join('\n'),
@@ -148,9 +148,9 @@ describe('live-copy-edit-agent', () => {
   });
 
   it('respects off mode before trying local AI commands', () => {
-    assert.equal(chooseCopyEditAgent({ env: { IMPECCABLE_LIVE_COPY_AGENT: 'off' } }), null);
-    assert.equal(chooseCopyEditAgent({ env: { IMPECCABLE_LIVE_COPY_AGENT: 'false' } }), null);
-    assert.equal(chooseCopyEditAgent({ env: { IMPECCABLE_LIVE_COPY_AGENT: 'mock' } }), 'mock');
+    assert.equal(chooseCopyEditAgent({ env: { FK_SKILLS_LIVE_COPY_AGENT: 'off' } }), null);
+    assert.equal(chooseCopyEditAgent({ env: { FK_SKILLS_LIVE_COPY_AGENT: 'false' } }), null);
+    assert.equal(chooseCopyEditAgent({ env: { FK_SKILLS_LIVE_COPY_AGENT: 'mock' } }), 'mock');
   });
 
   it('surfaces Claude CLI auth errors from is_error JSON output', () => {
@@ -195,7 +195,7 @@ describe('live-copy-edit-agent', () => {
     const nothingInstalled = describeNoProviderError({ exists: () => false, authed: () => false, env: {} });
     assert.match(nothingInstalled, /Claude CLI: not installed/);
     assert.match(nothingInstalled, /Codex CLI: not installed/);
-    assert.match(nothingInstalled, /IMPECCABLE_LIVE_COPY_AGENT=mock/);
+    assert.match(nothingInstalled, /FK_SKILLS_LIVE_COPY_AGENT=mock/);
 
     const codexInstalled = describeNoProviderError({
       exists: (cmd) => cmd === 'codex',
@@ -209,13 +209,13 @@ describe('live-copy-edit-agent', () => {
   it('auto mode picks the first authenticated provider via injected authCheck', () => {
     const claudeUnauthedCodexAuthed = (cmd) => cmd === 'codex';
     assert.equal(
-      chooseCopyEditAgent({ env: { IMPECCABLE_LIVE_COPY_AGENT: 'auto' }, authCheck: claudeUnauthedCodexAuthed }),
+      chooseCopyEditAgent({ env: { FK_SKILLS_LIVE_COPY_AGENT: 'auto' }, authCheck: claudeUnauthedCodexAuthed }),
       'codex',
     );
 
     const onlyClaudeAuthed = (cmd) => cmd === 'claude';
     assert.equal(
-      chooseCopyEditAgent({ env: { IMPECCABLE_LIVE_COPY_AGENT: 'auto' }, authCheck: onlyClaudeAuthed }),
+      chooseCopyEditAgent({ env: { FK_SKILLS_LIVE_COPY_AGENT: 'auto' }, authCheck: onlyClaudeAuthed }),
       'claude',
     );
 
@@ -230,7 +230,7 @@ describe('live-copy-edit-agent', () => {
     const noneAuthed = () => false;
     assert.equal(
       chooseCopyEditAgent({
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'auto' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'auto' },
         authCheck: noneAuthed,
         chatAvailable: () => true,
       }),
@@ -238,7 +238,7 @@ describe('live-copy-edit-agent', () => {
     );
     assert.equal(
       chooseCopyEditAgent({
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'auto' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'auto' },
         authCheck: noneAuthed,
         chatAvailable: () => false,
       }),
@@ -247,14 +247,14 @@ describe('live-copy-edit-agent', () => {
     // Explicit chat mode honors chatAvailable.
     assert.equal(
       chooseCopyEditAgent({
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
         chatAvailable: () => true,
       }),
       'chat',
     );
     assert.equal(
       chooseCopyEditAgent({
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'chat' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'chat' },
         chatAvailable: () => false,
       }),
       null,
@@ -262,7 +262,7 @@ describe('live-copy-edit-agent', () => {
     // CLI providers still preferred when authenticated.
     assert.equal(
       chooseCopyEditAgent({
-        env: { IMPECCABLE_LIVE_COPY_AGENT: 'auto' },
+        env: { FK_SKILLS_LIVE_COPY_AGENT: 'auto' },
         authCheck: (cmd) => cmd === 'codex',
         chatAvailable: () => true,
       }),
@@ -305,14 +305,14 @@ describe('live-copy-edit-agent', () => {
     );
   });
 
-  it('describeNoProviderError mentions starting impeccable live when chat is the missing piece', () => {
+  it('describeNoProviderError mentions starting fk live when chat is the missing piece', () => {
     const noChatPolling = describeNoProviderError({
       exists: () => false,
       authed: () => false,
       chatAvailable: () => false,
       env: {},
     });
-    assert.match(noChatPolling, /Chat: no Impeccable live session is currently polling/);
-    assert.match(noChatPolling, /Start Impeccable live/);
+    assert.match(noChatPolling, /Chat: no FK live session is currently polling/);
+    assert.match(noChatPolling, /Start FK live/);
   });
 });

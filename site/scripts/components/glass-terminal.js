@@ -12,7 +12,7 @@ const MOBILE_BREAKPOINT = 900;
 // Setup / management commands that aren't "steering" verbs. They're kept off
 // the command palette (fisheye + mobile carousel) but still appear in the
 // periodic table (rendered separately by framework-viz.js).
-const PALETTE_EXCLUDED = new Set(['impeccable', 'init', 'extract', 'document', 'live']);
+const PALETTE_EXCLUDED = new Set(['fk', 'init', 'extract', 'document', 'live']);
 
 function isMobile() {
     return window.innerWidth <= MOBILE_BREAKPOINT;
@@ -77,9 +77,9 @@ function renderDesktopLayout(container, commands) {
     let startIndex = -1;
 
     // Filter out deprecated shims. craft, teach, extract used to be filtered
-    // too (when they were rendered as 'impeccable craft' etc.) but are now
+    // too (when they were rendered as 'fk craft' etc.) but are now
     // first-class sub-commands that should appear in the gallery.
-    const deprecated = new Set(['teach-impeccable', 'frontend-design', 'arrange', 'normalize', 'onboard', 'impeccable craft', 'impeccable teach', 'impeccable extract']);
+    const deprecated = new Set(['teach-fk', 'frontend-design', 'arrange', 'normalize', 'onboard', 'fk craft', 'fk teach', 'fk extract']);
     const filteredCommands = commands.filter(c => !deprecated.has(c.id) && !PALETTE_EXCLUDED.has(c.id));
 
     const categoryOrder = ['create', 'evaluate', 'refine', 'simplify', 'harden', 'system'];
@@ -89,7 +89,7 @@ function renderDesktopLayout(container, commands) {
     };
     // Preferred order within each category (unlisted commands append at end)
     const categoryCommandOrder = {
-        'create': ['impeccable', 'craft', 'shape'],
+        'create': ['fk', 'craft', 'shape'],
         'evaluate': ['critique', 'audit'],
         'refine': ['typeset', 'layout', 'colorize', 'animate', 'delight', 'bolder', 'quieter', 'overdrive'],
         'simplify': ['distill', 'clarify', 'adapt'],
@@ -202,12 +202,12 @@ function renderSpread(cmd, index, isActive) {
         }
     }
 
-    // The root skill is rendered as impeccable; sub-commands are rendered as
-    // /impeccable on a smaller line above the command name, so the command name
+    // The root skill is rendered as fk; sub-commands are rendered as
+    // /fk on a smaller line above the command name, so the command name
     // stays the visual anchor at full display size.
-    const isRoot = cmd.id === 'impeccable';
+    const isRoot = cmd.id === 'fk';
     const nameHTML = isRoot
-        ? 'impeccable'
+        ? 'fk'
         : `<span class="spread-namespace"><span class="spread-slash">/</span>impeccable</span>${cmd.id}`;
 
     return `
@@ -490,11 +490,11 @@ function renderMobileLayout(container, commands) {
     // table); match the desktop fisheye filter.
     commands = commands.filter(c => !PALETTE_EXCLUDED.has(c.id));
     // Build carousel pills
-    // Carousel pills show bare command names for sub-commands, and /impeccable
+    // Carousel pills show bare command names for sub-commands, and /fk
     // for the root entry.
     const carouselHTML = commands.map((cmd, i) => `
         <button class="mobile-cmd-pill${i === 0 ? ' active' : ''}" data-id="${cmd.id}">
-            ${cmd.id === 'impeccable' ? '/impeccable' : cmd.id}
+            ${cmd.id === 'fk' ? '/fk' : cmd.id}
         </button>
     `).join('');
 
@@ -504,7 +504,7 @@ function renderMobileLayout(container, commands) {
         let relationshipHTML = '';
 
         // Relationships show bare command names (e.g., "pairs with quieter")
-        // because the invocation is /impeccable <name>, not /<name>.
+        // because the invocation is /fk <name>, not /<name>.
         if (relationship) {
             if (relationship.pairs) {
                 relationshipHTML = `<div class="mobile-cmd-rel">↔ pairs with <code>${relationship.pairs}</code></div>`;
@@ -513,9 +513,9 @@ function renderMobileLayout(container, commands) {
             }
         }
 
-        const cardName = cmd.id === 'impeccable'
-            ? '/impeccable'
-            : `<span class="mobile-cmd-namespace">/impeccable</span> ${cmd.id}`;
+        const cardName = cmd.id === 'fk'
+            ? '/fk'
+            : `<span class="mobile-cmd-namespace">/fk</span> ${cmd.id}`;
 
         return `
             <div class="mobile-cmd-info${i === 0 ? ' active' : ''}" data-id="${cmd.id}">

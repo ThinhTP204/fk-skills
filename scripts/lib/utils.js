@@ -6,7 +6,7 @@ import path from 'path';
 // excludes them from dist, and the harness-sync step preserves them across
 // the rm+recopy so local state isn't destroyed on every rebuild.
 // - config.json: legacy live-mode inject target list for existing projects.
-//   New installs write project config at .impeccable/live/config.json instead.
+//   New installs write project config at .fk-skills/live/config.json instead.
 export const PER_PROJECT_SCRIPT_ARTIFACTS = new Set(['config.json']);
 
 const DETECTOR_BUNDLE_DIR = 'cli/engine';
@@ -244,7 +244,7 @@ export function readFilesRecursive(dir, fileList = []) {
  * and copies that directory verbatim. If `skill/SKILL.md` existed, `npx skills`
  * would install the UNCOMPILED source (unresolved `{{placeholders}}`, no vendored
  * detector). Naming it `SKILL.src.md` hides it from discovery so the CLI falls
- * through to a compiled harness dir (`.agents/skills/impeccable`) instead.
+ * through to a compiled harness dir (`.agents/skills/fk`) instead.
  */
 export function readSourceFiles(rootDir) {
   const skillDir = path.join(rootDir, 'skill');
@@ -316,7 +316,7 @@ export function readSourceFiles(rootDir) {
   }
 
   skills.push({
-    name: frontmatter.name || 'impeccable',
+    name: frontmatter.name || 'fk',
     description: frontmatter.description || '',
     license: frontmatter.license || '',
     compatibility: frontmatter.compatibility || '',
@@ -699,7 +699,7 @@ function escapeRegex(str) {
 
 const EXCLUDED_FROM_SUGGESTIONS = new Set([
   'fk',                       // foundational skill, not a steering command
-  'teach-impeccable',         // deprecated shim
+  'teach-fk',         // deprecated shim
   'frontend-design',          // deprecated shim
 ]);
 

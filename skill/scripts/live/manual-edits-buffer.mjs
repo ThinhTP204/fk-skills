@@ -1,7 +1,7 @@
 /**
  * Shared helpers for the pending-manual-edits buffer on disk.
  *
- * Location: .impeccable/live/pending-manual-edits.json (project-local).
+ * Location: .fk-skills/live/pending-manual-edits.json (project-local).
  * Schema:   { version: 1, entries: [{ id, pageUrl, element, ops, stagedAt }] }
  *
  * Each entry corresponds to one Save action from the browser. Ops merge by

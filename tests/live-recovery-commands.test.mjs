@@ -12,7 +12,7 @@ const RESUME_SCRIPT = join(REPO_ROOT, 'skill/scripts/live-resume.mjs');
 const COMPLETE_SCRIPT = join(REPO_ROOT, 'skill/scripts/live-complete.mjs');
 
 function withTempProject(fn) {
-  const cwd = mkdtempSync(join(tmpdir(), 'impeccable-live-recovery-'));
+  const cwd = mkdtempSync(join(tmpdir(), 'fk-live-recovery-'));
   try { return fn(cwd); }
   finally { rmSync(cwd, { recursive: true, force: true }); }
 }
@@ -25,7 +25,7 @@ function runJson(script, args, cwd) {
 describe('live recovery CLI commands', () => {
   it('prints active durable session status without a running helper server', () => withTempProject((cwd) => {
     const store = createLiveSessionStore({ cwd });
-    store.appendEvent({ type: 'generate', id: 'cli-recover-1', action: 'impeccable', count: 3, pageUrl: '/', element: { outerHTML: '<button>Go</button>' } });
+    store.appendEvent({ type: 'generate', id: 'cli-recover-1', action: 'freeform', count: 3, pageUrl: '/', element: { outerHTML: '<button>Go</button>' } });
 
     const status = runJson(STATUS_SCRIPT, [], cwd);
     assert.equal(status.liveServer, null);
@@ -36,7 +36,7 @@ describe('live recovery CLI commands', () => {
 
   it('resumes the pending event and reports the next safe agent action', () => withTempProject((cwd) => {
     const store = createLiveSessionStore({ cwd });
-    store.appendEvent({ type: 'generate', id: 'cli-recover-2', action: 'impeccable', count: 2, pageUrl: '/', element: { outerHTML: '<section>Hero</section>' } });
+    store.appendEvent({ type: 'generate', id: 'cli-recover-2', action: 'freeform', count: 2, pageUrl: '/', element: { outerHTML: '<section>Hero</section>' } });
 
     const resume = runJson(RESUME_SCRIPT, ['--id', 'cli-recover-2'], cwd);
     assert.equal(resume.active, true);
@@ -102,7 +102,7 @@ describe('live recovery CLI commands', () => {
 
   it('marks a session completed through the canonical completion command', () => withTempProject((cwd) => {
     const store = createLiveSessionStore({ cwd });
-    store.appendEvent({ type: 'generate', id: 'cli-recover-3', action: 'impeccable', count: 1, pageUrl: '/', element: { outerHTML: '<p>Copy</p>' } });
+    store.appendEvent({ type: 'generate', id: 'cli-recover-3', action: 'freeform', count: 1, pageUrl: '/', element: { outerHTML: '<p>Copy</p>' } });
 
     const completed = runJson(COMPLETE_SCRIPT, ['--id', 'cli-recover-3'], cwd);
     assert.equal(completed.ok, true);

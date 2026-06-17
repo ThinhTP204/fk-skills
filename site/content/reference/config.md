@@ -6,11 +6,11 @@ section: concepts
 order: 2
 ---
 
-Impeccable stores runtime settings under `.impeccable/`. Most users do not need to hand-edit those files. Use the CLI when you want to record a confirmed exception.
+Impeccable stores runtime settings under `.fk-skills/`. Most users do not need to hand-edit those files. Use the CLI when you want to record a confirmed exception.
 
 Use config for:
 
-- detector ignores shared by `npx impeccable detect` and the design hook;
+- detector ignores shared by `npx fk-skills detect` and the design hook;
 - private local ignores that should not be committed;
 - hook lifecycle settings such as enabled, quiet mode, and audit logging.
 
@@ -21,43 +21,43 @@ Use `PRODUCT.md` and `DESIGN.md` for product and design intent. See [Design Cont
 List the current ignores:
 
 ```bash
-npx impeccable ignores list
+npx fk-skills ignores list
 ```
 
 Add the narrowest exception that matches the real reason:
 
 ```bash
-npx impeccable ignores add-value design-system-color "#ff00aa" --reason "Campaign accent"
-npx impeccable ignores add-file "src/legacy/**"
-npx impeccable ignores add-rule side-tab
+npx fk-skills ignores add-value design-system-color "#ff00aa" --reason "Campaign accent"
+npx fk-skills ignores add-file "src/legacy/**"
+npx fk-skills ignores add-rule side-tab
 ```
 
 Remove an exception when the underlying code is fixed:
 
 ```bash
-npx impeccable ignores remove-value design-system-color "#ff00aa"
+npx fk-skills ignores remove-value design-system-color "#ff00aa"
 ```
 
 The same detector config is used by the CLI and the hook, so an ignore behaves consistently in both places.
 
 ## Shared or local
 
-Default ignores go into `.impeccable/config.json`. Commit them when they represent team intent: a legacy folder, a confirmed brand exception, or a project-wide rule decision.
+Default ignores go into `.fk-skills/config.json`. Commit them when they represent team intent: a legacy folder, a confirmed brand exception, or a project-wide rule decision.
 
 Use `--local` for private work:
 
 ```bash
-npx impeccable ignores add-file "src/private-experiment/**" --local
+npx fk-skills ignores add-file "src/private-experiment/**" --local
 ```
 
-Local settings go into `.impeccable/config.local.json`, which Impeccable keeps out of git.
+Local settings go into `.fk-skills/config.local.json`, which Impeccable keeps out of git.
 
 ## Value ignores
 
 Prefer value ignores when a rule reports a specific value:
 
 ```bash
-npx impeccable ignores add-value overused-font Inter --reason "Brand font"
+npx fk-skills ignores add-value overused-font Inter --reason "Brand font"
 ```
 
 Fonts, colors, radii, and motion values should usually be suppressed by value, not by whole rule. That keeps the rule useful everywhere else.
@@ -65,7 +65,7 @@ Fonts, colors, radii, and motion values should usually be suppressed by value, n
 Wildcard value ignores are allowed only when scoped to a file:
 
 ```bash
-npx impeccable ignores add-value design-system-color "*" --file "src/demo.css"
+npx fk-skills ignores add-value design-system-color "*" --file "src/demo.css"
 ```
 
 That keeps one intentionally experimental file from teaching the whole project that every undocumented color is acceptable.
@@ -75,7 +75,7 @@ That keeps one intentionally experimental file from teaching the whole project t
 <details class="docs-prose-details">
   <summary>What the config file looks like</summary>
   <div>
-    <p>The shared config lives at <code>.impeccable/config.json</code>. A typical file looks like this:</p>
+    <p>The shared config lives at <code>.fk-skills/config.json</code>. A typical file looks like this:</p>
     <pre><code>{
   "detector": {
     "ignoreRules": [],
@@ -88,7 +88,7 @@ That keeps one intentionally experimental file from teaching the whole project t
   "hook": {
     "enabled": true,
     "quiet": false,
-    "auditLog": ".impeccable/hook.ndjson"
+    "auditLog": ".fk-skills/hook.ndjson"
   }
 }</code></pre>
     <p>The <code>detector</code> section is shared by manual scans and hooks. The <code>hook</code> section only controls automatic hook execution and hook output.</p>
@@ -107,7 +107,7 @@ That keeps one intentionally experimental file from teaching the whole project t
   }
 }</code></pre>
     <p>For one manual run, keep config but skip the design-system rules:</p>
-    <pre><code>npx impeccable detect --no-design-system src/</code></pre>
+    <pre><code>npx fk-skills detect --no-design-system src/</code></pre>
     <p>Use <code>--no-config</code> only when you want a raw scan with no project ignores and no <code>DESIGN.md</code> context.</p>
   </div>
 </details>
@@ -115,10 +115,10 @@ That keeps one intentionally experimental file from teaching the whole project t
 <details class="docs-prose-details">
   <summary>Hook runtime settings</summary>
   <div>
-    <p>Use <code>/impeccable hooks</code> for normal lifecycle changes:</p>
-    <pre><code>/impeccable hooks status
-/impeccable hooks on
-/impeccable hooks off</code></pre>
+    <p>Use <code>/fk hooks</code> for normal lifecycle changes:</p>
+    <pre><code>/fk hooks status
+/fk hooks on
+/fk hooks off</code></pre>
     <p><code>hook.quiet: true</code> suppresses clean and pending acknowledgements while still surfacing new findings.</p>
     <p><code>hook.auditLog</code> writes one NDJSON line per hook invocation for debugging. Leave it off during normal work.</p>
     <p>Environment variables still override config for one shell: <code>IMPECCABLE_HOOK_DISABLED</code>, <code>IMPECCABLE_HOOK_QUIET</code>, and <code>IMPECCABLE_HOOK_LOG</code>.</p>

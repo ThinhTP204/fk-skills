@@ -60,14 +60,14 @@ describe('live-e2e agent output translation', () => {
 
     assert.equal(
       output.variants[0].innerHtml,
-      '<h1 data-impeccable-hoist-id="1" class="hero-title">Title</h1>',
+      '<h1 data-fk-hoist-id="1" class="hero-title">Title</h1>',
     );
     assert.equal(
       output.variants[1].innerHtml,
-      '<h1 data-impeccable-hoist-id="1" class="hero-title">Title</h1>',
+      '<h1 data-fk-hoist-id="1" class="hero-title">Title</h1>',
     );
-    assert.match(output.scopedCss, /@scope \(\[data-impeccable-variant="1"\]\)/);
-    assert.match(output.scopedCss, /:scope \[data-impeccable-hoist-id="1"\]\s*\{/);
+    assert.match(output.scopedCss, /@scope \(\[data-fk-variant="1"\]\)/);
+    assert.match(output.scopedCss, /:scope \[data-fk-hoist-id="1"\]\s*\{/);
     assert.match(output.scopedCss, /color: red;/);
     assert.match(output.scopedCss, /font-weight: 700;/);
     assert.match(output.scopedCss, /content: "a;b";/);
@@ -89,7 +89,7 @@ describe('live-e2e agent output translation', () => {
 
     assert.equal(
       output.variants[0].innerHtml,
-      '<h1 data-impeccable-hoist-id="1" class="hero-title">Title</h1>',
+      '<h1 data-fk-hoist-id="1" class="hero-title">Title</h1>',
     );
     assert.match(output.scopedCss, /color: red;/);
     assert.match(output.scopedCss, /font-size: 2rem;/);
@@ -110,9 +110,9 @@ describe('live-e2e agent output translation', () => {
 
     assert.equal(
       output.variants[0].innerHtml,
-      '<h1 class="hero-title"><span data-impeccable-hoist-id="1">Title</span></h1>',
+      '<h1 class="hero-title"><span data-fk-hoist-id="1">Title</span></h1>',
     );
-    assert.match(output.scopedCss, /:scope \[data-impeccable-hoist-id="1"\]\s*\{/);
+    assert.match(output.scopedCss, /:scope \[data-fk-hoist-id="1"\]\s*\{/);
     assert.match(output.scopedCss, /color: red;/);
     assert.match(output.scopedCss, /transform: scale\(1\.1\);/);
   });
@@ -130,8 +130,8 @@ describe('live-e2e agent output translation', () => {
       { styleMode: 'scoped' },
     );
 
-    assert.match(output.scopedCss, /:scope \[data-impeccable-hoist-id="1"\]\s*\{[^}]*color: red;/);
-    assert.match(output.scopedCss, /:scope \[data-impeccable-hoist-id="2"\]\s*\{[^}]*font-weight: 700;/);
+    assert.match(output.scopedCss, /:scope \[data-fk-hoist-id="1"\]\s*\{[^}]*color: red;/);
+    assert.match(output.scopedCss, /:scope \[data-fk-hoist-id="2"\]\s*\{[^}]*font-weight: 700;/);
   });
 
   it('targets only the styled element when same-tag siblings are present', () => {
@@ -147,14 +147,14 @@ describe('live-e2e agent output translation', () => {
       { styleMode: 'scoped' },
     );
 
-    const hoistMatches = output.variants[0].innerHtml.match(/data-impeccable-hoist-id=/g) || [];
+    const hoistMatches = output.variants[0].innerHtml.match(/data-fk-hoist-id=/g) || [];
     assert.equal(hoistMatches.length, 1, 'only the styled span should carry the hoist attribute');
     assert.match(
       output.variants[0].innerHtml,
-      /<span data-impeccable-hoist-id="1">styled<\/span>/,
+      /<span data-fk-hoist-id="1">styled<\/span>/,
     );
     assert.match(output.variants[0].innerHtml, /<span>plain<\/span>/);
-    assert.match(output.scopedCss, /:scope \[data-impeccable-hoist-id="1"\]\s*\{[^}]*color: red;/);
+    assert.match(output.scopedCss, /:scope \[data-fk-hoist-id="1"\]\s*\{[^}]*color: red;/);
   });
 
   it('handles > inside a quoted attribute value without losing the style', () => {
@@ -171,7 +171,7 @@ describe('live-e2e agent output translation', () => {
     );
 
     assert.match(output.variants[0].innerHtml, /aria-label="x > y"/);
-    assert.match(output.variants[0].innerHtml, /data-impeccable-hoist-id="1"/);
+    assert.match(output.variants[0].innerHtml, /data-fk-hoist-id="1"/);
     assert.doesNotMatch(output.variants[0].innerHtml, /style=/);
     assert.match(output.scopedCss, /color: red;/);
   });
@@ -189,7 +189,7 @@ describe('live-e2e agent output translation', () => {
 
     assert.match(
       output.scopedCss,
-      /\[data-impeccable-variant="1"\] \[data-impeccable-hoist-id="1"\] \{/,
+      /\[data-fk-variant="1"\] \[data-fk-hoist-id="1"\] \{/,
     );
     assert.doesNotMatch(output.scopedCss, /@scope/);
   });
@@ -198,8 +198,8 @@ describe('live-e2e agent output translation', () => {
     const output = normalizeVariantOutput(
       {
         scopedCss: [
-          '@scope ([data-impeccable-variant="1"]) { :scope > h1 { color: blue; } }',
-          '@scope ([data-impeccable-variant="2"][data-p-uppercase]) { :scope > h1 { text-transform: uppercase; } }',
+          '@scope ([data-fk-variant="1"]) { :scope > h1 { color: blue; } }',
+          '@scope ([data-fk-variant="2"][data-p-uppercase]) { :scope > h1 { text-transform: uppercase; } }',
         ].join('\n'),
         variants: [
           { innerHtml: '<h1 class="hero-title">One</h1>' },
@@ -209,14 +209,14 @@ describe('live-e2e agent output translation', () => {
       { styleMode: 'scoped' },
     );
 
-    assert.match(output.scopedCss, /@scope \(\[data-impeccable-variant="2"\]\)/);
-    assert.match(output.scopedCss, /--impeccable-variant-ready: 1;/);
-    assert.match(output.scopedCss, /@scope \(\[data-impeccable-variant="2"\]\[data-p-uppercase\]\)/);
+    assert.match(output.scopedCss, /@scope \(\[data-fk-variant="2"\]\)/);
+    assert.match(output.scopedCss, /--fk-variant-ready: 1;/);
+    assert.match(output.scopedCss, /@scope \(\[data-fk-variant="2"\]\[data-p-uppercase\]\)/);
   });
 
   it('returns the original output untouched when no inline styles are present', () => {
     const original = {
-      scopedCss: '@scope ([data-impeccable-variant="1"]) { :scope > h1 { color: blue; } }',
+      scopedCss: '@scope ([data-fk-variant="1"]) { :scope > h1 { color: blue; } }',
       variants: [{ innerHtml: '<h1 class="hero-title">Title</h1>' }],
     };
     const result = normalizeVariantOutput(original, { styleMode: 'scoped' });

@@ -214,18 +214,18 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.setViewport({ width: 1280, height: 800 });
       await page.goto(`${baseUrl}/fixtures/antipatterns/typography.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
-      await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+      await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
       await page.evaluate(browserScript);
       const result = await page.evaluate(() => {
-        const groups = window.impeccableScan();
+        const groups = window.fkSkillsScan();
         const types = groups.flatMap(group => group.findings.map(finding => finding.type || finding.id));
         return {
           types,
           pageTypes: groups
             .filter(group => group.el === document.body || group.el === document.documentElement)
             .flatMap(group => group.findings.map(finding => finding.type || finding.id)),
-          hasBanner: Boolean(document.querySelector('.impeccable-banner')),
-          overlays: document.querySelectorAll('.impeccable-overlay:not(.impeccable-banner)').length,
+          hasBanner: Boolean(document.querySelector('.fk-banner')),
+          overlays: document.querySelectorAll('.fk-overlay:not(.fk-banner)').length,
         };
       });
       for (const id of ['tight-leading', 'tiny-text', 'all-caps-body', 'wide-tracking', 'justified-text']) {
@@ -367,12 +367,12 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.setViewport({ width: 1280, height: 800 });
       await page.goto(`${baseUrl}/fixtures/antipatterns/visual-contrast.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
-      await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+      await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
       await page.evaluate(browserScript);
       const result = await page.evaluate(async () => {
-        const before = document.querySelectorAll('.impeccable-overlay, .impeccable-label, .impeccable-banner').length;
-        const analyses = await window.impeccableAnalyzeVisualContrast({ maxCandidates: 20, scrollOffscreen: true });
-        const after = document.querySelectorAll('.impeccable-overlay, .impeccable-label, .impeccable-banner').length;
+        const before = document.querySelectorAll('.fk-overlay, .fk-label, .fk-banner').length;
+        const analyses = await window.fkSkillsAnalyzeVisualContrast({ maxCandidates: 20, scrollOffscreen: true });
+        const after = document.querySelectorAll('.fk-overlay, .fk-label, .fk-banner').length;
         return {
           before,
           after,
@@ -407,7 +407,7 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.setViewport({ width: 1280, height: 1000 });
       await page.goto(`${baseUrl}/fixtures/antipatterns/visual-contrast.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
-      await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+      await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
       await page.evaluate(browserScript);
       const result = await page.evaluate(async () => {
         let scrollEvents = 0;
@@ -416,15 +416,15 @@ describe('detectUrl — browser-only fixtures', () => {
           scrollEvents += 1;
           maxScrollY = Math.max(maxScrollY, window.scrollY);
         }, { passive: true });
-        const syncScanResult = window.impeccableScan({
+        const syncScanResult = window.fkSkillsScan({
           visualContrast: true,
           visualContrastMaxCandidates: 20,
         });
-        const syncDetectResult = window.impeccableDetect({
+        const syncDetectResult = window.fkSkillsDetect({
           visualContrast: true,
           serialize: true,
         });
-        const groups = await window.impeccableScanAsync({
+        const groups = await window.fkSkillsScanAsync({
           visualContrast: true,
           visualContrastMaxCandidates: 20,
         });
@@ -434,15 +434,15 @@ describe('detectUrl — browser-only fixtures', () => {
             text: group.el.textContent || '',
             types: group.findings.map(finding => finding.type || finding.id),
           })),
-          overlays: document.querySelectorAll('.impeccable-overlay:not(.impeccable-banner)').length,
-          labels: document.querySelectorAll('.impeccable-label').length,
-          analyses: window.impeccableGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
+          overlays: document.querySelectorAll('.fk-overlay:not(.fk-banner)').length,
+          labels: document.querySelectorAll('.fk-label').length,
+          analyses: window.fkSkillsGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
           scrollEvents,
           maxScrollY,
           finalScrollY: window.scrollY,
           syncScanIsArray: Array.isArray(syncScanResult),
           syncDetectIsArray: Array.isArray(syncDetectResult),
-          hasAsyncApi: typeof window.impeccableScanAsync === 'function' && typeof window.impeccableDetectAsync === 'function',
+          hasAsyncApi: typeof window.fkSkillsScanAsync === 'function' && typeof window.fkSkillsDetectAsync === 'function',
         };
       });
       const visualGroups = result.groups.filter(group =>
@@ -455,8 +455,8 @@ describe('detectUrl — browser-only fixtures', () => {
       assert.ok(result.labels >= 3, `expected regular labels for visible visual findings, got: ${JSON.stringify(result)}`);
       assert.equal(result.maxScrollY, 0, `visual scan should not scroll the page by default: ${JSON.stringify(result)}`);
       assert.equal(result.finalScrollY, 0, `visual scan should preserve scroll by default: ${JSON.stringify(result)}`);
-      assert.equal(result.syncScanIsArray, true, `impeccableScan should keep a synchronous Array return: ${JSON.stringify(result)}`);
-      assert.equal(result.syncDetectIsArray, true, `impeccableDetect should keep a synchronous Array return: ${JSON.stringify(result)}`);
+      assert.equal(result.syncScanIsArray, true, `fkSkillsScan should keep a synchronous Array return: ${JSON.stringify(result)}`);
+      assert.equal(result.syncDetectIsArray, true, `fkSkillsDetect should keep a synchronous Array return: ${JSON.stringify(result)}`);
       assert.equal(result.hasAsyncApi, true, `visual contrast should expose explicit async APIs: ${JSON.stringify(result)}`);
 
       const refreshedOverlayResult = await page.evaluate(async () => {
@@ -464,7 +464,7 @@ describe('detectUrl — browser-only fixtures', () => {
         const target = [...document.querySelectorAll('p')]
           .find(node => /White text on light image should be sampled/i.test(node.textContent || ''));
         target.style.fontSize = '10px';
-        const initialGroups = window.impeccableScan({
+        const initialGroups = window.fkSkillsScan({
           visualContrast: true,
           visualContrastMaxCandidates: 20,
         });
@@ -472,14 +472,14 @@ describe('detectUrl — browser-only fixtures', () => {
         const deadline = Date.now() + 1000;
         while (
           Date.now() < deadline &&
-          !/low contrast/i.test(target?._impeccableOverlay?.textContent || '')
+          !/low contrast/i.test(target?._fkOverlay?.textContent || '')
         ) {
-          const nextButton = target?._impeccableOverlay?.querySelector('button:last-of-type');
+          const nextButton = target?._fkOverlay?.querySelector('button:last-of-type');
           if (nextButton) nextButton.click();
           await new Promise(resolve => setTimeout(resolve, 25));
         }
         const labelVariants = [];
-        const overlay = target?._impeccableOverlay;
+        const overlay = target?._fkOverlay;
         for (let i = 0; i < 3; i++) {
           labelVariants.push(overlay?.textContent || '');
           overlay?.querySelector('button:last-of-type')?.click();
@@ -487,9 +487,9 @@ describe('detectUrl — browser-only fixtures', () => {
         }
         return {
           initialTypes: initialTargetGroup?.findings.map(finding => finding.type || finding.id) || [],
-          labelText: target?._impeccableOverlay?.textContent || '',
+          labelText: target?._fkOverlay?.textContent || '',
           labelVariants,
-          overlayConnected: Boolean(target?._impeccableOverlay?.isConnected),
+          overlayConnected: Boolean(target?._fkOverlay?.isConnected),
         };
       });
       assert.ok(refreshedOverlayResult.initialTypes.includes('tiny-text'), `test setup should create an initial sync overlay on the target: ${JSON.stringify(refreshedOverlayResult)}`);
@@ -503,10 +503,10 @@ describe('detectUrl — browser-only fixtures', () => {
         target?.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
         await new Promise(resolve => setTimeout(resolve, 250));
         return {
-          overlays: document.querySelectorAll('.impeccable-overlay:not(.impeccable-banner)').length,
-          labels: document.querySelectorAll('.impeccable-label').length,
-          analyses: window.impeccableGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
-          targetHasOverlay: Boolean(target?._impeccableOverlay),
+          overlays: document.querySelectorAll('.fk-overlay:not(.fk-banner)').length,
+          labels: document.querySelectorAll('.fk-label').length,
+          analyses: window.fkSkillsGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
+          targetHasOverlay: Boolean(target?._fkOverlay),
           scrollY: window.scrollY,
         };
       });
@@ -521,19 +521,19 @@ describe('detectUrl — browser-only fixtures', () => {
           .find(node => /Muted gray text on a misty image/i.test(node.textContent || ''));
         window.scrollTo(0, 0);
         await new Promise(resolve => setTimeout(resolve, 50));
-        await window.impeccableScanAsync({
+        await window.fkSkillsScanAsync({
           visualContrast: true,
           visualContrastMaxCandidates: 20,
         });
-        const staleCleared = !target?._impeccableOverlay;
+        const staleCleared = !target?._fkOverlay;
         target?.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
         await new Promise(resolve => setTimeout(resolve, 250));
         return {
           staleCleared,
-          targetHasOverlay: Boolean(target?._impeccableOverlay),
-          targetOverlayConnected: Boolean(target?._impeccableOverlay?.isConnected),
-          overlays: document.querySelectorAll('.impeccable-overlay:not(.impeccable-banner)').length,
-          analyses: window.impeccableGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
+          targetHasOverlay: Boolean(target?._fkOverlay),
+          targetOverlayConnected: Boolean(target?._fkOverlay?.isConnected),
+          overlays: document.querySelectorAll('.fk-overlay:not(.fk-banner)').length,
+          analyses: window.fkSkillsGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
         };
       });
       assert.equal(staleOverlayResult.staleCleared, true, `expected clearOverlays to remove stale target overlay refs, got: ${JSON.stringify(staleOverlayResult)}`);
@@ -546,7 +546,7 @@ describe('detectUrl — browser-only fixtures', () => {
         window.addEventListener('scroll', () => {
           maxScrollY = Math.max(maxScrollY, window.scrollY);
         }, { passive: true });
-        const groups = await window.impeccableScanAsync({
+        const groups = await window.fkSkillsScanAsync({
           visualContrast: true,
           visualContrastMaxCandidates: 20,
           visualContrastScrollOffscreen: true,
@@ -557,7 +557,7 @@ describe('detectUrl — browser-only fixtures', () => {
             text: group.el.textContent || '',
             types: group.findings.map(finding => finding.type || finding.id),
           })),
-          analyses: window.impeccableGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
+          analyses: window.fkSkillsGetLastVisualContrastAnalyses().filter(item => item.status === 'fail').length,
           maxScrollY,
           finalScrollY: window.scrollY,
         };
@@ -587,17 +587,17 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.goto(`${baseUrl}/fixtures/antipatterns/visual-contrast.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
       await page.evaluate(() => {
-        document.documentElement.dataset.impeccableExtension = 'true';
-        window.__impeccableMessages = [];
+        document.documentElement.dataset.fkExtension = 'true';
+        window.__fkSkillsMessages = [];
         window.addEventListener('message', event => {
           if (event.source !== window || !event.data?.source?.startsWith('impeccable-')) return;
-          window.__impeccableMessages.push(event.data);
+          window.__fkSkillsMessages.push(event.data);
         });
       });
       await page.evaluate(browserScript);
       const result = await page.evaluate(async () => {
         window.postMessage({
-          source: 'impeccable-command',
+          source: 'fk-skills-command',
           action: 'scan',
           config: {
             visualContrast: true,
@@ -607,25 +607,25 @@ describe('detectUrl — browser-only fixtures', () => {
         const scanDeadline = Date.now() + 1000;
         while (
           Date.now() < scanDeadline &&
-          !window.impeccableGetLastVisualContrastAnalyses()
+          !window.fkSkillsGetLastVisualContrastAnalyses()
             .some(item => item.status === 'unresolved' && item.reason === 'text outside viewport')
         ) {
           await new Promise(resolve => setTimeout(resolve, 25));
         }
-        const unresolvedBeforeRemove = window.impeccableGetLastVisualContrastAnalyses()
+        const unresolvedBeforeRemove = window.fkSkillsGetLastVisualContrastAnalyses()
           .filter(item => item.status === 'unresolved' && item.reason === 'text outside viewport').length;
-        window.postMessage({ source: 'impeccable-command', action: 'remove' }, '*');
+        window.postMessage({ source: 'fk-skills-command', action: 'remove' }, '*');
         await new Promise(resolve => setTimeout(resolve, 50));
         const target = [...document.querySelectorAll('p')]
           .find(node => /Muted gray text on a misty image/i.test(node.textContent || ''));
         target?.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
         await new Promise(resolve => setTimeout(resolve, 300));
-        const resultsAfterRemove = window.__impeccableMessages
-          .filter(message => message.source === 'impeccable-results').length;
+        const resultsAfterRemove = window.__fkSkillsMessages
+          .filter(message => message.source === 'fk-skills-results').length;
         return {
           unresolvedBeforeRemove,
-          overlayCount: document.querySelectorAll('.impeccable-overlay').length,
-          targetHasOverlay: Boolean(target?._impeccableOverlay),
+          overlayCount: document.querySelectorAll('.fk-overlay').length,
+          targetHasOverlay: Boolean(target?._fkOverlay),
           resultsAfterRemove,
         };
       });
@@ -650,11 +650,11 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.goto(`${baseUrl}/fixtures/antipatterns/visual-contrast.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
       await page.evaluate(() => {
-        document.documentElement.dataset.impeccableExtension = 'true';
-        window.__impeccableMessages = [];
+        document.documentElement.dataset.fkExtension = 'true';
+        window.__fkSkillsMessages = [];
         window.addEventListener('message', event => {
           if (event.source !== window || !event.data?.source?.startsWith('impeccable-')) return;
-          window.__impeccableMessages.push(event.data);
+          window.__fkSkillsMessages.push(event.data);
         });
       });
       await page.evaluate(browserScript);
@@ -665,7 +665,7 @@ describe('detectUrl — browser-only fixtures', () => {
         };
         try {
           window.postMessage({
-            source: 'impeccable-command',
+            source: 'fk-skills-command',
             action: 'scan',
             config: {
               visualContrast: true,
@@ -675,15 +675,15 @@ describe('detectUrl — browser-only fixtures', () => {
           const deadline = Date.now() + 1000;
           while (
             Date.now() < deadline &&
-            !window.__impeccableMessages.some(message => message.source === 'impeccable-error')
+            !window.__fkSkillsMessages.some(message => message.source === 'fk-skills-error')
           ) {
             await new Promise(resolve => setTimeout(resolve, 25));
           }
           return {
-            ready: window.__impeccableMessages.some(message => message.source === 'impeccable-ready'),
-            results: window.__impeccableMessages.some(message => message.source === 'impeccable-results'),
-            errors: window.__impeccableMessages
-              .filter(message => message.source === 'impeccable-error')
+            ready: window.__fkSkillsMessages.some(message => message.source === 'fk-skills-ready'),
+            results: window.__fkSkillsMessages.some(message => message.source === 'fk-skills-results'),
+            errors: window.__fkSkillsMessages
+              .filter(message => message.source === 'fk-skills-error')
               .map(message => message.message || ''),
           };
         } finally {
@@ -714,36 +714,36 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.goto(`${baseUrl}/fixtures/antipatterns/should-pass.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
       await page.evaluate(() => {
-        document.documentElement.dataset.impeccableExtension = 'true';
-        window.__impeccableMessages = [];
+        document.documentElement.dataset.fkExtension = 'true';
+        window.__fkSkillsMessages = [];
         window.addEventListener('message', event => {
           if (event.source !== window || !event.data?.source?.startsWith('impeccable-')) return;
-          window.__impeccableMessages.push(event.data);
+          window.__fkSkillsMessages.push(event.data);
         });
       });
       await page.evaluate(browserScript);
       const result = await page.evaluate(async () => {
         window.postMessage({
-          source: 'impeccable-command',
+          source: 'fk-skills-command',
           action: 'scan',
           config: { scanId: 'scan-2' },
         }, '*');
         const deadline = Date.now() + 1000;
         while (
           Date.now() < deadline &&
-          !window.__impeccableMessages.some(message =>
-            message.source === 'impeccable-results' &&
+          !window.__fkSkillsMessages.some(message =>
+            message.source === 'fk-skills-results' &&
             message.scanId === 'scan-2'
           )
         ) {
           await new Promise(resolve => setTimeout(resolve, 25));
         }
-        const resultMessage = window.__impeccableMessages.find(message =>
-          message.source === 'impeccable-results' &&
+        const resultMessage = window.__fkSkillsMessages.find(message =>
+          message.source === 'fk-skills-results' &&
           message.scanId === 'scan-2'
         );
         return {
-          ready: window.__impeccableMessages.some(message => message.source === 'impeccable-ready'),
+          ready: window.__fkSkillsMessages.some(message => message.source === 'fk-skills-ready'),
           scanId: resultMessage?.scanId || null,
           count: resultMessage?.count ?? null,
         };
@@ -757,7 +757,7 @@ describe('detectUrl — browser-only fixtures', () => {
     }
   });
 
-  it('browser API: impeccableDetect is pure, impeccableScan decorates', async () => {
+  it('browser API: fkSkillsDetect is pure, fkSkillsScan decorates', async () => {
     const puppeteer = await import('puppeteer');
     const browser = await puppeteer.default.launch({
       headless: true,
@@ -768,12 +768,12 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.setViewport({ width: 1280, height: 800 });
       await page.goto(`${baseUrl}/fixtures/antipatterns/quality.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
-      await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+      await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
       await page.evaluate(browserScript);
       const pure = await page.evaluate(() => {
-        const before = document.querySelectorAll('.impeccable-overlay, .impeccable-label, .impeccable-banner').length;
-        const findings = window.impeccableDetect({ decorate: false, serialize: true });
-        const after = document.querySelectorAll('.impeccable-overlay, .impeccable-label, .impeccable-banner').length;
+        const before = document.querySelectorAll('.fk-overlay, .fk-label, .fk-banner').length;
+        const findings = window.fkSkillsDetect({ decorate: false, serialize: true });
+        const after = document.querySelectorAll('.fk-overlay, .fk-label, .fk-banner').length;
         return { before, after, count: findings.length };
       });
       assert.equal(pure.before, 0);
@@ -781,8 +781,8 @@ describe('detectUrl — browser-only fixtures', () => {
       assert.ok(pure.count > 0);
 
       const decorated = await page.evaluate(() => {
-        const groups = window.impeccableScan();
-        const overlays = document.querySelectorAll('.impeccable-overlay, .impeccable-label, .impeccable-banner').length;
+        const groups = window.fkSkillsScan();
+        const overlays = document.querySelectorAll('.fk-overlay, .fk-label, .fk-banner').length;
         return { groups: groups.length, overlays };
       });
       assert.ok(decorated.groups > 0);
@@ -804,7 +804,7 @@ describe('detectUrl — browser-only fixtures', () => {
       await page.setViewport({ width: 1280, height: 800 });
       await page.goto(`${baseUrl}/fixtures/antipatterns/quality.html`, { waitUntil: 'load' });
       const browserScript = fs.readFileSync(path.join(ROOT, 'cli/engine/detect-antipatterns-browser.js'), 'utf-8');
-      await page.evaluate(() => { window.__IMPECCABLE_CONFIG__ = { autoScan: false }; });
+      await page.evaluate(() => { window.__FK_SKILLS_CONFIG__ = { autoScan: false }; });
       await page.evaluate(browserScript);
       const result = await page.evaluate(async () => {
         const originalQuerySelectorAll = Document.prototype.querySelectorAll;
@@ -812,11 +812,11 @@ describe('detectUrl — browser-only fixtures', () => {
           throw new Error('forced query failure');
         };
         try {
-          const scan = await window.impeccableScanAsync().then(
+          const scan = await window.fkSkillsScanAsync().then(
             () => ({ state: 'resolved' }),
             error => ({ state: 'rejected', message: error?.message || String(error) }),
           );
-          const detect = await window.impeccableDetectAsync().then(
+          const detect = await window.fkSkillsDetectAsync().then(
             () => ({ state: 'resolved' }),
             error => ({ state: 'rejected', message: error?.message || String(error) }),
           );

@@ -45,7 +45,7 @@ function runCommit(extraArgs = [], env = {}) {
     cwd: tmpDir,
     env: {
       ...process.env,
-      IMPECCABLE_LIVE_COPY_AGENT: 'mock',
+      FK_SKILLS_LIVE_COPY_AGENT: 'mock',
       ...env,
     },
   });
@@ -73,7 +73,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -99,7 +99,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit(['--page-url=/a'], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'partial',
         appliedEntryIds: ['a'],
         failed: [{ entryId: 'b', reason: 'ambiguous duplicate card text' }],
@@ -164,7 +164,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': [
           '<h1 class="hero">New title</h1>',
           '<p class="tagline">New tagline from failed entry</p>',
@@ -172,7 +172,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
           '',
         ].join('\n'),
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'partial',
         appliedEntryIds: ['title'],
         failed: [{ entryId: 'combo', reason: 'hook source conflict' }],
@@ -231,14 +231,14 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': [
           '<h1 class="hero">New title</h1>',
           '<span class="secondary-action">Omitted secondary action</span>',
           '',
         ].join('\n'),
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['title'],
         files: ['src/page.html'],
@@ -269,7 +269,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'partial',
         appliedEntryIds: ['a'],
         failed: [{ entryId: 'a', reason: 'ambiguous after edit' }],
@@ -292,7 +292,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         files: ['src/page.html'],
       }),
@@ -313,7 +313,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -346,7 +346,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -382,10 +382,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">Welcome</h1>\n<p>Hello</p>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -430,7 +430,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['p1'],
         files: ['site/pages/index.astro'],
@@ -465,7 +465,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     const result = await commitManualEdits({
       cwd: tmpDir,
       provider: 'chat',
-      env: { IMPECCABLE_LIVE_MANUAL_EDIT_REPAIR_ATTEMPTS: '2' },
+      env: { FK_SKILLS_LIVE_MANUAL_EDIT_REPAIR_ATTEMPTS: '2' },
       applyBatchToSource: async (_batch, { repair } = {}) => {
         calls += 1;
         if (!repair) {
@@ -515,11 +515,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">Hello</h1>\n',
         'src/notes.html': '<p>User changed this while Apply was running</p>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -559,11 +559,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">Hello</h1>\n',
         'src/notes.html': '<h1 class="hero">Hello</h1>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -603,11 +603,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">Hello</h1>\n',
         'src/extra.html': '<p>Existing file changed outside snapshot</p>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'error',
         message: 'agent failed after editing',
         files: ['src/page.html', 'src/extra.html'],
@@ -644,7 +644,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html'],
@@ -666,7 +666,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['empty'],
         files: ['src/page.html'],
@@ -722,7 +722,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const failed = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['hero-title', 'hero-hook'],
         files: ['site/pages/index.astro'],
@@ -736,7 +736,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
 
     writeAstro({ title: 'Impeccable Wow', hook: 'YESSSSS' });
     const applied = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['hero-title', 'hero-hook'],
         files: ['site/pages/index.astro'],
@@ -757,7 +757,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT: 'off',
+      FK_SKILLS_LIVE_COPY_AGENT: 'off',
     });
 
     assert.equal(result.cleared, 0);
@@ -778,15 +778,15 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1>New</h1>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: '{not json',
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: '{not json',
     });
 
     assert.equal(result.cleared, 0);
     assert.equal(result.applied.length, 0);
-    assert.match(result.failed[0].reason, /Invalid IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT JSON/);
+    assert.match(result.failed[0].reason, /Invalid FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT JSON/);
     assert.deepEqual(result.rolledBackFiles, ['src/page.html']);
     assert.deepEqual(result.rollbackFailures, []);
     assert.equal(fs.readFileSync(file, 'utf-8'), before);
@@ -804,10 +804,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1>New</h1>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'error',
         message: 'could not apply safely',
         failed: [{ entryId: 'e1', reason: 'ambiguous' }],
@@ -833,7 +833,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'error',
         message: 'could not apply safely',
         files: [],
@@ -857,7 +857,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
   });
 
   it('reports a corrupt pending buffer instead of treating it as empty', () => {
-    const bufferPath = path.join(tmpDir, '.impeccable', 'live', 'pending-manual-edits.json');
+    const bufferPath = path.join(tmpDir, '.fk-skills', 'live', 'pending-manual-edits.json');
     fs.mkdirSync(path.dirname(bufferPath), { recursive: true });
     fs.writeFileSync(bufferPath, '{ not valid json');
 
@@ -912,7 +912,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'partial',
         appliedEntryIds: [],
         failed: [{ entryId: 'cards', reason: 'ambiguous reference check' }],
@@ -997,14 +997,14 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'site/scripts/data.js':
           "export const skillFocusAreas = [{ area: 'ResXXX', detail: 'Fluid layouts, touch targets' }];\n" +
           "export const dimensionGuidelineCounts = { 'ResXXX': 42 };\n",
         'site/scripts/components/foundation-animations.js':
           "export const foundationAnimations = { 'ResXXX': '<svg>responsive</svg>' };\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['card'],
         files: ['site/scripts/data.js', 'site/scripts/components/foundation-animations.js'],
@@ -1056,7 +1056,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'site/scripts/data.js':
           "export const unrelatedCounts = {\n" +
           noisyCounts + "\n" +
@@ -1067,7 +1067,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
           "  'Responsive': 47,\n" +
           "};\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['count'],
         files: ['site/scripts/data.js'],
@@ -1083,7 +1083,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
   it('allows non-numeric count display copy when integer source data stays typed', () => {
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       scripts: {
-        'impeccable:manual-edit-validate': 'node src/validate.mjs',
+        'fk:manual-edit-validate': 'node src/validate.mjs',
       },
     }, null, 2));
     fs.writeFileSync(
@@ -1117,10 +1117,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/stats.mjs': "export const stats = { count: 7, countLabel: '7 seats' };\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['typed-count'],
         files: ['src/stats.mjs'],
@@ -1139,7 +1139,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     const before = "export const stats = { count: 7 };\n";
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       scripts: {
-        'impeccable:manual-edit-validate': 'node src/validate.mjs',
+        'fk:manual-edit-validate': 'node src/validate.mjs',
       },
     }, null, 2));
     fs.writeFileSync(statsFile, before);
@@ -1169,10 +1169,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/stats.mjs': "export const stats = { count: '7 seats' };\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['typed-count'],
         files: ['src/stats.mjs'],
@@ -1191,7 +1191,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
   });
 
   it('fails validation and keeps staged entries when touched JS is invalid or markers remain', () => {
-    fs.writeFileSync(path.join(tmpDir, 'src', 'broken.js'), "const label = 'XX29';\nconst answer = ;\n// impeccable-carbonize-start\n");
+    fs.writeFileSync(path.join(tmpDir, 'src', 'broken.js'), "const label = 'XX29';\nconst answer = ;\n// fk-carbonize-start\n");
     writeBuffer(tmpDir, {
       entries: [
         entry({ id: 'bad', ops: [{ ref: 'a', tag: 'span', originalText: '29', newText: 'XX29' }] }),
@@ -1199,7 +1199,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['bad'],
         files: ['src/broken.js'],
@@ -1226,10 +1226,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/data.json': '{"title":"New",}\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['json'],
         files: ['src/data.json'],
@@ -1257,10 +1257,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/config.cjs': "module.exports = { title: 'New', broken: };\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['cjs'],
         files: ['src/config.cjs'],
@@ -1278,7 +1278,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
   });
 
   it('strips live edit runtime attributes from the copy-edit prompt context', () => {
-    const decoratedHtml = '<section><h1 class="hero" contenteditable="true" data-impeccable-editable="true" data-impeccable-original-text="Original" style="user-select: text; cursor: text; outline: none; -webkit-user-modify: read-write-plaintext-only;">Edited</h1></section>';
+    const decoratedHtml = '<section><h1 class="hero" contenteditable="true" data-fk-editable="true" data-fk-original-text="Original" style="user-select: text; cursor: text; outline: none; -webkit-user-modify: read-write-plaintext-only;">Edited</h1></section>';
     const prompt = buildCopyEditBatchPrompt({
       pageUrl: '/',
       entries: [
@@ -1305,18 +1305,18 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     assert.match(prompt, /objectKeyMatches/);
     assert.match(prompt, /data object or mapped list item/);
     const serializedBatch = prompt.split('Staged copy-edit batch:\n').pop();
-    assert.doesNotMatch(serializedBatch, /data-impeccable-original-text|data-impeccable-editable|contenteditable|-webkit-user-modify/);
+    assert.doesNotMatch(serializedBatch, /data-fk-original-text|data-fk-editable|contenteditable|-webkit-user-modify/);
     assert.match(serializedBatch, /Edited/);
   });
 
   it('fails post-apply validation when live edit runtime attributes leak into source', () => {
-    fs.writeFileSync(path.join(tmpDir, 'src', 'page.astro'), '<h1 class="hero" data-impeccable-original-text="Original">Edited</h1>\n');
+    fs.writeFileSync(path.join(tmpDir, 'src', 'page.astro'), '<h1 class="hero" data-fk-original-text="Original">Edited</h1>\n');
 
     const checks = runCopyEditPostApplyChecks({ cwd: tmpDir, files: ['src/page.astro'] });
 
     assert.equal(checks.ok, false);
-    assert.equal(checks.failures[0].reason, 'leftover_impeccable_marker');
-    assert.match(checks.failures[0].marker, /data-impeccable-original-text/);
+    assert.equal(checks.failures[0].reason, 'leftover_fk_marker');
+    assert.match(checks.failures[0].marker, /data-fk-original-text/);
   });
 
   it('keeps verified source edits staged when post-apply validation fails', () => {
@@ -1328,7 +1328,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['bad'],
         files: ['src/broken.js'],
@@ -1352,10 +1352,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/broken.js': "const label = 'New';\nconst answer = ;\n",
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['bad'],
         files: ['src/broken.js'],
@@ -1385,10 +1385,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
-        'src/App.jsx': 'export default function App() { return <h1 className="hero" contenteditable="true" data-impeccable-editable="true" data-impeccable-original-text="Old">Old New</h1>; }\n',
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+        'src/App.jsx': 'export default function App() { return <h1 className="hero" contenteditable="true" data-fk-editable="true" data-fk-original-text="Old">Old New</h1>; }\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['edit-ui'],
         files: ['src/App.jsx'],
@@ -1399,7 +1399,7 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     assert.equal(result.applied.length, 0);
     assert.equal(result.reason, 'manual_edit_repair_needs_decision');
     assert.equal(result.failed[0].reason, 'post_apply_validation_failed');
-    assert.equal(result.failed[0].checks.some((check) => /data-impeccable-(editable|original-text)/.test(check.marker)), true);
+    assert.equal(result.failed[0].checks.some((check) => /data-fk-(editable|original-text)/.test(check.marker)), true);
     assert.equal(result.rolledBackFiles, undefined);
     assert.match(fs.readFileSync(file, 'utf-8'), /contenteditable="true"/);
     assert.equal(readBuffer(tmpDir).entries.map((item) => item.id).join(','), 'edit-ui');
@@ -1419,17 +1419,17 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': [
-          '<!-- impeccable-carbonize-start deadbeef -->',
-          '<div data-impeccable-variants="deadbeef" data-impeccable-variant-count="3">',
-          '  <div data-impeccable-variant="original"><h1 class="hero">New</h1></div>',
+          '<!-- fk-carbonize-start deadbeef -->',
+          '<div data-fk-variants="deadbeef" data-fk-variant-count="3">',
+          '  <div data-fk-variant="original"><h1 class="hero">New</h1></div>',
           '</div>',
-          '<!-- impeccable-carbonize-end deadbeef -->',
+          '<!-- fk-carbonize-end deadbeef -->',
           '',
         ].join('\n'),
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['variant-scaffold'],
         files: ['src/page.html'],
@@ -1441,11 +1441,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     assert.equal(result.reason, 'manual_edit_repair_needs_decision');
     assert.equal(result.failed[0].reason, 'post_apply_validation_failed');
     assert.equal(
-      result.failed[0].checks.some((check) => /impeccable-carbonize-start|data-impeccable-variant/.test(check.marker)),
+      result.failed[0].checks.some((check) => /fk-carbonize-start|data-fk-variant/.test(check.marker)),
       true,
     );
     assert.equal(result.rolledBackFiles, undefined);
-    assert.match(fs.readFileSync(file, 'utf-8'), /impeccable-carbonize-start/);
+    assert.match(fs.readFileSync(file, 'utf-8'), /fk-carbonize-start/);
     assert.equal(readBuffer(tmpDir).entries.map((item) => item.id).join(','), 'variant-scaffold');
   });
 
@@ -1470,11 +1470,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">New title</h1>\n',
-        'src/card.html': '<article class="card"><span data-impeccable-text-wrap="true">New card</span></article>\n',
+        'src/card.html': '<article class="card"><span data-fk-text-wrap="true">New card</span></article>\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['title', 'card'],
         files: ['src/page.html', 'src/card.html'],
@@ -1488,10 +1488,10 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
       'post_apply_validation_failed',
       'post_apply_validation_failed',
     ]);
-    assert.equal(result.failed[0].checks.some((check) => /data-impeccable-text-wrap/.test(check.marker)), true);
+    assert.equal(result.failed[0].checks.some((check) => /data-fk-text-wrap/.test(check.marker)), true);
     assert.equal(result.rolledBackFiles, undefined);
     assert.equal(fs.readFileSync(pageFile, 'utf-8'), '<h1 class="hero">New title</h1>\n');
-    assert.match(fs.readFileSync(cardFile, 'utf-8'), /data-impeccable-text-wrap/);
+    assert.match(fs.readFileSync(cardFile, 'utf-8'), /data-fk-text-wrap/);
     assert.deepEqual(readBuffer(tmpDir).entries.map((item) => item.id), ['title', 'card']);
   });
 
@@ -1507,11 +1507,11 @@ describe('live-commit-manual-edits.mjs batched AI apply', () => {
     });
 
     const result = runCommit([], {
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_WRITES: JSON.stringify({
         'src/page.html': '<h1 class="hero">New</h1>\n',
         'src/new-broken.js': 'const answer = ;\n',
       }),
-      IMPECCABLE_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
+      FK_SKILLS_LIVE_COPY_AGENT_MOCK_RESULT: JSON.stringify({
         status: 'done',
         appliedEntryIds: ['e1'],
         files: ['src/page.html', 'src/new-broken.js'],

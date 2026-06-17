@@ -7,7 +7,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Dev-only allowance so impeccable live mode can load. Empty array in any
 // non-development environment.
-const __impeccableLiveDev =
+const __fkLiveDev =
   process.env.NODE_ENV === 'development' ? ['http://localhost:8400'] : [];
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -19,10 +19,10 @@ const config = {
       mode: 'auto',
       directives: {
         'default-src': ['self'],
-        'script-src': ['self', 'unsafe-inline', ...__impeccableLiveDev],
+        'script-src': ['self', 'unsafe-inline', ...__fkLiveDev],
         'style-src': ['self', 'unsafe-inline'],
         'img-src': ['self', 'data:', 'blob:'],
-        'connect-src': ['self', ...__impeccableLiveDev],
+        'connect-src': ['self', ...__fkLiveDev],
         'frame-ancestors': ['self'],
       },
     },

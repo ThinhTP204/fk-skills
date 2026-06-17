@@ -169,7 +169,7 @@ function mergeUniqueStrings(...groups) {
 }
 
 function repairAttemptLimit(env = process.env) {
-  const value = Number(env.IMPECCABLE_LIVE_MANUAL_EDIT_REPAIR_ATTEMPTS || DEFAULT_REPAIR_ATTEMPTS);
+  const value = Number(env.FK_SKILLS_LIVE_MANUAL_EDIT_REPAIR_ATTEMPTS || DEFAULT_REPAIR_ATTEMPTS);
   if (!Number.isFinite(value)) return DEFAULT_REPAIR_ATTEMPTS;
   return Math.max(1, Math.min(10, Math.trunc(value)));
 }
@@ -1224,7 +1224,7 @@ async function main() {
     cwd: process.cwd(),
     pageUrl: argVal(args, '--page-url'),
     provider: argVal(args, '--provider') || undefined,
-    timeoutMs: Number(process.env.IMPECCABLE_LIVE_COPY_AGENT_TIMEOUT_MS || 120000),
+    timeoutMs: Number(process.env.FK_SKILLS_LIVE_COPY_AGENT_TIMEOUT_MS || 120000),
   });
   console.log(JSON.stringify(result));
 }

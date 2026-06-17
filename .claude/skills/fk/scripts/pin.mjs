@@ -114,7 +114,7 @@ function pin(command, projectRoot) {
   const harnessDirs = findHarnessDirs(projectRoot);
 
   if (harnessDirs.length === 0) {
-    console.log('No harness directories with impeccable installed found.');
+    console.log('No harness directories with fk installed found.');
     return false;
   }
 

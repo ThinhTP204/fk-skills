@@ -80,7 +80,7 @@ describe('live-poll --stream integration', () => {
   let serverCwd;
 
   before(async () => {
-    serverCwd = mkdtempSync(join(tmpdir(), 'impeccable-live-poll-stream-'));
+    serverCwd = mkdtempSync(join(tmpdir(), 'fk-live-poll-stream-'));
     server = await startServer(8498, { cwd: serverCwd });
   });
 

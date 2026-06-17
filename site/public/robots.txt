@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://impeccable.style/sitemap.xml
+Sitemap: https://fk.style/sitemap.xml

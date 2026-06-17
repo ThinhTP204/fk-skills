@@ -26,7 +26,7 @@
 /**
  * Which layer catches each rule.
  *
- *  'cli':     static analysis or jsdom (works with `npx impeccable detect`
+ *  'cli':     static analysis or jsdom (works with `npx fk-skills detect`
  *             on files, no browser required)
  *  'browser': requires real browser layout (getBoundingClientRect with
  *             actual dimensions). Works via Puppeteer or the browser
@@ -73,9 +73,9 @@ export const LAYER_LABELS = {
 };
 
 export const LAYER_DESCRIPTIONS = {
-  cli: 'Deterministic. Runs from `npx impeccable detect` on files, no browser required.',
+  cli: 'Deterministic. Runs from `npx fk-skills detect` on files, no browser required.',
   browser: 'Deterministic, but needs real browser layout. Runs via the browser extension or Puppeteer, not the plain CLI.',
-  llm: 'Not caught by any deterministic detector. Flagged by /impeccable critique during its LLM design review.',
+  llm: 'Not caught by any deterministic detector. Flagged by /fk critique during its LLM design review.',
 };
 
 // ─── Visual examples ─────────────────────────────────────────────────
@@ -164,7 +164,7 @@ export const VISUAL_EXAMPLES = {
 };
 
 /**
- * Anti-patterns that live in the /impeccable skill's DON'T list but
+ * Anti-patterns that live in the /fk skill's DON'T list but
  * don't have a deterministic detector. These can only be caught by
  * /critique running an LLM assessment pass.
  *

@@ -1017,7 +1017,7 @@ const REPEATED_KICKER_SKIP_SELECTOR = [
   '[aria-label*="breadcrumb" i]',
   '[class*="breadcrumb" i]',
   '[aria-hidden="true"]',
-  '[data-impeccable-allow-kickers]',
+  '[data-fk-allow-kickers]',
 ].join(',');
 
 const REPEATED_KICKER_CARD_CONTEXT_SELECTOR = [
@@ -1668,7 +1668,7 @@ function checkElementQualityDOM(el) {
   const lineHeightPx = resolveLengthPx(style.lineHeight, fontSize);
   const letterSpacingPx = resolveLengthPx(style.letterSpacing, fontSize);
   const rect = el.getBoundingClientRect();
-  const lineMax = (typeof window !== 'undefined' && window.__IMPECCABLE_CONFIG__?.lineLengthMax) || 80;
+  const lineMax = (typeof window !== 'undefined' && window.__FK_SKILLS_CONFIG__?.lineLengthMax) || 80;
   const viewportWidth = (typeof window !== 'undefined' ? window.innerWidth : 0) || 0;
   return checkQuality({ el, tag, style, hasDirectText, textLen, fontSize, lineHeightPx, letterSpacingPx, rect, lineMax, viewportWidth, win: typeof window !== 'undefined' ? window : null });
 }
@@ -1917,7 +1917,7 @@ function checkTypography() {
   let totalTextElements = 0;
   for (const el of document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, td, th, dd, blockquote, figcaption, a, button, label, span')) {
     // Skip impeccable's own elements
-    if (el.closest && el.closest('.impeccable-overlay, .impeccable-label, .impeccable-banner, .impeccable-tooltip')) continue;
+    if (el.closest && el.closest('.fk-overlay, .fk-label, .fk-banner, .impeccable-tooltip')) continue;
     // Only count elements that actually have visible direct text
     const hasText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim().length > 0);
     if (!hasText) continue;

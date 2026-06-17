@@ -4,7 +4,7 @@ tagline: "Fix typography that feels generic, inconsistent, or accidental."
 
 ## When to use it
 
-Reach for `/impeccable typeset` when the text on a page looks like default typography instead of designed typography. Muddy hierarchy, three sizes that look the same, body copy at 14px, a display font that is actually just Inter bold, headlines with no kerning attention.
+Reach for `/fk typeset` when the text on a page looks like default typography instead of designed typography. Muddy hierarchy, three sizes that look the same, body copy at 14px, a display font that is actually just Inter bold, headlines with no kerning attention.
 
 Common triggers: "hierarchy feels flat", "readability is off", "fonts look generic".
 
@@ -23,7 +23,7 @@ It then fixes what it finds: picks distinctive typefaces, builds a modular scale
 ## Try it
 
 ```
-/impeccable typeset the article layout
+/fk typeset the article layout
 ```
 
 Expected diff:
@@ -37,6 +37,6 @@ Expected diff:
 
 ## Pitfalls
 
-- **Asking for a new font without context.** Typeset will pick based on the `PRODUCT.md` brand voice. If you have not run `/impeccable init`, the suggestion will be generic.
-- **Reaching for typeset when the issue is layout.** If paragraphs are fine but the page feels cramped, you want `/impeccable layout`.
+- **Asking for a new font without context.** Typeset will pick based on the `PRODUCT.md` brand voice. If you have not run `/fk init`, the suggestion will be generic.
+- **Reaching for typeset when the issue is layout.** If paragraphs are fine but the page feels cramped, you want `/fk layout`.
 - **Expecting fluid clamp scales on app UIs.** Typeset uses fixed rem scales for app interfaces. Fluid typography is for marketing and content pages where line length varies dramatically.

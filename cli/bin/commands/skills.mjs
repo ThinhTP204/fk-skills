@@ -625,7 +625,7 @@ function isAlreadyInstalled(root) {
     if (!existsSync(skillsDir)) continue;
     try {
       const entries = readdirSync(skillsDir);
-      // Look for 'impeccable' skill (or prefixed variant, or legacy 'teach-impeccable')
+      // Look for 'impeccable' skill (or prefixed variant, or legacy 'teach-fk')
       if (entries.some(e =>
         e === 'fk' || e.endsWith('-fk') ||
         e === 'teach-fk' || e.endsWith('-teach-fk')
@@ -666,7 +666,7 @@ function isRealSkillDir(skillsDir, name) {
 }
 
 /**
- * One-way migration: copy config files from the legacy `.impeccable/` folder to
+ * One-way migration: copy config files from the legacy `.fk-skills/` folder to
  * `.fk-skills/`. Idempotent — skips files that already exist in the destination.
  * Does not delete the old folder so rollback is possible. Returns the number of
  * files migrated.
@@ -1599,7 +1599,7 @@ async function install(flags) {
   }
 
   const configMigrated = migrateImpeccableConfigDir(hookRoot);
-  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .impeccable/ to .fk-skills/.`);
+  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .fk-skills/ to .fk-skills/.`);
 
   const wantHooks = installHooks && await decideHookInstall(hookRoot, targets, { yes });
 
@@ -1743,7 +1743,7 @@ async function update(flags = []) {
   }
 
   const configMigrated = migrateImpeccableConfigDir(root);
-  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .impeccable/ to .fk-skills/.`);
+  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .fk-skills/ to .fk-skills/.`);
 
   console.log('Checking for updates...');
 
@@ -1789,7 +1789,7 @@ async function update(flags = []) {
     // Retire any old `i-`-prefixed install up front so the refresh lands on the
     // canonical `impeccable` dir rather than orphaning the prefixed copy.
     const migrated = migrateUnprefixImpeccable(root);
-    if (migrated > 0) console.log('Migrated a prefixed install back to /impeccable (the i- prefix is no longer used).');
+    if (migrated > 0) console.log('Migrated a prefixed install back to /fk (the i- prefix is no longer used).');
 
     const updated = refreshProviderSkills(tmpDir, root, copyProviders);
     const wantHooks = installHooks && await decideHookInstall(root, providers, { yes });

@@ -69,17 +69,17 @@ function loadFactory(doc = createDocument(), extras = {}) {
   context.globalThis = context;
   vm.createContext(context);
   vm.runInContext(readFileSync(SCRIPT, 'utf-8'), context, { filename: SCRIPT });
-  return { context, createHelpers: context.__IMPECCABLE_LIVE_DOM__.createLiveBrowserDomHelpers };
+  return { context, createHelpers: context.__FK_SKILLS_LIVE_DOM__.createLiveBrowserDomHelpers };
 }
 
 describe('live-browser-dom helpers', () => {
   it('detects owned chrome and pickable page elements', () => {
     const doc = createDocument();
     const { createHelpers } = loadFactory(doc);
-    const helpers = createHelpers({ prefix: 'impeccable-live', skipTags: new Set(['script']) });
+    const helpers = createHelpers({ prefix: 'fk-live', skipTags: new Set(['script']) });
 
-    assert.equal(helpers.own(createElement({ id: 'impeccable-live-bar' })), true);
-    assert.ok(helpers.own(createElement({ closestResult: createElement({ id: 'impeccable-live-root' }) })));
+    assert.equal(helpers.own(createElement({ id: 'fk-live-bar' })), true);
+    assert.ok(helpers.own(createElement({ closestResult: createElement({ id: 'fk-live-root' }) })));
     assert.equal(helpers.pickable(createElement({ tagName: 'SCRIPT' })), false);
     assert.equal(helpers.pickable(createElement({ rect: { width: 12, height: 30 } })), false);
     assert.equal(helpers.pickable(createElement({ tagName: 'BUTTON' })), true);
@@ -88,9 +88,9 @@ describe('live-browser-dom helpers', () => {
   it('mounts chrome in the configured live UI root and styles in head by default', () => {
     const doc = createDocument();
     const { context, createHelpers } = loadFactory(doc);
-    const helpers = createHelpers({ prefix: 'impeccable-live', document: doc });
+    const helpers = createHelpers({ prefix: 'fk-live', document: doc });
     const uiRoot = createAppendTarget();
-    context.__IMPECCABLE_LIVE_UI_ROOT__ = uiRoot;
+    context.__FK_SKILLS_LIVE_UI_ROOT__ = uiRoot;
 
     const el = {};
     const styleInRoot = {};
@@ -98,7 +98,7 @@ describe('live-browser-dom helpers', () => {
     helpers.uiAppendStyle(styleInRoot);
     assert.deepEqual(uiRoot.children, [el, styleInRoot]);
 
-    context.__IMPECCABLE_LIVE_UI_ROOT__ = null;
+    context.__FK_SKILLS_LIVE_UI_ROOT__ = null;
     const styleInHead = {};
     helpers.uiAppendStyle(styleInHead);
     assert.deepEqual(doc.head.children, [styleInHead]);
@@ -110,7 +110,7 @@ describe('live-browser-dom helpers', () => {
     const documentHit = {};
     doc.elementsById.set('fallback', documentHit);
     const { context, createHelpers } = loadFactory(doc, { CSS: { escape: (id) => 'escaped-' + id } });
-    context.__IMPECCABLE_LIVE_UI_ROOT__ = {
+    context.__FK_SKILLS_LIVE_UI_ROOT__ = {
       appendChild() {},
       getElementById() { return null; },
       querySelector(selector) {
@@ -118,10 +118,10 @@ describe('live-browser-dom helpers', () => {
         return rootHit;
       },
     };
-    const helpers = createHelpers({ prefix: 'impeccable-live', document: doc, css: context.CSS });
+    const helpers = createHelpers({ prefix: 'fk-live', document: doc, css: context.CSS });
 
     assert.equal(helpers.uiGetById('a.b'), rootHit);
-    context.__IMPECCABLE_LIVE_UI_ROOT__ = null;
+    context.__FK_SKILLS_LIVE_UI_ROOT__ = null;
     assert.equal(helpers.uiGetById('fallback'), documentHit);
   });
 
@@ -130,11 +130,11 @@ describe('live-browser-dom helpers', () => {
     const inner = { id: 'inner' };
     doc.activeElement = { shadowRoot: { activeElement: { shadowRoot: { activeElement: inner } } } };
     const { createHelpers } = loadFactory(doc);
-    const helpers = createHelpers({ prefix: 'impeccable-live', document: doc });
+    const helpers = createHelpers({ prefix: 'fk-live', document: doc });
     const anchor = createElement({ id: 'hero', tagName: 'SECTION', classList: ['hero'] });
 
     const frozen = helpers.makeFrozenAnchor(anchor);
-    assert.equal(frozen.__impeccableFrozenAnchor, true);
+    assert.equal(frozen.__fkFrozenAnchor, true);
     assert.equal(frozen.id, 'hero');
     assert.equal(frozen.classList[0], 'hero');
     assert.equal(frozen.getBoundingClientRect().width, 40);
@@ -144,7 +144,7 @@ describe('live-browser-dom helpers', () => {
 
   it('defangs modal outside handlers on live chrome roots', () => {
     const { createHelpers } = loadFactory();
-    const helpers = createHelpers({ prefix: 'impeccable-live' });
+    const helpers = createHelpers({ prefix: 'fk-live' });
     const root = createElement();
     let stopped = 0;
 

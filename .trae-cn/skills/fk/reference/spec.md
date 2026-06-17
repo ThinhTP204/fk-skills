@@ -237,11 +237,11 @@ Concrete, forceful guardrails. Lead each with "Do" or "Don't". Be specific: incl
 - **Don't** [...]
 ```
 
-### Step 4b: Write .impeccable/design.json sidecar (extensions only)
+### Step 4b: Write .fk-skills/design.json sidecar (extensions only)
 
-The frontmatter owns token primitives (colors, typography, rounded, spacing, components). The sidecar at `.impeccable/design.json` carries **what Stitch's schema can't hold**: tonal ramps per color, shadow/elevation tokens, motion tokens, breakpoints, full component HTML/CSS snippets (the panel renders these into a shadow DOM), and narrative (north star, rules, do's/don'ts). It extends the frontmatter, it doesn't duplicate it.
+The frontmatter owns token primitives (colors, typography, rounded, spacing, components). The sidecar at `.fk-skills/design.json` carries **what Stitch's schema can't hold**: tonal ramps per color, shadow/elevation tokens, motion tokens, breakpoints, full component HTML/CSS snippets (the panel renders these into a shadow DOM), and narrative (north star, rules, do's/don'ts). It extends the frontmatter, it doesn't duplicate it.
 
-Regenerate the sidecar whenever you regenerate root `DESIGN.md`. If the user only asks to refresh the sidecar (e.g., from the live panel's stale-hint), preserve `DESIGN.md` and write only `.impeccable/design.json`.
+Regenerate the sidecar whenever you regenerate root `DESIGN.md`. If the user only asks to refresh the sidecar (e.g., from the live panel's stale-hint), preserve `DESIGN.md` and write only `.fk-skills/design.json`.
 
 #### Schema
 
@@ -310,7 +310,7 @@ Aim for a tight set of **5-10 components** that best represent the visual system
 - **Signature components (include if distinctive):** hero CTA, featured card, filter pill, any custom pattern the user mentioned as important in PRODUCT.md.
 - **Skip the rest.** Utility components, form building blocks, wrapper layouts: not worth documenting unless visually distinctive.
 
-If the project has **no component library yet** (bare landing page, new project), synthesize canonical primitives from the tokens using best-practice defaults consistent with the DESIGN.md's rules. Every `.impeccable/design.json` has *something* to render, even on day zero.
+If the project has **no component library yet** (bare landing page, new project), synthesize canonical primitives from the tokens using best-practice defaults consistent with the DESIGN.md's rules. Every `.fk-skills/design.json` has *something* to render, even on day zero.
 
 #### Tonal ramps
 
@@ -331,7 +331,7 @@ Do not reword. The panel shows these as secondary collapsible context; the same 
 ### Step 5: Confirm and refine
 
 1. Show the user the full DESIGN.md you wrote. Briefly highlight the non-obvious creative choices (descriptive color names, atmosphere language, named rules).
-2. Mention that `.impeccable/design.json` was also written alongside; the live panel will now render this project's actual button/input/nav primitives instead of generic approximations.
+2. Mention that `.fk-skills/design.json` was also written alongside; the live panel will now render this project's actual button/input/nav primitives instead of generic approximations.
 3. Offer to refine any section: "Want me to revise a section, add component patterns I missed, or adjust the atmosphere language?"
 
 Your own write is the freshest source; subsequent commands in this session don't need a reload.
@@ -393,7 +393,7 @@ Per-section guidance in seed mode:
 - **Components**: omit entirely; no components exist yet.
 - **Do's and Don'ts**: carry PRODUCT.md's anti-references directly plus the anti-reference named in Q5.
 
-Seed mode writes a minimal frontmatter with `name` and `description` only; no colors, typography, rounded, spacing, or components yet. Real tokens land on the next Scan-mode run. Skip the `.impeccable/design.json` sidecar in seed mode for the same reason: nothing to render.
+Seed mode writes a minimal frontmatter with `name` and `description` only; no colors, typography, rounded, spacing, or components yet. Real tokens land on the next Scan-mode run. Skip the `.fk-skills/design.json` sidecar in seed mode for the same reason: nothing to render.
 
 ### Step 4: Confirm
 

@@ -12,7 +12,7 @@ export function initFoundationGrid() {
 
 	containers.forEach((container) => {
 		const source = container.dataset.source || 'foundation';
-		const data = source === 'slop' ? slopFocusAreas['impeccable'] : skillFocusAreas['impeccable'];
+		const data = source === 'slop' ? slopFocusAreas['fk'] : skillFocusAreas['fk'];
 		if (!data) return;
 		const showCount = source !== 'slop';
 

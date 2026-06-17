@@ -45,11 +45,11 @@ describe('buildInsertWrapperLines', () => {
       isJsx: false,
     });
     const joined = lines.join('\n');
-    assert.match(joined, /impeccable-variants-start abc12345/);
-    assert.match(joined, /data-impeccable-variants="abc12345"/);
-    assert.match(joined, /data-impeccable-mode="insert"/);
+    assert.match(joined, /fk-variants-start abc12345/);
+    assert.match(joined, /data-fk-variants="abc12345"/);
+    assert.match(joined, /data-fk-mode="insert"/);
     assert.match(joined, /Variants: insert below this line/);
-    assert.doesNotMatch(joined, /data-impeccable-variant="original"/);
+    assert.doesNotMatch(joined, /data-fk-variant="original"/);
   });
 
   it('keeps marker comments inside the wrapper for JSX', () => {
@@ -61,9 +61,9 @@ describe('buildInsertWrapperLines', () => {
       isJsx: true,
     });
     const joined = lines.join('\n');
-    assert.match(joined, /^\s*<div data-impeccable-variants="jsx12345"/m);
-    assert.match(joined, /{\/\* impeccable-variants-start jsx12345 \*\/}/);
-    assert.doesNotMatch(joined, /data-impeccable-variant="original"/);
+    assert.match(joined, /^\s*<div data-fk-variants="jsx12345"/m);
+    assert.match(joined, /{\/\* fk-variants-start jsx12345 \*\/}/);
+    assert.doesNotMatch(joined, /data-fk-variant="original"/);
   });
 });
 
@@ -101,11 +101,11 @@ describe('live-insert CLI integration', () => {
     assert.ok(result.insertLine > 0);
 
     const after = readFileSync(join(tmp, 'index.html'), 'utf-8');
-    assert.match(after, /data-impeccable-mode="insert"/);
-    assert.match(after, /impeccable-variants-start ins12345/);
-    assert.ok(after.indexOf('class="hero"') < after.indexOf('impeccable-variants-start ins12345'));
-    assert.ok(after.indexOf('impeccable-variants-start ins12345') < after.indexOf('class="features"'));
-    assert.doesNotMatch(after, /data-impeccable-variant="original"/);
+    assert.match(after, /data-fk-mode="insert"/);
+    assert.match(after, /fk-variants-start ins12345/);
+    assert.ok(after.indexOf('class="hero"') < after.indexOf('fk-variants-start ins12345'));
+    assert.ok(after.indexOf('fk-variants-start ins12345') < after.indexOf('class="features"'));
+    assert.doesNotMatch(after, /data-fk-variant="original"/);
   });
 
   it('splices an insert wrapper before an anchor element', () => {
@@ -120,8 +120,8 @@ describe('live-insert CLI integration', () => {
     );
 
     const after = readFileSync(join(tmp, 'page.html'), 'utf-8');
-    assert.ok(after.indexOf('impeccable-variants-start ins99999') < after.indexOf('class="cta"'));
-    assert.ok(after.indexOf('class="hero"') < after.indexOf('impeccable-variants-start ins99999'));
+    assert.ok(after.indexOf('fk-variants-start ins99999') < after.indexOf('class="cta"'));
+    assert.ok(after.indexOf('class="hero"') < after.indexOf('fk-variants-start ins99999'));
   });
 
   it('works in JSX files with inner marker comments', () => {
@@ -141,8 +141,8 @@ describe('live-insert CLI integration', () => {
     const result = JSON.parse(out.trim());
     assert.equal(result.commentSyntax.open, '{/*');
     const after = readFileSync(join(tmp, 'App.jsx'), 'utf-8');
-    assert.match(after, /data-impeccable-mode="insert"/);
-    assert.match(after, /{\/\* impeccable-variants-start jsxins01 \*\/}/);
+    assert.match(after, /data-fk-mode="insert"/);
+    assert.match(after, /{\/\* fk-variants-start jsxins01 \*\/}/);
   });
 
   it('exits with error when position is missing', () => {

@@ -46,11 +46,11 @@ const {
 } = Astro.props;
 
 const canonical = canonicalPath
-  ? `https://impeccable.style${canonicalPath}`
+  ? `https://fk.style${canonicalPath}`
   : undefined;
 
 // Social card defaults. Every page gets the brand card unless it passes its own.
-const SITE_OG_IMAGE = 'https://impeccable.style/og-image-v2.jpg';
+const SITE_OG_IMAGE = 'https://fk.style/og-image-v2.jpg';
 const ogImageUrl = ogImage || SITE_OG_IMAGE;
 const resolvedOgTitle = ogTitle || title;
 const resolvedOgDescription = ogDescription || description;
@@ -67,7 +67,7 @@ const resolvedOgDescription = ogDescription || description;
   <script is:inline>
     (function () {
       try {
-        var t = localStorage.getItem('impeccable-theme');
+        var t = localStorage.getItem('fk-skills-theme');
         var root = document.documentElement;
         var pref = (t === 'light' || t === 'dark') ? t : 'auto';
         var resolved = pref === 'auto'
@@ -86,7 +86,7 @@ const resolvedOgDescription = ogDescription || description;
   {canonical && <link rel="canonical" href={canonical}>}
 
   <meta property="og:type" content="website">
-  <meta property="og:url" content={canonical || 'https://impeccable.style'}>
+  <meta property="og:url" content={canonical || 'https://fk.style'}>
   <meta property="og:title" content={resolvedOgTitle}>
   <meta property="og:description" content={resolvedOgDescription}>
   <meta property="og:image" content={ogImageUrl}>

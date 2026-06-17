@@ -997,7 +997,7 @@
   background: var(--ks-rule);
   margin: 0 4px;
 }
-/* Global picker bar — mirrors the real Impeccable live bar: carved-tile mark,
+/* Global picker bar — mirrors the real FK live bar: carved-tile mark,
    Pick/Insert/Detect/DESIGN.md controls, exit. Lacquer-deep fill + 1.5px gold
    border + halo per DESIGN.md's "Picker Is Brand" rule. */
 .designing-kinpaku .docs-viz-live-gbar {

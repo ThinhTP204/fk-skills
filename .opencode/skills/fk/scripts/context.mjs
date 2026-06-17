@@ -7,7 +7,7 @@
  * Path resolution (first match wins):
  *   1. cwd, if PRODUCT.md or DESIGN.md is there
  *   2. .agents/context/ then docs/
- *   3. $IMPECCABLE_CONTEXT_DIR (absolute or cwd-relative) — power-user
+ *   3. $FK_SKILLS_CONTEXT_DIR (absolute or cwd-relative) — power-user
  *      escape hatch, only consulted when defaults are empty
  *   4. cwd as a "nothing found" default
  *
@@ -27,13 +27,13 @@ const FALLBACK_DIRS = ['.agents/context', 'docs'];
 // ─── Update check ──────────────────────────────────────────────────────────
 // Piggyback a lightweight skill-version check on the once-per-session boot.
 // When a newer skill ships, append an UPDATE_AVAILABLE directive so the agent
-// can offer `npx impeccable update`. Everything here is best-effort and
+// can offer `npx fk-skills update`. Everything here is best-effort and
 // silent on failure: a network problem, sandbox, or missing cache must never
 // block context output or print an error.
 
-const UPDATE_HOST = (process.env.IMPECCABLE_UPDATE_HOST || 'https://impeccable.style').replace(/\/$/, '');
+const UPDATE_HOST = (process.env.FK_SKILLS_UPDATE_HOST || process.env.IMPECCABLE_UPDATE_HOST || 'https://fk.style').replace(/\/$/, '');
 const UPDATE_CACHE_PATH =
-  process.env.IMPECCABLE_UPDATE_CACHE || path.join(os.homedir(), '.fk-skills', 'update-check.json');
+  process.env.FK_SKILLS_UPDATE_CACHE || process.env.IMPECCABLE_UPDATE_CACHE || path.join(os.homedir(), '.fk-skills', 'update-check.json');
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // throttle the network poll to once a day
 const RENOTIFY_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // don't re-surface the same version for a week
 const FETCH_TIMEOUT_MS = 1200;
@@ -48,7 +48,7 @@ export function resolveContextDir(cwd = process.cwd()) {
       return candidate;
     }
   }
-  const envDir = process.env.IMPECCABLE_CONTEXT_DIR;
+  const envDir = process.env.FK_SKILLS_CONTEXT_DIR;
   if (envDir && envDir.trim()) {
     const trimmed = envDir.trim();
     return path.isAbsolute(trimmed) ? trimmed : path.resolve(cwd, trimmed);
@@ -172,8 +172,8 @@ function buildUpdateDirective(localVersion, latestVersion) {
     `UPDATE_AVAILABLE: A newer Impeccable skill is available ` +
     `(installed v${localVersion}, latest v${latestVersion}). ` +
     `Before continuing, ask the user once: "A newer Impeccable (v${latestVersion}) is available. ` +
-    `Update now? It runs \`npx impeccable update\`." ` +
-    `If they agree, run \`npx impeccable update\` (the update applies to the next session, not this one). ` +
+    `Update now? It runs \`npx fk-skills update\`." ` +
+    `If they agree, run \`npx fk-skills update\` (the update applies to the next session, not this one). ` +
     `Either way, continue the current task without waiting, and do not raise this again.`
   );
 }
@@ -182,7 +182,7 @@ function buildUpdateDirective(localVersion, latestVersion) {
  * Best-effort update directive for the boot output. Returns a string to append
  * or null. Polls the version endpoint at most once per day (cached globally in
  * the user's home dir) and re-surfaces a given version at most once per week so
- * the agent never nags. Opt out entirely with IMPECCABLE_NO_UPDATE_CHECK=1.
+ * the agent never nags. Opt out entirely with FK_SKILLS_NO_UPDATE_CHECK=1.
  */
 // Read the unified config's top-level `updateCheck` (local overrides shared).
 // Inlined rather than importing hook-lib so the boot path stays lightweight.
@@ -199,7 +199,7 @@ function updateCheckDisabledByConfig(cwd = process.cwd()) {
 
 async function computeUpdateDirective(now = Date.now()) {
   try {
-    if (process.env.IMPECCABLE_NO_UPDATE_CHECK) return null;
+    if (process.env.FK_SKILLS_NO_UPDATE_CHECK || process.env.IMPECCABLE_NO_UPDATE_CHECK) return null;
     if (updateCheckDisabledByConfig()) return null;
     const localVersion = readLocalSkillVersion();
     if (!localVersion) return null;

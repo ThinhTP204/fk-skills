@@ -43,8 +43,8 @@ function stageFixture(name) {
   const tmp = mkdtempSync(join(tmpdir(), 'impeccable-fixture-'));
   cpSync(join(fixtureRoot, 'files'), tmp, { recursive: true });
   writeFileSync(join(tmp, '.gitignore'), gitignore);
-  mkdirSync(join(tmp, '.impeccable', 'live'), { recursive: true });
-  writeFileSync(join(tmp, '.impeccable', 'live', 'config.json'), JSON.stringify(fixture.config));
+  mkdirSync(join(tmp, '.fk-skills', 'live'), { recursive: true });
+  writeFileSync(join(tmp, '.fk-skills', 'live', 'config.json'), JSON.stringify(fixture.config));
 
   execFileSync('git', ['init', '-q'], { cwd: tmp });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tmp });
@@ -116,28 +116,28 @@ for (const name of listFixtures()) {
         assert.equal(result.gitIgnore?.mode, 'git-info-exclude', 'live runtime ignores are installed locally');
         const ignored = execFileSync('git', [
           'check-ignore',
-          '.impeccable/live/server.json',
-          '.impeccable/live/sessions/example.jsonl',
-          '.impeccable/live/previews/example/v1.html',
-          '.impeccable/live/deferred-svelte-component-accepts.json',
-          'src/lib/impeccable/ImpeccableLiveRoot.svelte',
-          'src/lib/impeccable/__runtime.js',
-          'src/lib/impeccable/a4ac4e74/v3.svelte',
+          '.fk-skills/live/server.json',
+          '.fk-skills/live/sessions/example.jsonl',
+          '.fk-skills/live/previews/example/v1.html',
+          '.fk-skills/live/deferred-svelte-component-accepts.json',
+          'src/lib/fk-skills/FkLiveRoot.svelte',
+          'src/lib/fk-skills/__runtime.js',
+          'src/lib/fk-skills/a4ac4e74/v3.svelte',
         ], { cwd: tmp, encoding: 'utf-8' });
-        assert.match(ignored, /\.impeccable\/live\/server\.json/);
-        assert.match(ignored, /\.impeccable\/live\/sessions\/example\.jsonl/);
-        assert.match(ignored, /\.impeccable\/live\/previews\/example\/v1\.html/);
-        assert.match(ignored, /\.impeccable\/live\/deferred-svelte-component-accepts\.json/);
-        assert.match(ignored, /src\/lib\/impeccable\/ImpeccableLiveRoot\.svelte/);
-        assert.match(ignored, /src\/lib\/impeccable\/__runtime\.js/);
-        assert.match(ignored, /src\/lib\/impeccable\/a4ac4e74\/v3\.svelte/);
+        assert.match(ignored, /\.fk-skills\/live\/server\.json/);
+        assert.match(ignored, /\.fk-skills\/live\/sessions\/example\.jsonl/);
+        assert.match(ignored, /\.fk-skills\/live\/previews\/example\/v1\.html/);
+        assert.match(ignored, /\.fk-skills\/live\/deferred-svelte-component-accepts\.json/);
+        assert.match(ignored, /src\/lib\/fk-skills\/FkLiveRoot\.svelte/);
+        assert.match(ignored, /src\/lib\/fk-skills\/__runtime\.js/);
+        assert.match(ignored, /src\/lib\/fk-skills\/a4ac4e74\/v3\.svelte/);
         if (result.adapter === 'sveltekit') {
           const layout = readFileSync(join(tmp, 'src/routes/+layout.svelte'), 'utf-8');
           const appHtml = readFileSync(join(tmp, 'src/app.html'), 'utf-8');
-          const root = readFileSync(join(tmp, 'src/lib/impeccable/ImpeccableLiveRoot.svelte'), 'utf-8');
-          assert.match(layout, /impeccable-live-svelte-start/, 'SvelteKit layout got the adapter marker');
-          assert.match(layout, /ImpeccableLiveRoot/, 'SvelteKit layout renders the adapter host');
-          assert.doesNotMatch(appHtml, /impeccable-live-start/, 'SvelteKit app.html must remain untouched');
+          const root = readFileSync(join(tmp, 'src/lib/fk-skills/FkLiveRoot.svelte'), 'utf-8');
+          assert.match(layout, /fk-live-svelte-start/, 'SvelteKit layout got the adapter marker');
+          assert.match(layout, /FkLiveRoot/, 'SvelteKit layout renders the adapter host');
+          assert.doesNotMatch(appHtml, /fk-live-start/, 'SvelteKit app.html must remain untouched');
           assert.doesNotMatch(appHtml, /localhost:9999\/live\.js/, 'SvelteKit app.html must not own live.js');
           assert.match(root, /localhost:9999\/live\.js/, 'SvelteKit root component loads live.js');
           return;
@@ -145,7 +145,7 @@ for (const name of listFixtures()) {
         for (const r of result.results) {
           assert.ok(r.inserted, `${r.file} got the tag (result: ${JSON.stringify(r)})`);
           const body = readFileSync(join(tmp, r.file), 'utf-8');
-          assert.match(body, /impeccable-live-start/);
+          assert.match(body, /fk-live-start/);
           assert.match(body, /localhost:9999\/live\.js/);
         }
       } finally {
@@ -163,15 +163,15 @@ for (const name of listFixtures()) {
         if (result.adapter === 'sveltekit') {
           const layout = readFileSync(join(tmp, 'src/routes/+layout.svelte'), 'utf-8');
           const appHtml = readFileSync(join(tmp, 'src/app.html'), 'utf-8');
-          assert.doesNotMatch(layout, /ImpeccableLiveRoot/);
-          assert.doesNotMatch(layout, /impeccable-live-svelte-start/);
-          assert.doesNotMatch(appHtml, /impeccable-live-start/);
-          assert.equal(existsSync(join(tmp, 'src/lib/impeccable/ImpeccableLiveRoot.svelte')), false);
+          assert.doesNotMatch(layout, /FkLiveRoot/);
+          assert.doesNotMatch(layout, /fk-live-svelte-start/);
+          assert.doesNotMatch(appHtml, /fk-live-start/);
+          assert.equal(existsSync(join(tmp, 'src/lib/fk-skills/FkLiveRoot.svelte')), false);
           return;
         }
         for (const r of result.results) {
           const body = readFileSync(join(tmp, r.file), 'utf-8');
-          assert.doesNotMatch(body, /impeccable-live-start/);
+          assert.doesNotMatch(body, /fk-live-start/);
           assert.doesNotMatch(body, /live\.js/);
         }
       } finally {

@@ -303,7 +303,7 @@ describe('ensureHookGitExcludes()', () => {
     const second = ensureHookGitExcludes(cwd);
     assert.equal(second.changed, false);
     const rewritten = fs.readFileSync(path.join(cwd, '.git', 'info', 'exclude'), 'utf-8');
-    assert.equal((rewritten.match(/impeccable-hook-ignore-start/g) || []).length, 1);
+    assert.equal((rewritten.match(/fk-skills-hook-ignore-start/g) || []).length, 1);
   });
 });
 
@@ -341,9 +341,9 @@ describe('filterFindings()', () => {
 
   it('does not treat source comments as hook suppression', () => {
     const content = [
-      '/* impeccable: ignore * */',
+      '/* fk: ignore * */',
       '.card { font-family: "Roboto", sans-serif; }',
-      '<!-- impeccable: ignore side-tab -->',
+      '<!-- fk: ignore side-tab -->',
       '<div style="border-left: 4px solid #7c3aed; border-radius: 16px;">Card</div>',
     ].join('\n');
     const filtered = filterFindings(
@@ -517,7 +517,7 @@ describe('hook-admin.mjs', () => {
     assert.match(status, /ignoreValues:\s+overused-font=inter/);
   });
 
-  it('a /impeccable hooks edit preserves sibling hook fields (consent, quiet)', () => {
+  it('a /fk hooks edit preserves sibling hook fields (consent, quiet)', () => {
     fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     // A recorded per-developer consent in the local file...
     fs.writeFileSync(getLocalConfigPath(cwd), JSON.stringify({ hook: { consent: 'declined' } }));
@@ -632,7 +632,7 @@ describe('renderTemplate()', () => {
       finding('side-tab', i + 1, { name: `R${i}`, description: 'd' }));
     const text = renderTemplate(findings, '/x/Card.tsx', DEFAULT_CONFIG, { cwd: '/x' });
     assert.ok(text.startsWith(`${ENVELOPE_PREFIX} Design hook findings requiring review in Card.tsx (12 issue(s)):`));
-    assert.match(text, /\.\.\. and 7 more \(see \/impeccable audit\)\./);
+    assert.match(text, /\.\.\. and 7 more \(see \/fk audit\)\./);
     // Exactly 5 finding lines.
     const lines = text.split('\n').filter((l) => l.startsWith('- '));
     assert.equal(lines.length, 5);
@@ -656,12 +656,12 @@ describe('renderTemplate()', () => {
     assert.match(text, /literal or domain-appropriate motion/);
     assert.match(text, /Do not change intentional design just to satisfy the hook/);
     assert.match(text, /Persist hook ignores only after the user explicitly confirms/);
-    assert.match(text, /Do not add source comments such as `impeccable: ignore`/);
+    assert.match(text, /Do not add source comments such as `fk: ignore`/);
     assert.match(text, /ignore-value \.\.\. --shared/);
     assert.match(text, /ignore-rule overused-font --all-values/);
-    assert.match(text, /\/impeccable hooks ignore-file Card\.tsx/);
+    assert.match(text, /\/fk hooks ignore-file Card\.tsx/);
     assert.match(text, /ignore-rule <id>/);
-    assert.match(text, /\/impeccable audit/);
+    assert.match(text, /\/fk audit/);
   });
 
   it('shows the exact value-specific command for overused-font findings', () => {
@@ -669,7 +669,7 @@ describe('renderTemplate()', () => {
       [finding('overused-font', 1, { name: 'Overused font', snippet: 'body { font-family: "Roboto", sans-serif; }' })],
       '/x/fonts.css', DEFAULT_CONFIG, { cwd: '/x' }
     );
-    assert.match(text, /\/impeccable hooks ignore-value overused-font Roboto --shared/);
+    assert.match(text, /\/fk hooks ignore-value overused-font Roboto --shared/);
     assert.match(text, /ignore-rule overused-font --all-values/);
   });
 
@@ -678,7 +678,7 @@ describe('renderTemplate()', () => {
       [finding('bounce-easing', 1, { name: 'Bounce or elastic easing', snippet: 'animation: bounce-ball' })],
       '/x/main.css', DEFAULT_CONFIG, { cwd: '/x' }
     );
-    assert.match(text, /\/impeccable hooks ignore-value bounce-easing bounce-ball --shared/);
+    assert.match(text, /\/fk hooks ignore-value bounce-easing bounce-ball --shared/);
   });
 
   it('drops the L<line> prefix when line is 0', () => {
@@ -697,7 +697,7 @@ describe('renderTemplate()', () => {
       })],
       '/x/a.tsx', DEFAULT_CONFIG, { cwd: '/x' }
     );
-    assert.doesNotMatch(text, /\/impeccable hooks ignore-value side-tab Inter/);
+    assert.doesNotMatch(text, /\/fk hooks ignore-value side-tab Inter/);
   });
 
   it('clamps oversize output to maxChars', () => {
@@ -965,12 +965,12 @@ rounded:
     assert.equal(r.audit.quiet, true);
   });
 
-  it('re-entrancy guard short-circuits when IMPECCABLE_HOOK_DEPTH is set', async () => {
+  it('re-entrancy guard short-circuits when FK_SKILLS_HOOK_DEPTH is set', async () => {
     const file = writeFixture('src/Card.tsx', 'noop');
     const det = fakeDetector([finding('side-tab', 1)]);
     const r = await runHook({
       stdinJson: JSON.stringify(eventFor(file)),
-      env: { IMPECCABLE_HOOK_DEPTH: '1' },
+      env: { FK_SKILLS_HOOK_DEPTH: '1' },
       cwd,
       detector: det,
     });
@@ -1178,7 +1178,7 @@ rounded:
     }
     assert.ok(r.stdout.includes('Suppressing further design hints'));
     assert.match(r.stdout, /More than 6 edits in this session reached/);
-    assert.match(r.stdout, /Run \/impeccable audit to revisit/);
+    assert.match(r.stdout, /Run \/fk audit to revisit/);
   });
 
   it('handles MultiEdit and apply_patch payload shapes (file_path field)', async () => {
@@ -1253,11 +1253,11 @@ rounded:
 });
 
 describe('suppressionNotice()', () => {
-  it('starts with envelope and mentions /impeccable audit', () => {
+  it('starts with envelope and mentions /fk audit', () => {
     const text = suppressionNotice('src/Card.tsx');
     assert.ok(text.startsWith(ENVELOPE_PREFIX));
     assert.match(text, /More than 6 edits in this session reached/);
-    assert.match(text, /\/impeccable audit/);
+    assert.match(text, /\/fk audit/);
   });
 });
 
@@ -1286,7 +1286,7 @@ describe('ALLOWED_EXTS', () => {
 describe('renderCleanAck() / renderPendingAck()', () => {
   it('renderCleanAck stays short and ends with the steer line', () => {
     const text = renderCleanAck('/x/src/App.jsx', { cwd: '/x' });
-    assert.match(text, /^\[impeccable@1\] Design hook scanned src\/App\.jsx\. No anti-patterns\./);
+    assert.match(text, /^\[fk@1\] Design hook scanned src\/App\.jsx\. No anti-patterns\./);
     assert.match(text, /typography hierarchy, spacing rhythm, and color contrast/);
     // Budget guard: should fit comfortably under a single context-message
     // injection (~200 chars). Hard upper bound 240 chars.
@@ -1296,7 +1296,7 @@ describe('renderCleanAck() / renderPendingAck()', () => {
   it('renderPendingAck quotes up to 3 known findings and counts the rest', () => {
     const known = ['side-tab:3', 'gradient-text:4', 'ai-color-palette:8', 'overused-font:12'];
     const text = renderPendingAck('/x/src/SlopCard.jsx', known, { cwd: '/x' });
-    assert.match(text, /^\[impeccable@1\] Design hook scanned src\/SlopCard\.jsx\./);
+    assert.match(text, /^\[fk@1\] Design hook scanned src\/SlopCard\.jsx\./);
     assert.match(text, /Still has 4 finding\(s\) flagged earlier this session/);
     assert.match(text, /side-tab:3, gradient-text:4, ai-color-palette:8/);
     assert.match(text, /\+1 more/); // 4 total, 3 shown

@@ -70,17 +70,17 @@ tagline: "A design review with scoring, persona tests, and automated detection."
 
 ## When to use it
 
-Reach for `/impeccable critique` when you want an honest second opinion on something you already built. Not "does it work" but "is it any good". The skill scores your interface against Nielsen's 10 heuristics, runs cognitive load checks, tests through persona lenses, and cross-references an automated detector for 25 concrete anti-patterns.
+Reach for `/fk critique` when you want an honest second opinion on something you already built. Not "does it work" but "is it any good". The skill scores your interface against Nielsen's 10 heuristics, runs cognitive load checks, tests through persona lenses, and cross-references an automated detector for 25 concrete anti-patterns.
 
 Use it when a page is functionally done and you want to know if it reads as intentional or as AI slop.
 
 ## How it works
 
-`/impeccable critique` runs two independent assessments in parallel so they do not bias each other.
+`/fk critique` runs two independent assessments in parallel so they do not bias each other.
 
 The first is an **LLM design review**: the model reads your source, visually inspects the live page if browser automation is available, and walks the impeccable skill's full DO/DON'T catalog. It scores Nielsen's heuristics, counts cognitive load failures, traces the emotional journey through the flow, and flags AI slop.
 
-The second is an **automated detector** (`npx impeccable detect`) that deterministically finds gradient text, purple palettes, side-tab borders, nested cards, line length problems, and the other visible fingerprints of generic AI output.
+The second is an **automated detector** (`npx fk-skills detect`) that deterministically finds gradient text, purple palettes, side-tab borders, nested cards, line length problems, and the other visible fingerprints of generic AI output.
 
 The two reports merge into one prioritized list: what is working, the three to five things that need fixing, and the provocative questions worth answering before shipping.
 
@@ -89,7 +89,7 @@ The two reports merge into one prioritized list: what is working, the three to f
 Point it at a page:
 
 ```
-/impeccable critique the homepage hero
+/fk critique the homepage hero
 ```
 
 You get back a scored report. Typical shape:
@@ -100,7 +100,7 @@ You get back a scored report. Typical shape:
 - **Priority issues**: three to five items, each with what, why, and fix
 - **Questions to answer**: the ones the interface itself cannot decide for you
 
-From there, pair with `/impeccable polish` or `/impeccable distill` to act on the fixes.
+From there, pair with `/fk polish` or `/fk distill` to act on the fixes.
 
 ## Pitfalls
 

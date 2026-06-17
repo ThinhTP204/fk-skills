@@ -33,7 +33,7 @@ tagline: "Set up a project for Impeccable, once. Context, live mode, and where t
 
 ## When to use it
 
-Run `/impeccable init` once at the start of a project. Without it, every other command has to guess: generic SaaS voice, safe-default fonts, the AI color palette. With it, every command reads your answers before it generates.
+Run `/fk init` once at the start of a project. Without it, every other command has to guess: generic SaaS voice, safe-default fonts, the AI color palette. With it, every command reads your answers before it generates.
 
 Reach for it when:
 
@@ -46,8 +46,8 @@ Reach for it when:
 One codebase scan feeds everything init writes:
 
 - **`PRODUCT.md`** is the strategic file. It stores the audience, product purpose, voice, anti-references, design principles, accessibility needs, and the brand/product choice. Answers "who, what, why".
-- **`DESIGN.md`** is the visual file. Colors, typography, elevation, components, do's and don'ts. Answers "how it looks". Written by the delegated `/impeccable document` command, which init invokes at the end.
-- **Live mode config.** Since the same crawl already knows your framework and entry files, init pre-configures `/impeccable live` so it opens straight into variant mode with no first-time setup.
+- **`DESIGN.md`** is the visual file. Colors, typography, elevation, components, do's and don'ts. Answers "how it looks". Written by the delegated `/fk document` command, which init invokes at the end.
+- **Live mode config.** Since the same crawl already knows your framework and entry files, init pre-configures `/fk live` so it opens straight into variant mode with no first-time setup.
 
 The flow scans the codebase first (README, package.json, components, tokens, brand assets) and asks you to confirm one core choice: is this a brand surface or a product surface?
 
@@ -63,12 +63,12 @@ It closes by pointing you at the best commands to run next, picked from what the
 ## Try it
 
 ```
-/impeccable init
+/fk init
 ```
 
 Expect a 5 to 8 minute interview. The first question is usually the brand/product choice; the rest are short. Init will quote back what it inferred from your code ("from the routes, this looks like a product surface, match?") so you are confirming, not starting from scratch.
 
-Along the way it offers to run `/impeccable document` for you. Say yes unless you have a specific reason to hold off. A real DESIGN.md is what keeps variants, polishes, and audits on-brand.
+Along the way it offers to run `/fk document` for you. Say yes unless you have a specific reason to hold off. A real DESIGN.md is what keeps variants, polishes, and audits on-brand.
 
 ## Pitfalls
 

@@ -1,6 +1,6 @@
 # Craft Flow
 
-Build a feature with impeccable UX and UI quality: shape the design, land the visual direction, build real production code, inspect and improve in-browser until it meets a high-end studio bar.
+Build a feature with fk UX and UI quality: shape the design, land the visual direction, build real production code, inspect and improve in-browser until it meets a high-end studio bar.
 
 Before writing code, you need: PRODUCT.md loaded, register identified and the matching reference loaded, and a confirmed design direction for this task (either from `plan` or supplied by the user). PRODUCT.md is project context, not a task-specific brief.
 
@@ -54,7 +54,7 @@ If the harness has native image generation (Codex), a compact shape's "confirm o
 
 ## Step 2: Load References
 
-Based on the design brief's "Recommended References" section, consult the relevant impeccable reference files. At minimum, always consult:
+Based on the design brief's "Recommended References" section, consult the relevant fk reference files. At minimum, always consult:
 
 - [layout.md](layout.md) for layout, spacing, grid, container queries, optical adjustments
 - [typeset.md](typeset.md) for type hierarchy, font selection, web font loading, OpenType features (Reference Material section)
@@ -106,7 +106,7 @@ If your tool returns a file path, read the PNG back into the conversation. A scr
 
 For long-form brand surfaces, inspect major sections individually. Thumbnails hide spacing, clipping, and cascade defects.
 
-After the first pass, write an honest critique against the brief, the approved mock's major ingredients (hero silhouette, motifs, imagery, nav/CTA, density), and impeccable's DON'Ts. Patch material defects and re-inspect. **Don't invent defects to demonstrate iteration.** A confident "first pass clean, shipping" beats a fake fix.
+After the first pass, write an honest critique against the brief, the approved mock's major ingredients (hero silhouette, motifs, imagery, nav/CTA, density), and fk's DON'Ts. Patch material defects and re-inspect. **Don't invent defects to demonstrate iteration.** A confident "first pass clean, shipping" beats a fake fix.
 
 Actively check: responsive behavior (composes, not shrinks), every state (empty / error / loading / edge), craft details (spacing, alignment, hierarchy, contrast, motion timing, focus), performance basics. The exit bar: defensible in a high-end studio review.
 

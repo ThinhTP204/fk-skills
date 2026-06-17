@@ -183,7 +183,7 @@
   font-weight: 300;
 }
 
-/* Sub-commands: stack the /impeccable namespace as a smaller label above the
+/* Sub-commands: stack the /fk namespace as a smaller label above the
    command name so the command name stays at full display size and never
    clips (e.g., "overdrive" is long). */
 .spread-command-name .spread-namespace {

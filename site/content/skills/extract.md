@@ -25,7 +25,7 @@ tagline: "Pull reusable components, tokens, and patterns into the design system.
 
 ## When to use it
 
-`/impeccable extract` is for the moment your codebase has accidentally become a design system. Repeated button styles in 12 places. Three variants of the same card. Hex colors scattered throughout. Hand-rolled spacing that accidentally matches a scale. Reach for it when you want to consolidate this drift into reusable primitives.
+`/fk extract` is for the moment your codebase has accidentally become a design system. Repeated button styles in 12 places. Three variants of the same card. Hex colors scattered throughout. Hand-rolled spacing that accidentally matches a scale. Reach for it when you want to consolidate this drift into reusable primitives.
 
 Use it after a product has shipped enough features to reveal the patterns. Premature extraction creates abstractions that do not match reality.
 
@@ -44,7 +44,7 @@ The skill is cautious. It only extracts things used three or more times, with th
 ## Try it
 
 ```
-/impeccable extract the button styles
+/fk extract the button styles
 ```
 
 Expected output:

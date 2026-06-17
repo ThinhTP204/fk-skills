@@ -13,15 +13,15 @@ const posthogHost =
 
 // Dev-only allowance so impeccable live mode can load. Guarded by NODE_ENV;
 // empty array in any non-development environment.
-const __impeccableLiveDev =
+const __fkLiveDev =
   process.env.NODE_ENV === "development" ? ["http://localhost:8400"] : [];
 
 const baseConfig = createBaseNextConfig({
   appName: "web",
   enableMapbox: true,
   additionalImgSrc: ["https:", "https://*.googleusercontent.com"],
-  additionalScriptSrc: [posthogHost, ...__impeccableLiveDev],
-  additionalConnectSrc: [posthogHost, ...__impeccableLiveDev],
+  additionalScriptSrc: [posthogHost, ...__fkLiveDev],
+  additionalConnectSrc: [posthogHost, ...__fkLiveDev],
 });
 
 const nextConfig: NextConfig = {

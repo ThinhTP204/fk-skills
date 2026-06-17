@@ -6,8 +6,8 @@ if (IS_BROWSER) {
   // Detect extension mode via the script tag's data attribute or the document element fallback.
   // currentScript is reliable for synchronously-executing scripts (which our IIFE is).
   const _myScript = document.currentScript;
-  const EXTENSION_MODE = (_myScript && _myScript.dataset.impeccableExtension === 'true')
-    || document.documentElement.dataset.impeccableExtension === 'true';
+  const EXTENSION_MODE = (_myScript && _myScript.dataset.fkExtension === 'true')
+    || document.documentElement.dataset.fkExtension === 'true';
 
   // Kinpaku gold — pinned to the site's brand token (see
   // site/styles/kinpaku-tokens.css --ks-kinpaku). Keep this in sync with
@@ -34,7 +34,7 @@ if (IS_BROWSER) {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    .impeccable-overlay:not(.impeccable-banner) {
+    .fk-overlay:not(.fk-banner) {
       pointer-events: none;
       outline: 2px solid ${OUTLINE_COLOR};
       border-radius: 4px;
@@ -43,20 +43,20 @@ if (IS_BROWSER) {
       animation-play-state: paused;
       border-top-left-radius: 0;
     }
-    .impeccable-overlay.impeccable-visible {
+    .fk-overlay.impeccable-visible {
       animation-play-state: running;
     }
-    .impeccable-overlay.impeccable-hover {
+    .fk-overlay.impeccable-hover {
       outline-color: ${BRAND_COLOR_HOVER};
       z-index: 100001 !important;
     }
-    .impeccable-overlay.impeccable-hover .impeccable-label {
+    .fk-overlay.impeccable-hover .fk-label {
       background: ${BRAND_COLOR_HOVER};
     }
-    .impeccable-overlay.impeccable-spotlight {
+    .fk-overlay.impeccable-spotlight {
       z-index: 100002 !important;
     }
-    .impeccable-overlay.impeccable-spotlight-dimmed {
+    .fk-overlay.impeccable-spotlight-dimmed {
       opacity: 0.15 !important;
       animation: none !important;
       filter: blur(3px);
@@ -75,7 +75,7 @@ if (IS_BROWSER) {
     .impeccable-spotlight-backdrop.impeccable-visible {
       opacity: 1;
     }
-    .impeccable-hidden .impeccable-overlay${EXTENSION_MODE ? '' : ':not(.impeccable-banner)'} {
+    .impeccable-hidden .fk-overlay${EXTENSION_MODE ? '' : ':not(.fk-banner)'} {
       display: none !important;
     }
   `;
@@ -114,7 +114,7 @@ if (IS_BROWSER) {
   function showSpotlight(target) {
     if (!target || !target.getBoundingClientRect) return;
     // Respect the spotlightBlur setting: if disabled, don't show the backdrop
-    if (window.__IMPECCABLE_CONFIG__?.spotlightBlur === false) {
+    if (window.__FK_SKILLS_CONFIG__?.spotlightBlur === false) {
       spotlightTarget = target;
       return;
     }
@@ -206,7 +206,7 @@ if (IS_BROWSER) {
   let overlayIndex = 0;
   const visibilityObserver = new IntersectionObserver((entries) => {
     for (const entry of entries) {
-      const overlay = entry.target._impeccableOverlay;
+      const overlay = entry.target._fkOverlay;
       if (!overlay) continue;
       if (entry.isIntersecting) {
         overlay.style.display = '';
@@ -236,9 +236,9 @@ if (IS_BROWSER) {
     if (typeof overlay._cleanup === 'function') {
       try { overlay._cleanup(); } catch { /* best effort overlay teardown */ }
     }
-    if (overlay._targetEl && overlay._targetEl._impeccableOverlay === overlay) {
+    if (overlay._targetEl && overlay._targetEl._fkOverlay === overlay) {
       visibilityObserver.unobserve(overlay._targetEl);
-      delete overlay._targetEl._impeccableOverlay;
+      delete overlay._targetEl._fkOverlay;
     }
     const idx = overlays.indexOf(overlay);
     if (idx >= 0) overlays.splice(idx, 1);
@@ -259,7 +259,7 @@ if (IS_BROWSER) {
   });
 
   const highlight = function(el, findings) {
-    if (el._impeccableOverlay) detachOverlay(el._impeccableOverlay);
+    if (el._fkOverlay) detachOverlay(el._fkOverlay);
     const hasSlop = findings.some(f => RULE_CATEGORY[f.type || f.id] === 'slop');
 
     const fixed = isInFixedContext(el);
@@ -361,7 +361,7 @@ if (IS_BROWSER) {
     // Start hidden; the IntersectionObserver will show it once the target is rendered
     outline.style.display = 'none';
     outline._staggerIndex = overlayIndex++;
-    el._impeccableOverlay = outline;
+    el._fkOverlay = outline;
     visibilityObserver.observe(el);
 
     // After first paint, check label width vs outline
@@ -657,8 +657,8 @@ if (IS_BROWSER) {
     const candidates = [];
     for (const el of document.querySelectorAll('*')) {
       if (candidates.length >= maxCandidates) break;
-      if (el.closest('.impeccable-overlay, .impeccable-label, .impeccable-banner, .impeccable-tooltip')) continue;
-      if (el.closest('[id^="impeccable-live-"]')) continue;
+      if (el.closest('.fk-overlay, .fk-label, .fk-banner, .impeccable-tooltip')) continue;
+      if (el.closest('[id^="fk-live-"]')) continue;
       if (el === document.body || el === document.documentElement) continue;
       if (!isRenderedForBrowserRule(el)) continue;
 
@@ -1036,7 +1036,7 @@ if (IS_BROWSER) {
 
     for (const node of nodes) {
       if (!node || node.nodeType !== 1) continue;
-      if (node.closest?.('.impeccable-overlay, .impeccable-label, .impeccable-banner, .impeccable-tooltip')) continue;
+      if (node.closest?.('.fk-overlay, .fk-label, .fk-banner, .impeccable-tooltip')) continue;
       const tag = node.tagName?.toLowerCase();
       if (tag === 'img') {
         const sample = await sampleImageElement(node, point);
@@ -1283,7 +1283,7 @@ if (IS_BROWSER) {
   }
 
   function browserDesignSystemConfig() {
-    const raw = window.__IMPECCABLE_CONFIG__?.designSystem;
+    const raw = window.__FK_SKILLS_CONFIG__?.designSystem;
     if (!raw?.present) return null;
     const allowedFonts = new Set((raw.allowedFonts || []).map(normalizeBrowserFontName).filter(Boolean));
     const allowedColors = (raw.allowedColors || [])
@@ -1454,7 +1454,7 @@ if (IS_BROWSER) {
 
   function collectBrowserFindings() {
     const groupMap = new Map();
-    const _disabled = EXTENSION_MODE ? (window.__IMPECCABLE_CONFIG__?.disabledRules || []) : [];
+    const _disabled = EXTENSION_MODE ? (window.__FK_SKILLS_CONFIG__?.disabledRules || []) : [];
     const _ruleOk = (id) => !_disabled.length || !_disabled.includes(id);
     const designSystem = browserDesignSystemConfig();
     const designSeen = { fonts: new Set(), colors: new Set(), radii: new Set() };
@@ -1465,13 +1465,13 @@ if (IS_BROWSER) {
 
     for (const el of document.querySelectorAll('*')) {
       // Skip impeccable's own elements and any descendants (overlays, labels, banner, nav buttons)
-      if (el.closest('.impeccable-overlay, .impeccable-label, .impeccable-banner, .impeccable-tooltip')) continue;
+      if (el.closest('.fk-overlay, .fk-label, .fk-banner, .impeccable-tooltip')) continue;
       // Skip browser extension elements (Claude, etc.)
       const elId = el.id || '';
       if (elId.startsWith('claude-') || elId.startsWith('cic-')) continue;
       // Skip the impeccable live-mode overlay (highlight, tooltip, bar, picker, toast).
       // These are inspector chrome, not part of the user's design.
-      if (el.closest('[id^="impeccable-live-"]')) continue;
+      if (el.closest('[id^="fk-live-"]')) continue;
       // Skip html/body -- page-level findings go in the banner, not a full-page overlay
       if (el === document.body || el === document.documentElement) continue;
 
@@ -1548,11 +1548,11 @@ if (IS_BROWSER) {
     }
 
     // Regex-on-HTML checks (shared with Node)
-    // Clone the document and strip impeccable-live overlay nodes before the
+    // Clone the document and strip fk-live overlay nodes before the
     // regex scan, so the inspector's own inline styles (transitions on top/
     // left/width/height, etc.) don't register as page anti-patterns.
     const docClone = document.documentElement.cloneNode(true);
-    for (const node of docClone.querySelectorAll('[id^="impeccable-live-"]')) {
+    for (const node of docClone.querySelectorAll('[id^="fk-live-"]')) {
       node.remove();
     }
     const htmlPatternFindings = checkHtmlPatterns(docClone.outerHTML);
@@ -1570,11 +1570,11 @@ if (IS_BROWSER) {
   }
 
   function shouldRunVisualContrast(options = {}) {
-    return options.visualContrast === true || window.__IMPECCABLE_CONFIG__?.visualContrast === true;
+    return options.visualContrast === true || window.__FK_SKILLS_CONFIG__?.visualContrast === true;
   }
 
   function visualContrastOptions(options = {}) {
-    const config = window.__IMPECCABLE_CONFIG__ || {};
+    const config = window.__FK_SKILLS_CONFIG__ || {};
     const scrollOffscreen = typeof options.scrollOffscreen === 'boolean'
       ? options.scrollOffscreen
       : typeof options.visualContrastScrollOffscreen === 'boolean'
@@ -1651,7 +1651,7 @@ if (IS_BROWSER) {
     if (!EXTENSION_MODE) return;
     const allFindings = browserFindingsFromMap(groupMap);
     window.postMessage({
-      source: 'impeccable-results',
+      source: 'fk-skills-results',
       findings: serializeFindings(allFindings),
       count: allFindings.length,
       ...scanResultMeta(options),
@@ -1661,7 +1661,7 @@ if (IS_BROWSER) {
   function postExtensionError(err) {
     if (!EXTENSION_MODE) return;
     window.postMessage({
-      source: 'impeccable-error',
+      source: 'fk-skills-error',
       message: err?.message || String(err),
     }, '*');
   }
@@ -1793,7 +1793,7 @@ if (IS_BROWSER) {
     // In extension mode, post serialized results for the DevTools panel
     if (EXTENSION_MODE) {
       window.postMessage({
-        source: 'impeccable-results',
+        source: 'fk-skills-results',
         findings: serializeFindings(allFindings),
         count: allFindings.length,
         ...scanResultMeta(options),
@@ -1855,9 +1855,9 @@ if (IS_BROWSER) {
   if (EXTENSION_MODE) {
     // Extension mode: listen for commands, don't auto-scan
     window.addEventListener('message', (e) => {
-      if (e.source !== window || !e.data || e.data.source !== 'impeccable-command') return;
+      if (e.source !== window || !e.data || e.data.source !== 'fk-skills-command') return;
       if (e.data.action === 'scan') {
-        if (e.data.config) window.__IMPECCABLE_CONFIG__ = e.data.config;
+        if (e.data.config) window.__FK_SKILLS_CONFIG__ = e.data.config;
         try {
           scan(e.data.config || {});
         } catch (err) {
@@ -1909,9 +1909,9 @@ if (IS_BROWSER) {
         }
       }
     });
-    window.postMessage({ source: 'impeccable-ready' }, '*');
+    window.postMessage({ source: 'fk-skills-ready' }, '*');
   } else {
-    if (window.__IMPECCABLE_CONFIG__?.autoScan !== false) {
+    if (window.__FK_SKILLS_CONFIG__?.autoScan !== false) {
       const runAutoScan = () => {
         try {
           scan();
@@ -1927,11 +1927,11 @@ if (IS_BROWSER) {
     }
   }
 
-  window.impeccableDetect = detect;
-  window.impeccableDetectAsync = detectAsync;
-  window.impeccableScan = scan;
-  window.impeccableScanAsync = scanAsync;
+  window.fkSkillsDetect = detect;
+  window.fkSkillsDetectAsync = detectAsync;
+  window.fkSkillsScan = scan;
+  window.fkSkillsScanAsync = scanAsync;
   window.impeccableCollectVisualContrastCandidates = collectVisualContrastCandidates;
-  window.impeccableAnalyzeVisualContrast = analyzeVisualContrast;
-  window.impeccableGetLastVisualContrastAnalyses = () => lastVisualContrastAnalyses.slice();
+  window.fkSkillsAnalyzeVisualContrast = analyzeVisualContrast;
+  window.fkSkillsGetLastVisualContrastAnalyses = () => lastVisualContrastAnalyses.slice();
 }

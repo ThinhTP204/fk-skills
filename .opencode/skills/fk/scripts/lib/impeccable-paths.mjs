@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const IMPECCABLE_DIR = '.impeccable';
+export const IMPECCABLE_DIR = '.fk-skills';
 export const LIVE_DIR = 'live';
 export const CRITIQUE_DIR = 'critique';
 
@@ -40,12 +40,15 @@ export function getLegacyLiveConfigPath(scriptsDir) {
 }
 
 export function resolveLiveConfigPath({ cwd = process.cwd(), scriptsDir, env = process.env } = {}) {
-  if (env.IMPECCABLE_LIVE_CONFIG && env.IMPECCABLE_LIVE_CONFIG.trim()) {
-    const configured = env.IMPECCABLE_LIVE_CONFIG.trim();
+  const liveConfig = env.FK_SKILLS_LIVE_CONFIG || env.IMPECCABLE_LIVE_CONFIG;
+  if (liveConfig && liveConfig.trim()) {
+    const configured = liveConfig.trim();
     return path.isAbsolute(configured) ? configured : path.resolve(cwd, configured);
   }
   const primary = getLiveConfigPath(cwd);
   if (fs.existsSync(primary)) return primary;
+  const legacyProject = path.join(cwd, '.impeccable', LIVE_DIR, 'config.json');
+  if (fs.existsSync(legacyProject)) return legacyProject;
   if (scriptsDir) {
     const legacy = getLegacyLiveConfigPath(scriptsDir);
     if (fs.existsSync(legacy)) return legacy;
@@ -58,7 +61,7 @@ export function getLiveServerPath(cwd = process.cwd()) {
 }
 
 export function getLegacyLiveServerPath(cwd = process.cwd()) {
-  return path.join(cwd, '.impeccable-live.json');
+  return path.join(cwd, '.fk-skills-live.json');
 }
 
 export function readLiveServerInfo(cwd = process.cwd()) {
@@ -106,7 +109,7 @@ export function getLiveSessionsDir(cwd = process.cwd()) {
 }
 
 export function getLegacyLiveSessionsDir(cwd = process.cwd()) {
-  return path.join(cwd, '.impeccable-live', 'sessions');
+  return path.join(cwd, '.fk-skills-live', 'sessions');
 }
 
 export function getLiveAnnotationsDir(cwd = process.cwd()) {
@@ -118,7 +121,7 @@ export function getCritiqueDir(cwd = process.cwd()) {
 }
 
 export function getLegacyLiveAnnotationsDir(cwd = process.cwd()) {
-  return path.join(cwd, '.impeccable-live', 'annotations');
+  return path.join(cwd, '.fk-skills-live', 'annotations');
 }
 
 function firstExisting(paths) {

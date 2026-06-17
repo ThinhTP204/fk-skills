@@ -6,7 +6,7 @@
 
 // Dev-only allowance so impeccable live mode can load. Empty string in any
 // non-development environment.
-const __impeccableLiveDev =
+const __fkLiveDev =
   process.env.NODE_ENV === "development" ? " http://localhost:8400" : "";
 
 module.exports = {
@@ -19,10 +19,10 @@ module.exports = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline' 'unsafe-eval'${__impeccableLiveDev}; ` +
+              `script-src 'self' 'unsafe-inline' 'unsafe-eval'${__fkLiveDev}; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob:; " +
-              `connect-src 'self'${__impeccableLiveDev}; ` +
+              `connect-src 'self'${__fkLiveDev}; ` +
               "frame-ancestors 'self';",
           },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },

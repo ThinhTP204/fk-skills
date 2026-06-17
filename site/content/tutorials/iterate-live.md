@@ -2,18 +2,18 @@
 title: Iterate on UI with Live Mode
 tagline: "Pick an element, generate three variants, accept one. Canvas-like iteration without leaving your code."
 order: 2
-description: "Use /impeccable live to visually iterate on a real element in your dev server: pick, annotate, generate three variants, accept the one you want, and have it written back to source."
+description: "Use /fk live to visually iterate on a real element in your dev server: pick, annotate, generate three variants, accept the one you want, and have it written back to source."
 ---
 
 ## What you'll build
 
-You will use `/impeccable live` on your dev server to iterate on a single piece of UI (a hero, a card, a section) and end with one of three AI-generated variants written back to source as real code. You'll see the canvas-style picking, annotation, and three-up cycling flow.
+You will use `/fk live` on your dev server to iterate on a single piece of UI (a hero, a card, a section) and end with one of three AI-generated variants written back to source as real code. You'll see the canvas-style picking, annotation, and three-up cycling flow.
 
 Total time: about ten minutes. Most of that is picking what to iterate on.
 
 ## Prerequisites
 
-- Impeccable installed (see [getting started](/tutorials/getting-started) if you have not). Run `/impeccable init` first if you haven't yet: variants lean on `PRODUCT.md` and `DESIGN.md` for brand fit.
+- Impeccable installed (see [getting started](/tutorials/getting-started) if you have not). Run `/fk init` first if you haven't yet: variants lean on `PRODUCT.md` and `DESIGN.md` for brand fit.
 - A running dev server with HMR (Vite, Next.js, SvelteKit, Astro, Nuxt, Bun) OR a static HTML file open in a browser.
 - A page with at least one piece of UI you'd like to iterate on. A newsletter card, a hero, a pricing tier, something small enough to hold in your head.
 
@@ -22,7 +22,7 @@ Total time: about ten minutes. Most of that is picking what to iterate on.
 From your harness, run:
 
 ```
-/impeccable live
+/fk live
 ```
 
 The skill starts a small local helper server on port 8400 and injects a `<script>` tag into your dev entry file that loads the picker. If your project has a strict Content Security Policy, the first run detects it and offers a one-time, dev-only patch for `script-src` and `connect-src`. Accept the patch: it is guarded by `NODE_ENV === "development"` and you can revert any time.
@@ -111,13 +111,13 @@ The stop also strips the `<script>` tag from your dev entry and stops the helper
 
 ## What to try next
 
-- Run `/impeccable live` on a different page after a `/impeccable polish` pass to A/B the polished version against two more directions.
+- Run `/fk live` on a different page after a `/fk polish` pass to A/B the polished version against two more directions.
 - Pair with [critique with the overlay](/tutorials/critique-with-overlay): run critique first, fix priority issues, then use live to explore redirections on the element critique flagged.
-- Reach for `/impeccable craft` when you want the shape-then-build flow (a new feature end-to-end, not a single element).
+- Reach for `/fk craft` when you want the shape-then-build flow (a new feature end-to-end, not a single element).
 
 ## Common issues
 
-- **The picker never appears on the page.** Either the helper did not start (look for errors in the terminal) or CSP is blocking the inject. Re-run `/impeccable live` and let it re-check CSP. If you declined the patch on first run, delete the `cspChecked` line in `.impeccable/live/config.json` and re-run.
+- **The picker never appears on the page.** Either the helper did not start (look for errors in the terminal) or CSP is blocking the inject. Re-run `/fk live` and let it re-check CSP. If you declined the patch on first run, delete the `cspChecked` line in `.fk-skills/live/config.json` and re-run.
 - **"element lives in a generated file"** on Go. Live detected that the picked element is in a compiled output, not a source file. It routes the accept through a fallback path so the variant still lands in true source. Follow the hint; don't force-accept into the generated file.
-- **Variants don't feel brand-aligned.** Check that `PRODUCT.md` and `DESIGN.md` exist at the project root. Without them, live leans toward generic defaults. Run `/impeccable init` and `/impeccable document` first.
-- **The helper port is in use.** Another live session left its server running. `/impeccable live stop` releases the port.
+- **Variants don't feel brand-aligned.** Check that `PRODUCT.md` and `DESIGN.md` exist at the project root. Without them, live leans toward generic defaults. Run `/fk init` and `/fk document` first.
+- **The helper port is in use.** Another live session left its server running. `/fk live stop` releases the port.

@@ -53,7 +53,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // PRODUCT.md / DESIGN.md live wherever context.mjs resolves. The generated
-// DESIGN sidecar is project-local at .impeccable/design.json, with legacy
+// DESIGN sidecar is project-local at .fk-skills/design.json, with legacy
 // DESIGN.json fallback for existing projects.
 const CONTEXT_DIR = resolveContextDir(process.cwd());
 const DEFAULT_POLL_TIMEOUT = 600_000;   // 10 min — agent re-polls on timeout anyway
@@ -346,7 +346,7 @@ function loadBrowserScripts() {
     path.join(__dirname, 'detector', 'detect-antipatterns-browser.js'),
     path.join(__dirname, '..', '..', 'cli', 'engine', 'detect-antipatterns-browser.js'),
     path.join(__dirname, '..', '..', '..', '..', 'cli', 'engine', 'detect-antipatterns-browser.js'),
-    path.join(process.cwd(), 'node_modules', 'impeccable', 'cli', 'engine', 'detect-antipatterns-browser.js'),
+    path.join(process.cwd(), 'node_modules', 'fk-skills', 'cli', 'engine', 'detect-antipatterns-browser.js'),
   ];
   let detectScript = '';
   for (const p of detectPaths) {
@@ -535,13 +535,13 @@ function createRequestHandler({ detectScript, liveScriptParts }) {
     }
 
     // --- Design system (unified v2 response) + raw ---
-    //   /design-system.json    returns both parsed DESIGN.md and .impeccable/design.json
+    //   /design-system.json    returns both parsed DESIGN.md and .fk-skills/design.json
     //                          sidecar when present. Panel merges them:
     //                            { present, parsed, sidecar, hasMd, hasSidecar,
     //                              mdNewerThanJson, parseError?, sidecarError? }
     //                          - parsed: output of parseDesignMd (frontmatter
     //                            + six canonical sections) when DESIGN.md exists.
-    //                          - sidecar: .impeccable/design.json contents when present.
+    //                          - sidecar: .fk-skills/design.json contents when present.
     //                            Expected shape: schemaVersion 2, carrying
     //                            extensions + components + narrative.
     //   /design-system/raw     returns DESIGN.md markdown verbatim
@@ -586,7 +586,7 @@ function createRequestHandler({ detectScript, liveScriptParts }) {
         try {
           response.sidecar = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
         } catch (err) {
-          response.sidecarError = 'Failed to parse .impeccable/design.json: ' + err.message;
+          response.sidecarError = 'Failed to parse .fk-skills/design.json: ' + err.message;
         }
       }
 
@@ -781,7 +781,7 @@ function sessionFileMetadataFromPollReply(file) {
   const normalized = file.split(path.sep).join('/');
   const base = { file: normalized };
   if (!normalized.endsWith('/manifest.json') && normalized !== 'manifest.json') return base;
-  if (!normalized.includes('node_modules/.impeccable-live/') && !normalized.includes('src/lib/impeccable/')) return base;
+  if (!normalized.includes('node_modules/.fk-skills-live/') && !normalized.includes('src/lib/fk-skills/')) return base;
 
   let full;
   try {
@@ -966,7 +966,7 @@ function cleanupSvelteComponentSessionsBeforeExit() {
   try {
     removeAllSvelteComponentSessions(process.cwd());
   } catch (err) {
-    console.warn('[impeccable] Svelte component session cleanup failed:', err.message);
+    console.warn('[fk] Svelte component session cleanup failed:', err.message);
   }
 }
 
@@ -974,10 +974,10 @@ function applyLegacyDeferredAcceptsOnStartup() {
   try {
     const result = applyDeferredSvelteComponentAccepts(process.cwd());
     if (result.applied > 0 || result.failed > 0) {
-      console.log('[impeccable] applied legacy deferred Svelte component accepts:', JSON.stringify(result));
+      console.log('[fk] applied legacy deferred Svelte component accepts:', JSON.stringify(result));
     }
   } catch (err) {
-    console.warn('[impeccable] legacy deferred Svelte component accept apply failed:', err.message);
+    console.warn('[fk] legacy deferred Svelte component accept apply failed:', err.message);
   }
 }
 
@@ -1123,7 +1123,7 @@ httpServer = http.createServer(createRequestHandler({ detectScript, liveScriptPa
 httpServer.listen(state.port, '127.0.0.1', () => {
   writeLiveServerInfo(process.cwd(), { pid: process.pid, port: state.port, token: state.token });
   const url = `http://localhost:${state.port}`;
-  console.log(`\nImpeccable live server running on ${url}`);
+  console.log(`\nFK live server running on ${url}`);
   console.log(`Token: ${state.token}\n`);
   console.log(`Script: ${url}/live.js`);
   console.log('Inject: managed by live-inject.mjs; Astro source tags use is:inline automatically.');

@@ -346,7 +346,7 @@ function resolveBundledImport(importerName, specifier, names) {
 
 // Regression guard for issue #254: the bundled detector imported
 // `../../lib/impeccable-config.mjs`, a file that lives outside `cli/engine` and
-// was never copied into the bundle, so `/impeccable critique` crashed with
+// was never copied into the bundle, so `/fk critique` crashed with
 // "Cannot find module .../lib/impeccable-config.mjs". This walks every bundled
 // script and asserts each relative import resolves to another bundled file, so
 // any future out-of-bundle dependency fails the build instead of the user.

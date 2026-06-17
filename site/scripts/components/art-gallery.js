@@ -10,8 +10,8 @@ export function renderGallery(skills) {
 	const container = document.querySelector(".skills-gallery");
 	if (!container) return;
 
-	// Filter skills (hide impeccable as per original)
-	const filteredSkills = skills.filter((s) => s.id !== "impeccable");
+	// Filter skills (hide fk as per original)
+	const filteredSkills = skills.filter((s) => s.id !== "fk");
 
 	container.innerHTML = `
         <div class="gallery-track">

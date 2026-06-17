@@ -29,7 +29,7 @@ function withDetectorScript(html: string) {
   if (html.includes('detect-antipatterns-browser.js')) return html;
   const script = [
     '<script>',
-    'window.__IMPECCABLE_CONFIG__ = { ...(window.__IMPECCABLE_CONFIG__ || {}), autoScan: true };',
+    'window.__FK_SKILLS_CONFIG__ = { ...(window.__FK_SKILLS_CONFIG__ || {}), autoScan: true };',
     '</script>',
     '<script src="/js/detect-antipatterns-browser.js"></script>',
   ].join('');

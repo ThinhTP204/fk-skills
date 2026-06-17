@@ -335,8 +335,8 @@ function isInsideProject(filePath, cwd) {
 function cursorBlockMessage(findings, filePath, config, cwd) {
   const rendered = renderTemplate(findings, filePath, config, { cwd });
   const blocked = rendered.replace(
-    '[impeccable@1] Design hook findings requiring review',
-    '[impeccable@1] Impeccable design hook blocked this write before it landed. Design hook findings requiring review',
+    '[fk@1] Design hook findings requiring review',
+    '[fk@1] Impeccable design hook blocked this write before it landed. Design hook findings requiring review',
   );
   return blocked.length > 4000 ? `${blocked.slice(0, 3984)}\n...(truncated)` : blocked;
 }
@@ -469,8 +469,8 @@ async function main() {
 }
 
 main().catch((err) => {
-  if (process.env.IMPECCABLE_HOOK_DEBUG) {
-    process.stderr.write(`[impeccable-hook-before-edit] ${err}\n`);
+  if (process.env.FK_SKILLS_HOOK_DEBUG) {
+    process.stderr.write(`[fk-hook-before-edit] ${err}\n`);
   }
   done({ permission: 'allow' });
 });

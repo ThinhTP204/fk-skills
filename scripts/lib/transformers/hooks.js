@@ -3,7 +3,7 @@
  *
  * Two emission targets exist:
  *
- * 1. Project-local install (the `npx impeccable skills install` CLI path):
+ * 1. Project-local install (the `npx fk-skills skills install` CLI path):
  *      - Claude Code: `.claude/settings.json`   (${CLAUDE_PROJECT_DIR}-relative)
  *      - Codex:       `.codex/hooks.json`
  *      - Cursor:      `.cursor/hooks.json`
@@ -12,7 +12,7 @@
  *      - `plugin/hooks/hooks.json`              (${CLAUDE_PLUGIN_ROOT}-relative)
  *
  * The plugin variant resolves the hook script relative to the installed plugin
- * root rather than assuming a `.claude/skills/impeccable/` layout, so it stays
+ * root rather than assuming a `.claude/skills/fk/` layout, so it stays
  * correct wherever Claude Code unpacks the plugin.
  */
 

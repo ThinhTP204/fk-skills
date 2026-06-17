@@ -3,7 +3,7 @@
  *
  * Each scenario:
  *   1. Creates a temp workspace.
- *   2. Symlinks the real .claude/skills/impeccable into the workspace so
+ *   2. Symlinks the real .claude/skills/fk into the workspace so
  *      scripts (load-context.mjs, etc.) resolve from the canonical path
  *      the skill references.
  *   3. Optionally writes PRODUCT.md / DESIGN.md fixtures.
@@ -44,14 +44,14 @@ function loadSkillBody() {
   }
   // The source uses placeholders that the build step replaces per-provider.
   // For the test harness we want a single body that works for any provider,
-  // and the scripts the skill references live at .claude/skills/impeccable/
+  // and the scripts the skill references live at .claude/skills/fk/
   // (the workspace symlink), so hard-code those values.
   md = md
     .replaceAll('{{model}}', 'the assistant')
     .replaceAll('{{command_prefix}}', '/')
     .replaceAll('{{ask_instruction}}', 'Ask the user')
     .replaceAll('{{config_file}}', 'AGENTS.md')
-    .replaceAll('{{scripts_path}}', '.claude/skills/impeccable/scripts')
+    .replaceAll('{{scripts_path}}', '.claude/skills/fk/scripts')
     .replaceAll('{{command_hint}}', 'command');
   return md.trim();
 }
@@ -61,8 +61,8 @@ export const SKILL_BODY = loadSkillBody();
 /**
  * Create a temp workspace and prepopulate it.
  *
- * - `.claude/skills/impeccable` is symlinked at the SOURCE skill dir (not
- *   the built `.claude/skills/impeccable/`) so the test exercises whatever
+ * - `.claude/skills/fk` is symlinked at the SOURCE skill dir (not
+ *   the built `.claude/skills/fk/`) so the test exercises whatever
  *   is in `skill/` right now, without needing `bun run build` to refresh
  *   the harness output dirs. The trade-off: reference files surface their
  *   raw `{{placeholders}}`, but the assertions only check tool calls, not
@@ -74,12 +74,12 @@ export const SKILL_BODY = loadSkillBody();
  *   exercises the update-check path (the source dir has only SKILL.src.md).
  */
 export function prepareWorkspace({ files = {}, skillVersion = null } = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'impeccable-skill-test-'));
-  const skillDest = path.join(dir, '.claude', 'skills', 'impeccable');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fk-skill-test-'));
+  const skillDest = path.join(dir, '.claude', 'skills', 'fk');
   fs.mkdirSync(path.join(dir, '.claude', 'skills'), { recursive: true });
   if (skillVersion) {
     fs.cpSync(SKILL_SOURCE_DIR, skillDest, { recursive: true });
-    fs.writeFileSync(path.join(skillDest, 'SKILL.md'), `---\nname: impeccable\nversion: ${skillVersion}\n---\n\nbody\n`);
+    fs.writeFileSync(path.join(skillDest, 'SKILL.md'), `---\nname: fk\nversion: ${skillVersion}\n---\n\nbody\n`);
   } else {
     fs.symlinkSync(SKILL_SOURCE_DIR, skillDest, 'dir');
   }
@@ -178,7 +178,7 @@ export function makeTools(workspace, extraEnv = {}) {
   const tools = {
     bash: tool({
       description:
-        'Run a bash command in the workspace root. Use this to invoke skill scripts (e.g. `node .claude/skills/impeccable/scripts/load-context.mjs`).',
+        'Run a bash command in the workspace root. Use this to invoke skill scripts (e.g. `node .claude/skills/fk/scripts/load-context.mjs`).',
       inputSchema: z.object({
         command: z.string().describe('The bash command to execute.'),
       }),

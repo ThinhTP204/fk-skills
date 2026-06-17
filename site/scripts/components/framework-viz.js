@@ -25,7 +25,7 @@ const categoryLabels = {
 };
 
 const commandSymbols = {
-	'impeccable': 'Im',
+	'fk': 'Im',
 	'craft': 'Cf',
 	'shape': 'Sh',
 	'critique': 'Cr',
@@ -52,7 +52,7 @@ const commandSymbols = {
 };
 
 const commandNumbers = {
-	'impeccable': 1, 'craft': 2, 'shape': 3,
+	'fk': 1, 'craft': 2, 'shape': 3,
 	'critique': 4, 'audit': 5,
 	'typeset': 6, 'layout': 7, 'colorize': 8, 'animate': 9,
 	'delight': 10, 'bolder': 11, 'quieter': 12, 'overdrive': 13,
@@ -61,9 +61,9 @@ const commandNumbers = {
 	'init': 21, 'document': 22, 'extract': 23, 'live': 24
 };
 
-// After the v3.0 consolidation, all commands except the root "impeccable" are
-// sub-commands of /impeccable. The renderer handles the display label directly
-// (bare name for sub-commands, "/impeccable" for the root). This map is kept
+// After the v3.0 consolidation, all commands except the root "fk" are
+// sub-commands of /fk. The renderer handles the display label directly
+// (bare name for sub-commands, "/fk" for the root). This map is kept
 // as an extension point for any future per-command display overrides.
 const commandDisplay = {};
 
@@ -133,7 +133,7 @@ export class PeriodicTable {
 		const combinesWith = toArray(rel.combinesWith);
 
 		// Build relationships line. Command names are shown bare (no slash)
-		// because they're names, not invocations — the invocation is /impeccable <name>.
+		// because they're names, not invocations — the invocation is /fk <name>.
 		let relParts = [];
 		if (pairs.length > 0) relParts.push(`pairs with ${pairs.join(', ')}`);
 		if (combinesWith.length > 0) relParts.push(`+ ${combinesWith.join(', ')}`);
@@ -231,11 +231,11 @@ export class PeriodicTable {
 		el.dataset.category = category;
 		el.type = 'button';
 		// Build accessible label with the full invocation
-		const invocation = cmd === 'impeccable'
-			? '/impeccable'
-			: cmd.startsWith('impeccable ')
+		const invocation = cmd === 'fk'
+			? '/fk'
+			: cmd.startsWith('fk ')
 				? `/${cmd}`
-				: `/impeccable ${cmd}`;
+				: `/fk ${cmd}`;
 		el.setAttribute('aria-label', `${invocation} command - ${categoryLabels[category]}`);
 		el.style.cssText = `
 			width: 56px;
@@ -295,8 +295,8 @@ export class PeriodicTable {
 			line-height: 1.3;
 			white-space: nowrap;
 		`;
-		if (cmd === 'impeccable') {
-			name.textContent = 'impeccable';
+		if (cmd === 'fk') {
+			name.textContent = 'fk';
 		} else if (display) {
 			name.textContent = display.label;
 		} else {

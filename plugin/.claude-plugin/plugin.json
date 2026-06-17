@@ -9,6 +9,6 @@
   "repository": "https://github.com/ThinhTP204/fk-skills",
   "skills": "./skills/",
   "agents": [
-    "./agents/impeccable-manual-edit-applier.md"
+    "./agents/fk-manual-edit-applier.md"
   ]
 }

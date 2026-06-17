@@ -25,37 +25,37 @@ export function renderCommandDemo(commandId) {
   const demo = getCommandDemo(commandId);
 
   if (!demo) {
-    // impeccable has multiple modes — show a usage guide
-    if (commandId === 'impeccable') {
+    // fk has multiple modes — show a usage guide
+    if (commandId === 'fk') {
       return `
         <div class="demo-container">
           <div class="demo-viewport" style="padding: var(--spacing-lg); font-size: 13px; line-height: 1.6;">
             <div style="display: flex; flex-direction: column; gap: 16px; color: var(--color-ash);">
-              <div style="font-size: 14px; color: var(--color-text); font-weight: 600;">Three ways to use /impeccable</div>
+              <div style="font-size: 14px; color: var(--color-text); font-weight: 600;">Three ways to use /fk</div>
               <div style="display: flex; flex-direction: column; gap: 14px;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <div style="display: flex; gap: 8px; align-items: baseline;">
-                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/impeccable</code>
+                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/fk</code>
                     <span style="opacity: 0.4; font-size: 11px;">freeform</span>
                   </div>
                   <span style="padding-left: 0; opacity: 0.8;">Use on any task. Loads full design intelligence, anti-patterns, and reference knowledge into the current context.</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <div style="display: flex; gap: 8px; align-items: baseline;">
-                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/impeccable init</code>
+                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/fk init</code>
                     <span style="opacity: 0.4; font-size: 11px;">one-time setup</span>
                   </div>
                   <span style="padding-left: 0; opacity: 0.8;">Scans your codebase, interviews you about brand and audience, saves a Design Context all other commands use, configures live mode, and points you at what to run next.</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <div style="display: flex; gap: 8px; align-items: baseline;">
-                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/impeccable craft</code>
+                    <code style="font-size: 12px; color: var(--spread-accent, var(--color-accent)); font-weight: 600; white-space: nowrap;">/fk craft</code>
                     <span style="opacity: 0.4; font-size: 11px;">build a feature</span>
                   </div>
                   <span style="padding-left: 0; opacity: 0.8;">Runs /shape to plan UX first, loads the right references, then builds and iterates visually until the result delights.</span>
                 </div>
               </div>
-              <div style="font-size: 12px; opacity: 0.5; margin-top: 2px; font-style: italic;">Start with <code style="font-size: 11px;">/impeccable init</code> once per project. Then use the other modes as needed.</div>
+              <div style="font-size: 12px; opacity: 0.5; margin-top: 2px; font-style: italic;">Start with <code style="font-size: 11px;">/fk init</code> once per project. Then use the other modes as needed.</div>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function renderCommandDemo(commandId) {
                   <div style="display: flex; gap: 8px; align-items: baseline;">
                     <span style="color: var(--spread-accent, var(--color-accent)); font-weight: 600; font-size: 12px;">1. Shape</span>
                   </div>
-                  <span style="opacity: 0.8;">Runs <code style="font-size: 11px;">/impeccable shape</code> internally to build a design brief from discovery questions. No code yet.</span>
+                  <span style="opacity: 0.8;">Runs <code style="font-size: 11px;">/fk shape</code> internally to build a design brief from discovery questions. No code yet.</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <div style="display: flex; gap: 8px; align-items: baseline;">
@@ -163,10 +163,10 @@ export function renderCommandDemo(commandId) {
                   <div style="display: flex; gap: 8px; align-items: baseline;">
                     <span style="color: var(--spread-accent, var(--color-accent)); font-weight: 600; font-size: 12px;">3. Handoff</span>
                   </div>
-                  <span style="opacity: 0.8;">The confirmed brief guides <code style="font-size: 11px;">/impeccable craft</code> or any other implementation approach. No code written, just the thinking that makes code good.</span>
+                  <span style="opacity: 0.8;">The confirmed brief guides <code style="font-size: 11px;">/fk craft</code> or any other implementation approach. No code written, just the thinking that makes code good.</span>
                 </div>
               </div>
-              <div style="font-size: 12px; opacity: 0.5; margin-top: 2px; font-style: italic;">Use standalone or as the first step of <code style="font-size: 11px;">/impeccable craft</code>.</div>
+              <div style="font-size: 12px; opacity: 0.5; margin-top: 2px; font-style: italic;">Use standalone or as the first step of <code style="font-size: 11px;">/fk craft</code>.</div>
             </div>
           </div>
         </div>

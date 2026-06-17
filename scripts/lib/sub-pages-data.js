@@ -33,8 +33,8 @@ export {
  * These are deprecated shims or internal skills that users shouldn't browse.
  */
 const EXCLUDED_SKILLS = new Set([
-  'frontend-design',   // deprecated, renamed to impeccable
-  'teach-impeccable',  // deprecated, folded into /impeccable init
+  'frontend-design',   // deprecated, renamed to fk
+  'teach-fk',  // deprecated, folded into /fk init
   'arrange',           // renamed to layout
   'normalize',         // merged into /polish
 ]);
@@ -46,7 +46,7 @@ const EXCLUDED_SKILLS = new Set([
  */
 export const SKILL_CATEGORIES = {
   // CREATE - build something new
-  impeccable: 'create',
+  fk: 'create',
   craft: 'create',
   shape: 'create',
   // EVALUATE - review and assess
@@ -206,11 +206,11 @@ export async function buildSubPageData(rootDir) {
   const contentDir = path.join(rootDir, 'site/content');
   const commandDemos = await loadCommandDemos(rootDir);
 
-  // After the v3.0 consolidation there's only one source skill (impeccable).
+  // After the v3.0 consolidation there's only one source skill (fk).
   // Its reference/ directory holds one file per command (audit.md, polish.md, ...).
   // We synthesize a virtual skill entry for each sub-command so the sub-page
   // generators can keep rendering per-command pages, index cards, etc.
-  const impeccableSkill = rawSkills.find((s) => s.name === 'impeccable');
+  const fkSkill = rawSkills.find((s) => s.name === 'fk');
   const metadataPath = path.join(rootDir, 'skill/scripts/command-metadata.json');
   let commandMetadata = {};
   if (fs.existsSync(metadataPath)) {
@@ -222,24 +222,24 @@ export async function buildSubPageData(rootDir) {
   // rendering, resolve them here using the claude-code provider as the canonical
   // form ("/" prefix). The list of all command names includes the root skill
   // plus all sub-commands from metadata so cross-references render correctly.
-  const allCommandNames = ['impeccable', ...Object.keys(commandMetadata)];
+  const allCommandNames = ['fk', ...Object.keys(commandMetadata)];
   const resolvePlaceholders = (content) =>
     replacePlaceholders(content, 'claude-code', [], allCommandNames);
 
   const skills = [];
 
-  // 1. The root impeccable skill itself.
-  if (impeccableSkill && !EXCLUDED_SKILLS.has(impeccableSkill.name)) {
-    const editorial = readEditorialWrapper(contentDir, 'skills', 'impeccable');
-    const demo = commandDemos['impeccable'] || null;
+  // 1. The root fk skill itself.
+  if (fkSkill && !EXCLUDED_SKILLS.has(fkSkill.name)) {
+    const editorial = readEditorialWrapper(contentDir, 'skills', 'fk');
+    const demo = commandDemos['fk'] || null;
     skills.push({
-      id: 'impeccable',
-      name: 'impeccable',
-      description: impeccableSkill.description,
-      argumentHint: impeccableSkill.argumentHint,
-      category: SKILL_CATEGORIES['impeccable'],
-      body: resolvePlaceholders(impeccableSkill.body),
-      references: (impeccableSkill.references || []).map((r) => ({
+      id: 'fk',
+      name: 'fk',
+      description: fkSkill.description,
+      argumentHint: fkSkill.argumentHint,
+      category: SKILL_CATEGORIES['fk'],
+      body: resolvePlaceholders(fkSkill.body),
+      references: (fkSkill.references || []).map((r) => ({
         ...r,
         content: resolvePlaceholders(r.content),
       })),
@@ -250,10 +250,10 @@ export async function buildSubPageData(rootDir) {
   }
 
   // 2. One virtual entry per sub-command, body sourced from its reference file.
-  if (impeccableSkill) {
+  if (fkSkill) {
     for (const [cmdId, meta] of Object.entries(commandMetadata)) {
       if (EXCLUDED_SKILLS.has(cmdId)) continue;
-      const refFile = impeccableSkill.references?.find((r) => r.name === cmdId);
+      const refFile = fkSkill.references?.find((r) => r.name === cmdId);
       if (!refFile) continue; // no reference file = no page
 
       const editorial = readEditorialWrapper(contentDir, 'skills', cmdId);

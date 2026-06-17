@@ -318,13 +318,13 @@ Full detector docs: see `cli/engine/detect-antipatterns.mjs` in this repo.
 
 ## Upgrading from impeccable
 
-fk-skills started as a fork of [impeccable](https://github.com/impeccable-style/impeccable). If you are migrating from that project, here is what changed.
+fk-skills started as a fork of [impeccable](https://github.com/impeccable-style/fk). If you are migrating from that project, here is what changed.
 
 ### Commands
 
-The skill prefix changed from `/impeccable` to `/fk`, and several commands were renamed:
+The skill prefix changed from `/fk` to `/fk`, and several commands were renamed:
 
-| Old (`/impeccable`) | New (`/fk`) |
+| Old (`/fk`) | New (`/fk`) |
 |---------------------|-------------|
 | `init` | `setup` |
 | `craft` | `build` |
@@ -346,7 +346,7 @@ The skill prefix changed from `/impeccable` to `/fk`, and several commands were 
 
 These commands kept their name (prefix only changed):
 
-| Old (`/impeccable`) | New (`/fk`) |
+| Old (`/fk`) | New (`/fk`) |
 |---------------------|-------------|
 | `copy` | `copy` |
 | `type` | `type` |
@@ -357,17 +357,17 @@ These commands kept their name (prefix only changed):
 
 ### Config folder
 
-In v1.0.5, the local config folder was renamed from `.impeccable/` to `.fk-skills/`. Running `npx fk-skills install` or `npx fk-skills update` migrates your files automatically.
+In v1.0.5, the local config folder was renamed from `.fk-skills/` to `.fk-skills/`. Running `npx fk-skills install` or `npx fk-skills update` migrates your files automatically.
 
 | Before | After (v1.0.5+) |
 |--------|-----------------|
-| `.impeccable/config.json` | `.fk-skills/config.json` |
-| `.impeccable/config.local.json` | `.fk-skills/config.local.json` |
-| `.impeccable/design.json` | `.fk-skills/design.json` |
-| `.impeccable/hook.cache.json` | `.fk-skills/hook.cache.json` |
-| `.impeccable/hook.pending.json` | `.fk-skills/hook.pending.json` |
+| `.fk-skills/config.json` | `.fk-skills/config.json` |
+| `.fk-skills/config.local.json` | `.fk-skills/config.local.json` |
+| `.fk-skills/design.json` | `.fk-skills/design.json` |
+| `.fk-skills/hook.cache.json` | `.fk-skills/hook.cache.json` |
+| `.fk-skills/hook.pending.json` | `.fk-skills/hook.pending.json` |
 
-The old `.impeccable/` folder is left in place after migration. You can delete it manually once you have confirmed everything works.
+The old `.fk-skills/` folder is left in place after migration. You can delete it manually once you have confirmed everything works.
 
 ## Contributing
 

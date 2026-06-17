@@ -94,7 +94,7 @@ describe('live-wrap.mjs buffer-aware "original" content', () => {
     runWrap(['--classes', 'hero', '--tag', 'section', '--page-url', '/']);
 
     const after = fs.readFileSync(file, 'utf-8');
-    const originalWrapper = after.match(/data-impeccable-variant="original"[\s\S]*?<\/div>/)?.[0] || '';
+    const originalWrapper = after.match(/data-fk-variant="original"[\s\S]*?<\/div>/)?.[0] || '';
     assert.equal((originalWrapper.match(/Hello/g) || []).length, 1);
     assert.match(originalWrapper, /<h1>Hello<\/h1>/);
     assert.match(originalWrapper, /<p>Welcome<\/p>/);

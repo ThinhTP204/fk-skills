@@ -129,7 +129,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       world: 'MAIN',
       files: ['detector/detect.js'],
     }).then(() => {
-      // Detector will post impeccable-ready, content script handles the rest
+      // Detector will post fk-skills-ready, content script handles the rest
     }).catch((err) => {
       console.warn('[impeccable] Fallback injection failed:', err);
     });

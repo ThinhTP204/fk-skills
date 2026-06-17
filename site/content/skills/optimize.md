@@ -4,7 +4,7 @@ tagline: "Diagnose and fix UI performance from LCP to bundle size."
 
 ## When to use it
 
-`/impeccable optimize` is for interfaces that feel slow. First paint takes forever, scrolling janks, images pop in late, interactions feel laggy, the bundle ships 800KB of JavaScript. Use it when the Web Vitals are bad or when users are complaining that things are sluggish.
+`/fk optimize` is for interfaces that feel slow. First paint takes forever, scrolling janks, images pop in late, interactions feel laggy, the bundle ships 800KB of JavaScript. Use it when the Web Vitals are bad or when users are complaining that things are sluggish.
 
 Do not use it as premature optimization. If LCP is 1.1s and INP is 80ms, stop. The design work matters more.
 
@@ -23,7 +23,7 @@ The skill measures before and after. Every fix gets quantified. If a change does
 ## Try it
 
 ```
-/impeccable optimize the homepage
+/fk optimize the homepage
 ```
 
 Expected shape:
@@ -51,6 +51,6 @@ Bundle: 340KB → 180KB
 
 ## Pitfalls
 
-- **Optimizing before measuring.** Without baseline metrics, you cannot tell what helped. Run `/impeccable optimize` with specific Web Vitals numbers, not vibes.
+- **Optimizing before measuring.** Without baseline metrics, you cannot tell what helped. Run `/fk optimize` with specific Web Vitals numbers, not vibes.
 - **Chasing tiny wins.** A 20ms improvement in INP that takes a week is rarely worth it. Optimize has diminishing returns; know when to stop.
 - **Forgetting to re-measure after every change.** The build could have made things worse in a way the skill did not predict. Verify.

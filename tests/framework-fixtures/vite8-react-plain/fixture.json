@@ -26,8 +26,8 @@
     },
     "steer": {
       "message": "steer-e2e mark hero",
-      "expectSelector": "h1.hero-title[data-impeccable-steer=\"e2e\"]",
-      "expectSourceContains": "data-impeccable-steer=\"e2e\"",
+      "expectSelector": "h1.hero-title[data-fk-steer=\"e2e\"]",
+      "expectSourceContains": "data-fk-steer=\"e2e\"",
       "sourceFile": "src/App.jsx"
     },
     "manualEditScenarios": [

@@ -2,13 +2,13 @@
 
 ## Architecture (v3.0+)
 
-There is **one** user-invocable skill, `impeccable`, with **23 commands** underneath it. Users type `/impeccable polish`, `/impeccable audit`, etc. The skill is defined in `skill/`:
+There is **one** user-invocable skill, `impeccable`, with **23 commands** underneath it. Users type `/fk polish`, `/fk audit`, etc. The skill is defined in `skill/`:
 
 - `SKILL.src.md` — frontmatter (with the auto-trigger-optimized description and the `allowed-tools` list), shared design laws, and the **Commands** router table. Provider `SKILL.md` files are generated from this source.
 - `reference/` — one `<command>.md` per command (`audit.md`, `polish.md`, `critique.md`, etc.) plus the domain reference files (`typography.md`, `color-and-contrast.md`, etc.). When a sub-command is matched, the router loads its reference file.
 - `reference/brand.md` and `reference/product.md` — the two register references. SKILL.md's Setup section selects one based on the task cue, the surface in focus, or the `register` field in PRODUCT.md (first match wins).
 - `scripts/command-metadata.json` — single source of truth for each command's description, argument hint, and (eventually) category. Both the build and `pin.mjs` read from this.
-- `scripts/pin.mjs` — creates/removes lightweight redirect shims so users can have `/audit` as a standalone shortcut that delegates to `/impeccable audit`.
+- `scripts/pin.mjs` — creates/removes lightweight redirect shims so users can have `/audit` as a standalone shortcut that delegates to `/fk audit`.
 
 **Do not add standalone skills** unless there's a strong reason. The consolidation was deliberate: the `/` menu pollution problem is real and gets worse as users install more plugins.
 
@@ -19,7 +19,7 @@ Every design task belongs to one of two registers:
 - **Brand** — design IS the product: marketing, landing pages, brand sites, campaign surfaces, portfolios, long-form content. Distinctiveness is the bar. Spans every visual lane (tech-minimal, luxury, editorial-magazine, consumer-warm, brutalist, etc.) — do not default to only one.
 - **Product** — design SERVES the product: app UI, admin, dashboards, tools. Earned familiarity is the bar — fluent users of Linear / Figma / Notion / Raycast / Stripe should trust it.
 
-PRODUCT.md at the project root carries a `## Register` section with a bare value (`brand` or `product`). `/impeccable init` asks about register first because it shapes every downstream answer.
+PRODUCT.md at the project root carries a `## Register` section with a bare value (`brand` or `product`). `/fk init` asks about register first because it shapes every downstream answer.
 
 Sub-command reference files add a short `## Register` section near the top *only where the answer diverges between the two*. Don't restate the register files' content in sub-commands — link instead. Sub-commands where register meaningfully diverges today: `typeset`, `animate`, `bolder`, `delight`, `colorize`, `layout`, `quieter`.
 
@@ -146,8 +146,8 @@ Unit tests (build orchestration, detector logic) run via `bun test`. Fixture tes
 
 ```bash
 bun run test:live-e2e                                       # full suite, ~2 min, 19 fixtures
-IMPECCABLE_E2E_ONLY=vite8-react-modal bun run test:live-e2e # scope to one fixture
-IMPECCABLE_E2E_DEBUG=1 bun run test:live-e2e                # dump page DOM + dev-server tail on failure
+FK_SKILLS_E2E_ONLY=vite8-react-modal bun run test:live-e2e # scope to one fixture
+FK_SKILLS_E2E_DEBUG=1 bun run test:live-e2e                # dump page DOM + dev-server tail on failure
 ```
 
 **One-time setup**: `npx playwright install chromium` (the suite uses a specific Chromium build keyed to the bundled Playwright version).
@@ -156,7 +156,7 @@ IMPECCABLE_E2E_DEBUG=1 bun run test:live-e2e                # dump page DOM + de
 
 The agent is pluggable via a one-method interface in `tests/live-e2e/agent.mjs`: `generateVariants(event, context) → { scopedCss, variants[] }`. The default fake agent emits canned variants that exercise all three param kinds (`range`, `steps`, `toggle`). The orchestrator (wrap, write, accept, carbonize) is agent-agnostic.
 
-**LLM agent (opt-in)**: set `IMPECCABLE_E2E_AGENT=llm` to swap the fake agent for `tests/live-e2e/agents/llm-agent.mjs`, which calls Claude (default Haiku 4.5) via `@anthropic-ai/sdk`. Requires `ANTHROPIC_API_KEY` in env; the test runner skips with a clear message when it's unset. Override the model with `IMPECCABLE_E2E_LLM_MODEL=claude-sonnet-4-6` if Haiku produces unreliable JSON. Caching is on — live.md is the cacheable prefix, and after the first call subsequent fixtures pay only the cache-read rate. Pass rate on a typical sweep is 18/19; the modal fixture's intrinsic state-loss flake is amplified by LLM latency and may need a re-run. **This path hits the API and costs money** — keep it out of CI unless you really want it there.
+**LLM agent (opt-in)**: set `FK_SKILLS_E2E_AGENT=llm` to swap the fake agent for `tests/live-e2e/agents/llm-agent.mjs`, which calls Claude (default Haiku 4.5) via `@anthropic-ai/sdk`. Requires `ANTHROPIC_API_KEY` in env; the test runner skips with a clear message when it's unset. Override the model with `FK_SKILLS_E2E_LLM_MODEL=claude-sonnet-4-6` if Haiku produces unreliable JSON. Caching is on — live.md is the cacheable prefix, and after the first call subsequent fixtures pay only the cache-read rate. Pass rate on a typical sweep is 18/19; the modal fixture's intrinsic state-loss flake is amplified by LLM latency and may need a re-run. **This path hits the API and costs money** — keep it out of CI unless you really want it there.
 
 Adding a new fixture is a matter of cloning a directory under `tests/framework-fixtures/`, swapping the source files, and writing a `fixture.json`. See `tests/framework-fixtures/README.md` for the full schema.
 
@@ -166,8 +166,8 @@ Adding a new fixture is a matter of cloning a directory under `tests/framework-f
 
 ```bash
 bun run test:skill-behavior                                              # full suite (27 tests, ~5 min, ~$0.50-1.50 across providers)
-IMPECCABLE_SKILL_BEHAVIOR_MODELS=gemini-3.1-flash-lite bun run test:skill-behavior   # scope to one provider
-IMPECCABLE_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior          # dump per-scenario trace JSON to stderr (use when iterating)
+FK_SKILLS_SKILL_BEHAVIOR_MODELS=gemini-3.1-flash-lite bun run test:skill-behavior   # scope to one provider
+FK_SKILLS_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior          # dump per-scenario trace JSON to stderr (use when iterating)
 ```
 
 **Three providers per run, every run.** The suite always exercises `claude-sonnet-4-6`, `gpt-5.5`, and `gemini-3.1-flash-lite`. Sonnet and GPT-5.5 are production-tier, matching what users actually run, so the pass/fail signal reflects real agent behavior rather than a cheap proxy; gemini stays on the flash-lite tier. **Don't substitute Claude alone**: many of the most useful findings come from divergence between providers.
@@ -180,10 +180,10 @@ IMPECCABLE_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior          # dump 
 3. PRODUCT.md + DESIGN.md → loads `brand.md` + consults the design system
 4. context already loaded in turn 1 → turn 2 does **not** re-run `context.mjs`
 5. PRODUCT.md without `## Register` field → agent infers `brand` from task cue
-6. `/impeccable polish` → loads `reference/polish.md`
-7. `/impeccable audit` → loads `reference/audit.md`
+6. `/fk polish` → loads `reference/polish.md`
+7. `/fk audit` → loads `reference/audit.md`
 8. existing SvelteKit project → agent reads at least one project code file
-9. `context.mjs` emits `UPDATE_AVAILABLE` (seeded newer version) → agent surfaces it but does **not** auto-run `npx impeccable skills update`
+9. `context.mjs` emits `UPDATE_AVAILABLE` (seeded newer version) → agent surfaces it but does **not** auto-run `npx fk-skills skills update`
 
 **Baseline.** The 21-22 / 24 baseline (with stable gpt scenario 6/7 failures) was measured on the old cheap tier (`claude-haiku-4-5` / `gpt-5.4-mini`). It needs re-measuring on the current `claude-sonnet-4-6` / `gpt-5.5` lineup; the production-tier models are expected to do better on the sub-command routing scenarios the old gpt tier failed. See `tests/skill-behavior/README.md`.
 
@@ -198,11 +198,11 @@ IMPECCABLE_SKILL_BEHAVIOR_VERBOSE=1 bun run test:skill-behavior          # dump 
 The CLI lives in this repo under `cli/`: `cli/bin/` (entry + sub-commands), `cli/engine/` (the detect-antipatterns rule engine + browser variant), `cli/lib/` (helpers shared by CLI and Cloudflare Pages Functions). Published to npm as `impeccable`.
 
 ```bash
-npx impeccable detect [file-or-dir-or-url...]   # detect anti-patterns
-npx impeccable detect --fast --json src/         # regex-only, JSON output
-npx impeccable live                              # start browser overlay server
-npx impeccable skills install                    # install skills
-npx impeccable --help                            # show help
+npx fk-skills detect [file-or-dir-or-url...]   # detect anti-patterns
+npx fk-skills detect --fast --json src/         # regex-only, JSON output
+npx fk-skills live                              # start browser overlay server
+npx fk-skills skills install                    # install skills
+npx fk-skills --help                            # show help
 ```
 
 The browser detector (`cli/engine/detect-antipatterns-browser.js`) is generated from the main engine. After changing `cli/engine/detect-antipatterns.mjs`, rebuild it:
@@ -256,7 +256,7 @@ If you need to fix release notes after the fact (typo, missing thank-you, format
 
 ## Adding New Commands
 
-All commands live under `/impeccable`. To add a new one:
+All commands live under `/fk`. To add a new one:
 
 1. Create `skill/reference/<command>.md` with the command's instructions (this is what the LLM loads when the command is invoked)
 2. Add a row to the **Sub-command reference table** in `skill/SKILL.src.md`
@@ -332,7 +332,7 @@ Reference rules to copy from: `side-tab` (border, ~line 312), `low-contrast` (co
 
 ## Evals Framework (separate private repo)
 
-The eval framework lives in a separate private repo at `~/code/impeccable-evals/`. It measures whether the `/impeccable` skill improves or harms AI-generated frontend design by running the same brief through a model with and without the skill loaded.
+The eval framework lives in a separate private repo at `~/code/impeccable-evals/`. It measures whether the `/fk` skill improves or harms AI-generated frontend design by running the same brief through a model with and without the skill loaded.
 
 **If you're picking up eval work, switch to that repo and read its `AGENT.md` first.** It captures model choices, sample size policy, lessons learned, common workflows, and gotchas.
 

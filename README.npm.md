@@ -6,37 +6,37 @@ Detect UI anti-patterns and design quality issues from the command line. Scans H
 
 ```bash
 # Install skills into your AI harness (Claude, Cursor, Gemini, etc.)
-npx impeccable skills install
+npx fk-skills skills install
 
 # Non-interactive install for a specific scope
-npx impeccable skills install -y --providers=claude,codex --scope=project
+npx fk-skills skills install -y --providers=claude,codex --scope=project
 
 # First command to run inside your AI harness
-/impeccable init
+/fk init
 
 # Update skills to the latest version
-npx impeccable skills update
+npx fk-skills skills update
 
 # Install or update skills without hook manifests
-npx impeccable skills install --no-hooks
+npx fk-skills skills install --no-hooks
 
 # Link skills from a Git submodule checkout
-npx impeccable skills link --source=.impeccable --providers=claude,cursor
+npx fk-skills skills link --source=.impeccable --providers=claude,cursor
 
 # List all available commands
-npx impeccable skills help
+npx fk-skills skills help
 
 # Scan files or directories for anti-patterns
-npx impeccable detect src/
+npx fk-skills detect src/
 
 # Scan a live URL (requires Puppeteer)
-npx impeccable detect https://example.com
+npx fk-skills detect https://example.com
 
 # JSON output for CI/tooling
-npx impeccable detect --json src/
+npx fk-skills detect --json src/
 
 # Deprecated compatibility flag; full scan still runs
-npx impeccable detect --fast src/
+npx fk-skills detect --fast src/
 ```
 
 ## What It Detects

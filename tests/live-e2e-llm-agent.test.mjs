@@ -54,7 +54,7 @@ describe('live-e2e LLM agent provider config', () => {
 
   it('explicitly selects DeepSeek over Anthropic', () => {
     const config = resolveLlmAgentConfig({}, {
-      IMPECCABLE_E2E_LLM_PROVIDER: 'deepseek',
+      FK_SKILLS_E2E_LLM_PROVIDER: 'deepseek',
       ANTHROPIC_API_KEY: 'claude-key',
       DEEPSEEK_API_KEY: 'deepseek-key',
     });
@@ -70,8 +70,8 @@ describe('live-e2e LLM agent provider config', () => {
     const config = resolveLlmAgentConfig(
       { model: 'custom-model', baseURL: 'https://example.test/anthropic' },
       {
-        IMPECCABLE_E2E_LLM_PROVIDER: 'deepseek',
-        IMPECCABLE_E2E_LLM_MODEL: 'ignored-model',
+        FK_SKILLS_E2E_LLM_PROVIDER: 'deepseek',
+        FK_SKILLS_E2E_LLM_MODEL: 'ignored-model',
         DEEPSEEK_API_KEY: 'test-key',
       },
     );
@@ -82,7 +82,7 @@ describe('live-e2e LLM agent provider config', () => {
 
   it('allows the DeepSeek API base URL to come from env', () => {
     const config = resolveLlmAgentConfig({}, {
-      IMPECCABLE_E2E_LLM_PROVIDER: 'deepseek',
+      FK_SKILLS_E2E_LLM_PROVIDER: 'deepseek',
       DEEPSEEK_API_KEY: 'test-key',
       DEEPSEEK_API_BASE_URL: 'https://proxy.example.test/anthropic',
     });
@@ -92,8 +92,8 @@ describe('live-e2e LLM agent provider config', () => {
 
   it('rejects unsupported providers', () => {
     assert.throws(
-      () => resolveLlmAgentConfig({}, { IMPECCABLE_E2E_LLM_PROVIDER: 'other' }),
-      /Unsupported IMPECCABLE_E2E_LLM_PROVIDER: other/,
+      () => resolveLlmAgentConfig({}, { FK_SKILLS_E2E_LLM_PROVIDER: 'other' }),
+      /Unsupported FK_SKILLS_E2E_LLM_PROVIDER: other/,
     );
   });
 });
@@ -136,8 +136,8 @@ describe('live-e2e LLM agent provider replay', () => {
     }
 
     const config = resolveLlmAgentConfig({
-      provider: process.env.IMPECCABLE_E2E_LLM_PROVIDER || 'deepseek',
-      model: process.env.IMPECCABLE_E2E_LLM_MODEL,
+      provider: process.env.FK_SKILLS_E2E_LLM_PROVIDER || 'deepseek',
+      model: process.env.FK_SKILLS_E2E_LLM_MODEL,
     });
     const agent = await createLlmAgent({ config, log: (msg) => t.diagnostic(msg) });
     if (!agent) {
@@ -173,8 +173,8 @@ describe('live-e2e LLM agent provider replay', () => {
     }
 
     const config = resolveLlmAgentConfig({
-      provider: process.env.IMPECCABLE_E2E_LLM_PROVIDER || 'deepseek',
-      model: process.env.IMPECCABLE_E2E_LLM_MODEL,
+      provider: process.env.FK_SKILLS_E2E_LLM_PROVIDER || 'deepseek',
+      model: process.env.FK_SKILLS_E2E_LLM_MODEL,
     });
     const agent = await createLlmAgent({ config, log: (msg) => t.diagnostic(msg) });
     if (!agent) {
@@ -1566,7 +1566,7 @@ describe('live-e2e LLM agent variant copy validation', () => {
 
 describe('live-e2e LLM agent parseVariantResponse', () => {
   const validParsed = {
-    scopedCss: '@scope ([data-impeccable-variant="1"]) {}',
+    scopedCss: '@scope ([data-fk-variant="1"]) {}',
     variants: [{ innerHtml: '<h1 class="hero-title">Title</h1>' }],
   };
 
@@ -1602,7 +1602,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects scopedCss that includes an outer style tag', () => {
     const body = JSON.stringify({
-      scopedCss: '<style data-impeccable-css="SESSION_ID">@scope ([data-impeccable-variant="1"]) {}</style>',
+      scopedCss: '<style data-fk-css="SESSION_ID">@scope ([data-fk-variant="1"]) {}</style>',
       variants: [{ innerHtml: '<h1>x</h1>' }],
     });
     assert.throws(
@@ -1613,7 +1613,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects scopedCss that would break JSX template literals', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) { .title::before { content: `bad`; } }',
+      scopedCss: '@scope ([data-fk-variant="1"]) { .title::before { content: `bad`; } }',
       variants: [{ innerHtml: '<h1>x</h1>' }],
     });
     assert.throws(
@@ -1624,7 +1624,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects scopedCss with template interpolation', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) { .title { color: ${bad}; } }',
+      scopedCss: '@scope ([data-fk-variant="1"]) { .title { color: ${bad}; } }',
       variants: [{ innerHtml: '<h1>x</h1>' }],
     });
     assert.throws(
@@ -1635,7 +1635,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects malformed scopedCss before it reaches framework compilers', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) { .title { color: red; }',
+      scopedCss: '@scope ([data-fk-variant="1"]) { .title { color: red; }',
       variants: [{ innerHtml: '<h1>x</h1>' }],
     });
     assert.throws(
@@ -1646,7 +1646,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects variant HTML that includes its own style tag', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) {}',
+      scopedCss: '@scope ([data-fk-variant="1"]) {}',
       variants: [{ innerHtml: '<h1><style>.x{color:red}</style>x</h1>' }],
     });
     assert.throws(
@@ -1657,7 +1657,7 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects framework-shaped variant HTML', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) {}',
+      scopedCss: '@scope ([data-fk-variant="1"]) {}',
       variants: [{ innerHtml: '<h1 className="hero-title" style={{ color: "red" }}>x</h1>' }],
     });
     assert.throws(
@@ -1668,8 +1668,8 @@ describe('live-e2e LLM agent parseVariantResponse', () => {
 
   it('rejects variant HTML that tries to emit wrapper scaffolding', () => {
     const body = JSON.stringify({
-      scopedCss: '@scope ([data-impeccable-variant="1"]) {}',
-      variants: [{ innerHtml: '<div data-impeccable-variant="1"><h1>x</h1></div>' }],
+      scopedCss: '@scope ([data-fk-variant="1"]) {}',
+      variants: [{ innerHtml: '<div data-fk-variant="1"><h1>x</h1></div>' }],
     });
     assert.throws(
       () => parseVariantResponse(body),

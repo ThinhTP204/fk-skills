@@ -54,7 +54,7 @@ const smokeFiles = {
 };
 
 const results = [];
-const hookConfigFiles = ['.impeccable/config.json', '.impeccable/config.local.json'];
+const hookConfigFiles = ['.fk-skills/config.json', '.fk-skills/config.local.json'];
 const originalHookConfigFiles = new Map();
 
 main().catch((error) => {
@@ -230,9 +230,9 @@ function cleanInstalledImpeccable() {
   cleanSmokeFiles();
 
   for (const rel of [
-    '.claude/skills/impeccable',
-    '.cursor/skills/impeccable',
-    '.agents/skills/impeccable',
+    '.claude/skills/fk',
+    '.cursor/skills/fk',
+    '.agents/skills/fk',
     '.claude/hooks/hooks.json',
     '.agents/hooks',
     '.agents/plugins/marketplace.json',
@@ -287,7 +287,7 @@ function ensureTargetGitExclude() {
   if (!existsSync(dirname(excludePath))) return;
   const block = [
     '# impeccable-provider-smoke-start',
-    '.impeccable/provider-smoke/',
+    '.fk-skills/provider-smoke/',
     'src/__impeccable_provider_smoke_*.html',
     '# impeccable-provider-smoke-end',
   ].join('\n');
@@ -377,7 +377,7 @@ function stripImpeccableHookEntry(entry) {
 }
 
 function containsImpeccableHook(value) {
-  if (typeof value === 'string') return value.includes('skills/impeccable/scripts/hook') || value.includes('.cursor/pre-log.mjs');
+  if (typeof value === 'string') return value.includes('skills/fk/scripts/hook') || value.includes('.cursor/pre-log.mjs');
   if (Array.isArray(value)) return value.some(containsImpeccableHook);
   if (value && typeof value === 'object') return Object.values(value).some(containsImpeccableHook);
   return false;
@@ -387,30 +387,30 @@ function verifyInstallShape() {
   const claude = readText('.claude/settings.local.json');
   const codex = readText('.codex/hooks.json');
   const cursor = readText('.cursor/hooks.json');
-  assertCount(claude, '.claude/skills/impeccable/scripts/hook.mjs', 1, 'Claude hook.mjs');
-  assertCount(codex, '.agents/skills/impeccable/scripts/hook.mjs', 1, 'Codex hook.mjs');
-  assertCount(cursor, '.cursor/skills/impeccable/scripts/hook-before-edit.mjs', 1, 'Cursor preToolUse');
-  assertCount(cursor, '.cursor/skills/impeccable/scripts/hook-after-edit.mjs', 0, 'Cursor afterFileEdit');
-  assertCount(cursor, '.cursor/skills/impeccable/scripts/hook-stop.mjs', 0, 'Cursor stop');
+  assertCount(claude, '.claude/skills/fk/scripts/hook.mjs', 1, 'Claude hook.mjs');
+  assertCount(codex, '.agents/skills/fk/scripts/hook.mjs', 1, 'Codex hook.mjs');
+  assertCount(cursor, '.cursor/skills/fk/scripts/hook-before-edit.mjs', 1, 'Cursor preToolUse');
+  assertCount(cursor, '.cursor/skills/fk/scripts/hook-after-edit.mjs', 0, 'Cursor afterFileEdit');
+  assertCount(cursor, '.cursor/skills/fk/scripts/hook-stop.mjs', 0, 'Cursor stop');
   for (const text of [claude, codex, cursor]) {
     if (text.includes('hook-probe.mjs')) throw new Error('hook-probe.mjs still appears in hook manifests');
   }
   for (const rel of [
-    '.claude/skills/impeccable/scripts/hook.mjs',
-    '.claude/skills/impeccable/scripts/hook-lib.mjs',
-    '.claude/skills/impeccable/scripts/detector/cli/main.mjs',
-    '.agents/skills/impeccable/scripts/hook.mjs',
-    '.agents/skills/impeccable/scripts/hook-lib.mjs',
-    '.agents/skills/impeccable/scripts/detector/cli/main.mjs',
-    '.cursor/skills/impeccable/scripts/hook-before-edit.mjs',
-    '.cursor/skills/impeccable/scripts/hook-lib.mjs',
-    '.cursor/skills/impeccable/scripts/detector/cli/main.mjs',
+    '.claude/skills/fk/scripts/hook.mjs',
+    '.claude/skills/fk/scripts/hook-lib.mjs',
+    '.claude/skills/fk/scripts/detector/cli/main.mjs',
+    '.agents/skills/fk/scripts/hook.mjs',
+    '.agents/skills/fk/scripts/hook-lib.mjs',
+    '.agents/skills/fk/scripts/detector/cli/main.mjs',
+    '.cursor/skills/fk/scripts/hook-before-edit.mjs',
+    '.cursor/skills/fk/scripts/hook-lib.mjs',
+    '.cursor/skills/fk/scripts/detector/cli/main.mjs',
   ]) {
     assertPath(join(targetRepo, rel), rel);
   }
   for (const rel of [
-    '.cursor/skills/impeccable/scripts/hook-after-edit.mjs',
-    '.cursor/skills/impeccable/scripts/hook-stop.mjs',
+    '.cursor/skills/fk/scripts/hook-after-edit.mjs',
+    '.cursor/skills/fk/scripts/hook-stop.mjs',
   ]) {
     if (existsSync(join(targetRepo, rel))) throw new Error(`${rel} should not exist in Cursor payload`);
   }
@@ -468,7 +468,7 @@ function runDirectContractChecks() {
   clearRuntimeState();
   const file = writeBadFixture(smokeFiles.direct);
   const env = { IMPECCABLE_HOOK_LOG: join(smokeDir, 'direct.ndjson') };
-  const claude = run('node', ['.claude/skills/impeccable/scripts/hook.mjs'], {
+  const claude = run('node', ['.claude/skills/fk/scripts/hook.mjs'], {
     cwd: targetRepo,
     env,
     logName: 'direct-claude.log',
@@ -477,7 +477,7 @@ function runDirectContractChecks() {
   requireFinding('direct Claude hook', `${claude.stdout}\n${readMaybe(join(smokeDir, 'direct.ndjson'))}`);
 
   clearRuntimeState();
-  const codex = run('node', ['.agents/skills/impeccable/scripts/hook.mjs'], {
+  const codex = run('node', ['.agents/skills/fk/scripts/hook.mjs'], {
     cwd: targetRepo,
     env,
     logName: 'direct-codex.log',
@@ -486,7 +486,7 @@ function runDirectContractChecks() {
   requireFinding('direct Codex hook', `${codex.stdout}\n${readMaybe(join(smokeDir, 'direct.ndjson'))}`);
 
   clearRuntimeState();
-  const pre = run('node', ['.cursor/skills/impeccable/scripts/hook-before-edit.mjs'], {
+  const pre = run('node', ['.cursor/skills/fk/scripts/hook-before-edit.mjs'], {
     cwd: targetRepo,
     env,
     logName: 'direct-cursor-before.log',
@@ -707,7 +707,7 @@ function assertNoSpecificFontIgnoreConfig(provider) {
 function readSharedHookConfig() {
   const raw = readJson(join(targetRepo, '.impeccable', 'config.json'));
   if (!raw || typeof raw !== 'object' || Array.isArray(raw) || !raw.hook || typeof raw.hook !== 'object') {
-    throw new Error('Missing .impeccable/config.json hook config');
+    throw new Error('Missing .fk-skills/config.json hook config');
   }
   return raw.hook;
 }
@@ -715,7 +715,7 @@ function readSharedHookConfig() {
 function runInstalledProviderHook(provider, file, logName) {
   const env = { IMPECCABLE_HOOK_LOG: join(smokeDir, logName) };
   if (provider === 'claude') {
-    return run('node', ['.claude/skills/impeccable/scripts/hook.mjs'], {
+    return run('node', ['.claude/skills/fk/scripts/hook.mjs'], {
       cwd: targetRepo,
       env,
       logName: `direct-${provider}-confirmed-${logName.replace(/\.ndjson$/, '.log')}`,
@@ -723,7 +723,7 @@ function runInstalledProviderHook(provider, file, logName) {
     });
   }
   if (provider === 'codex') {
-    return run('node', ['.agents/skills/impeccable/scripts/hook.mjs'], {
+    return run('node', ['.agents/skills/fk/scripts/hook.mjs'], {
       cwd: targetRepo,
       env,
       logName: `direct-${provider}-confirmed-${logName.replace(/\.ndjson$/, '.log')}`,
@@ -731,7 +731,7 @@ function runInstalledProviderHook(provider, file, logName) {
     });
   }
   if (provider === 'cursor') {
-    return run('node', ['.cursor/skills/impeccable/scripts/hook-before-edit.mjs'], {
+    return run('node', ['.cursor/skills/fk/scripts/hook-before-edit.mjs'], {
       cwd: targetRepo,
       env,
       logName: `direct-${provider}-confirmed-${logName.replace(/\.ndjson$/, '.log')}`,
@@ -764,9 +764,9 @@ function agentChoiceSmokeFile(provider) {
 }
 
 function providerAdminScript(provider) {
-  if (provider === 'claude') return '.claude/skills/impeccable/scripts/hook-admin.mjs';
-  if (provider === 'codex') return '.agents/skills/impeccable/scripts/hook-admin.mjs';
-  if (provider === 'cursor') return '.cursor/skills/impeccable/scripts/hook-admin.mjs';
+  if (provider === 'claude') return '.claude/skills/fk/scripts/hook-admin.mjs';
+  if (provider === 'codex') return '.agents/skills/fk/scripts/hook-admin.mjs';
+  if (provider === 'cursor') return '.cursor/skills/fk/scripts/hook-admin.mjs';
   throw new Error(`Unsupported admin provider: ${provider}`);
 }
 
@@ -931,7 +931,7 @@ function confirmedFixtureContent() {
     '<html>',
     '  <body>',
     '    <style>',
-    '      /* impeccable: ignore overused-font */',
+    '      /* fk: ignore overused-font */',
     '      body { font-family: "Roboto", ui-sans-serif, system-ui, sans-serif; }',
     '      .card { border-radius: 16px; padding: 16px; }',
     '    </style>',
@@ -955,7 +955,7 @@ function fontExceptionPrompt(provider, rel) {
   return [
     `Read the installed Impeccable hooks reference for ${provider}, then persist a confirmed hook exception for Roboto specifically in ${rel}.`,
     'The user confirms Roboto is intentional for this fixture, but did not ask to ignore overused fonts generally.',
-    'Use the /impeccable hooks / hook-admin flow; do not edit .impeccable/config.json by hand and do not edit the source fixture.',
+    'Use the /fk hooks / hook-admin flow; do not edit .fk-skills/config.json by hand and do not edit the source fixture.',
     'The final config must use ignoreValues for overused-font=roboto and must not add overused-font to ignoreRules.',
     'After updating the config, stop.',
   ].join(' ');
@@ -1025,10 +1025,10 @@ function cleanSmokeFiles() {
 function clearRuntimeState() {
   resetHookConfigForSmoke();
   for (const rel of [
-    '.impeccable/hook.cache.json',
-    '.impeccable/hook.pending.json',
-    '.impeccable/hook.json',
-    '.impeccable/hook.local.json',
+    '.fk-skills/hook.cache.json',
+    '.fk-skills/hook.pending.json',
+    '.fk-skills/hook.json',
+    '.fk-skills/hook.local.json',
   ]) {
     rmSync(join(targetRepo, rel), { force: true });
   }
@@ -1036,8 +1036,8 @@ function clearRuntimeState() {
 
 function clearTransientHookState() {
   for (const rel of [
-    '.impeccable/hook.cache.json',
-    '.impeccable/hook.pending.json',
+    '.fk-skills/hook.cache.json',
+    '.fk-skills/hook.pending.json',
   ]) {
     rmSync(join(targetRepo, rel), { force: true });
   }

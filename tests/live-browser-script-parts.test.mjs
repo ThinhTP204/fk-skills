@@ -53,9 +53,9 @@ describe('live browser script parts', () => {
       ],
     });
 
-    const tokenIndex = script.indexOf('window.__IMPECCABLE_TOKEN__');
-    const portIndex = script.indexOf('window.__IMPECCABLE_PORT__');
-    const vocabIndex = script.indexOf('window.__IMPECCABLE_VOCAB__');
+    const tokenIndex = script.indexOf('window.__FK_SKILLS_TOKEN__');
+    const portIndex = script.indexOf('window.__FK_SKILLS_PORT__');
+    const vocabIndex = script.indexOf('window.__FK_SKILLS_VOCAB__');
     const sessionIndex = script.indexOf('window.__SESSION_PART__');
     const domIndex = script.indexOf('window.__DOM_PART__');
     const browserIndex = script.indexOf('window.__BROWSER_PART__');
@@ -66,8 +66,8 @@ describe('live browser script parts', () => {
     assert.ok(vocabIndex < sessionIndex);
     assert.ok(sessionIndex < domIndex);
     assert.ok(domIndex < browserIndex);
-    assert.match(script, /impeccable live script part: session-state \(live-browser-session\.js\)/);
-    assert.match(script, /impeccable live script part: dom-helpers \(live-browser-dom\.js\)/);
-    assert.match(script, /impeccable live script part: browser-ui \(live-browser\.js\)/);
+    assert.match(script, /fk live script part: session-state \(live-browser-session\.js\)/);
+    assert.match(script, /fk live script part: dom-helpers \(live-browser-dom\.js\)/);
+    assert.match(script, /fk live script part: browser-ui \(live-browser\.js\)/);
   });
 });

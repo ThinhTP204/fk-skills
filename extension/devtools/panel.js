@@ -325,7 +325,7 @@ async function formatFindingsForCopy(findings) {
   }
 
   lines.push('---');
-  lines.push('Detected by [Impeccable](https://impeccable.style). Skills are suggestions, not required.');
+  lines.push('Detected by [Impeccable](https://fk.style). Skills are suggestions, not required.');
   return lines.join('\n');
 }
 

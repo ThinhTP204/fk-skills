@@ -18,7 +18,7 @@ Fixtures can also opt into a **runtime E2E** pass that actually installs depende
 ```json
 {
   "name": "human-readable label",
-  "config": { ...contents for .impeccable/live/config.json ... },
+  "config": { ...contents for .fk-skills/live/config.json ... },
   "sourceFiles": ["paths that is-generated should classify as source (false)"],
   "generatedFiles": ["paths that is-generated should classify as generated (true)"],
   "wrapCases": [
@@ -62,7 +62,7 @@ Fixtures can also opt into a **runtime E2E** pass that actually installs depende
     },
     "steer": {
       "message": "steer-e2e mark hero",
-      "expectSelector": "h1.hero-title[data-impeccable-steer=\"e2e\"]"
+      "expectSelector": "h1.hero-title[data-fk-steer=\"e2e\"]"
     },
     "probe": {
       "expectLiveInit": true,
@@ -80,15 +80,15 @@ The `runtime` block is optional. Fixtures without it only run the static unit ch
 2. Runs `runtime.install` to install real deps.
 3. Starts `live-server.mjs --background` and runs `live-inject.mjs --port` against it.
 4. Spawns `runtime.devCommand` and scrapes the port from stdout using `runtime.readyPattern` (the first capture group must be the port).
-5. Opens Playwright Chromium at the dev URL and asserts `window.__IMPECCABLE_LIVE_INIT__ === true` (the browser-side handshake oracle) within `runtime.readyTimeoutMs`.
-6. Runs a **Steer smoke** step (unless `runtime.steer === false`): submit a message in the global Steer bar, wait for the fake agent to reply `steer_done`, assert the bar unlocks and a `data-impeccable-steer` marker lands in source + DOM. Then continues with pick → Go → cycle → accept.
+5. Opens Playwright Chromium at the dev URL and asserts `window.__FK_SKILLS_LIVE_INIT__ === true` (the browser-side handshake oracle) within `runtime.readyTimeoutMs`.
+6. Runs a **Steer smoke** step (unless `runtime.steer === false`): submit a message in the global Steer bar, wait for the fake agent to reply `steer_done`, assert the bar unlocks and a `data-fk-steer` marker lands in source + DOM. Then continues with pick → Go → cycle → accept.
 7. Tears everything down (Playwright close, dev server SIGTERM, live-server stop, tmp rm).
 
 Useful runtime E2E filters:
 
-- `IMPECCABLE_E2E_ONLY=<fixture>[,<fixture>]` scopes the run to selected fixture names.
-- `IMPECCABLE_E2E_SCENARIOS=core` runs only the main click → Go → cycle → accept path; omit it or use `all` to include manual edit, annotation, and exit probes.
-- `IMPECCABLE_E2E_TEST_TIMEOUT_MS`, `IMPECCABLE_E2E_INSTALL_TIMEOUT_MS`, and `IMPECCABLE_E2E_DEV_READY_TIMEOUT_MS` tighten CI smoke timeouts without changing fixture metadata.
+- `FK_SKILLS_E2E_ONLY=<fixture>[,<fixture>]` scopes the run to selected fixture names.
+- `FK_SKILLS_E2E_SCENARIOS=core` runs only the main click → Go → cycle → accept path; omit it or use `all` to include manual edit, annotation, and exit probes.
+- `FK_SKILLS_E2E_TEST_TIMEOUT_MS`, `FK_SKILLS_E2E_INSTALL_TIMEOUT_MS`, and `FK_SKILLS_E2E_DEV_READY_TIMEOUT_MS` tighten CI smoke timeouts without changing fixture metadata.
 
 Optional `runtime.steer` fields:
 
@@ -96,8 +96,8 @@ Optional `runtime.steer` fields:
 "steer": {
   "message": "steer-e2e mark hero",
   "sourceFile": "src/routes/About.jsx",
-  "expectSelector": "h1.hero-title[data-impeccable-steer=\"e2e\"]",
-  "expectSourceContains": "data-impeccable-steer=\"e2e\"",
+  "expectSelector": "h1.hero-title[data-fk-steer=\"e2e\"]",
+  "expectSourceContains": "data-fk-steer=\"e2e\"",
   "preActions": [{ "type": "click", "selector": "[data-testid='nav-about']" }]
 }
 ```

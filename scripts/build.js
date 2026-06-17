@@ -32,7 +32,7 @@ import { ANTIPATTERNS } from '../cli/engine/registry/antipatterns.mjs';
  */
 function generateCounts(rootDir, skills, buildDir) {
   // Count active commands. After the v3.0 consolidation, commands are sub-commands
-  // of /impeccable. Count them from the command router table in SKILL.md.
+  // of /fk. Count them from the command router table in SKILL.md.
   const impeccableSkill = skills.find(s => s.name === 'fk');
   let commandCount;
   if (impeccableSkill) {
@@ -460,7 +460,7 @@ function assembleUniversal(distDir) {
   // (all provider dirs are dotfiles, hidden by default in Finder)
   fs.writeFileSync(path.join(universalDir, 'README.txt'),
 `Impeccable. Design fluency for AI harnesses.
-https://impeccable.style
+https://fk.style
 
 This folder contains skills for all supported tools:
 
@@ -682,9 +682,9 @@ async function build() {
     // in dist/ so the cleanup script can redirect users, but they should
     // not clutter the repo's own skill directories.
     const deprecatedLocalSkills = [
-      'frontend-design', 'teach-impeccable',
+      'frontend-design', 'teach-fk',
       'arrange', 'normalize', 'onboard', 'extract',
-      // v3.0 consolidation: standalone skills -> /impeccable sub-commands
+      // v3.0 consolidation: standalone skills -> /fk sub-commands
       'adapt', 'animate', 'audit', 'bolder', 'clarify', 'colorize',
       'critique', 'delight', 'distill', 'harden', 'layout', 'optimize',
       'overdrive', 'polish', 'quieter', 'shape', 'typeset',
@@ -702,7 +702,7 @@ async function build() {
     // The Claude Code marketplace is configured with `source: "./plugin"`, so
     // the plugin cache only copies this slim directory (~0.3 MB) instead of
     // the entire monorepo (~291 MB on the previous "./" source). The harness
-    // dirs above stay where they are because `npx skills add pbakaus/impeccable`
+    // dirs above stay where they are because `npx skills add pbakaus/fk`
     // reads them directly from the GitHub repo at install time.
     const pluginRoot = path.join(ROOT_DIR, 'plugin');
     const pluginManifestDir = path.join(pluginRoot, '.claude-plugin');

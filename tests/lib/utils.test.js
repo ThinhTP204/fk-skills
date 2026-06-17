@@ -179,7 +179,7 @@ describe('generateYamlFrontmatter', () => {
 
   test('should quote strings containing colon-space (breaks plain scalars)', () => {
     const data = {
-      name: 'impeccable',
+      name: 'fk',
       description: 'Design fluency. Also handles: critique, audit. Commands: craft, polish.'
     };
 
@@ -437,7 +437,7 @@ Audit the code.`;
 
   test('should read skill with reference files', () => {
     const skillContent = `---
-name: impeccable
+name: fk
 description: Impeccable design skill
 ---
 
@@ -461,7 +461,7 @@ Impeccable design instructions.`;
     expect(refNames).toEqual(['color', 'typography']);
   });
 
-  test('should fall back to "impeccable" when frontmatter has no name', () => {
+  test('should fall back to "fk" when frontmatter has no name', () => {
     const skillDir = path.join(testRootDir, 'skill');
     ensureDir(skillDir);
     fs.writeFileSync(path.join(skillDir, 'SKILL.src.md'), 'Just body, no frontmatter.');
@@ -469,7 +469,7 @@ Impeccable design instructions.`;
     const { skills } = readSourceFiles(testRootDir);
 
     expect(skills).toHaveLength(1);
-    expect(skills[0].name).toBe('impeccable');
+    expect(skills[0].name).toBe('fk');
   });
 
   test('should ignore non-md files in skill/reference', () => {
@@ -626,8 +626,8 @@ describe('replacePlaceholders', () => {
     expect(result).toBe('Commands: /audit, /polish');
   });
 
-  test('should exclude legacy teach-impeccable from {{available_commands}}', () => {
-    const result = replacePlaceholders('Commands: {{available_commands}}', 'claude-code', ['audit', 'teach-impeccable', 'polish']);
+  test('should exclude legacy teach-fk from {{available_commands}}', () => {
+    const result = replacePlaceholders('Commands: {{available_commands}}', 'claude-code', ['audit', 'teach-fk', 'polish']);
     expect(result).toBe('Commands: /audit, /polish');
   });
 
