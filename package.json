@@ -27,7 +27,8 @@
   },
   "type": "module",
   "bin": {
-    "fk": "cli/bin/cli.js"
+    "fk": "cli/bin/cli.js",
+    "fk-skills": "cli/bin/cli.js"
   },
   "main": "./cli/engine/detect-antipatterns.mjs",
   "exports": {
