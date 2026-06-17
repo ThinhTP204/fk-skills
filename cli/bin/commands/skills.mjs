@@ -476,8 +476,12 @@ async function downloadAndExtractBundle() {
   const localBundle = process.env.IMPECCABLE_BUNDLE_PATH;
   if (localBundle) return copyOrExtractLocalBundle(localBundle);
 
-  const tmpZip = join(tmpdir(), `impeccable-update-${Date.now()}.zip`);
-  const tmpDir = join(tmpdir(), `impeccable-update-${Date.now()}`);
+  // Use the bundled universal.zip shipped with the npm package if available
+  const bundledZip = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'dist', 'universal.zip');
+  if (existsSync(bundledZip)) return copyOrExtractLocalBundle(bundledZip);
+
+  const tmpZip = join(tmpdir(), `fk-update-${Date.now()}.zip`);
+  const tmpDir = join(tmpdir(), `fk-update-${Date.now()}`);
   await downloadFile(`${API_BASE}/api/download/bundle/universal`, tmpZip);
   mkdirSync(tmpDir, { recursive: true });
   await extractZip(tmpZip, tmpDir);
