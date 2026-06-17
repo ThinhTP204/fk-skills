@@ -32,7 +32,7 @@ const ACTION_ALIASES = new Map([
 function printUsage() {
   console.log(`Usage: impeccable ignores <action> [options]
 
-Manage detector ignores in .impeccable config.
+Manage detector ignores in .fk-skills config.
 
 Actions:
   list                                  Show merged, shared, and local ignores
@@ -45,8 +45,8 @@ Actions:
   clear                                 Clear detector ignores in the selected scope
 
 Scope:
-  --shared                              Write .impeccable/config.json (default)
-  --local                               Write .impeccable/config.local.json
+  --shared                              Write .fk-skills/config.json (default)
+  --local                               Write .fk-skills/config.local.json
   --all                                 For remove/clear, apply to shared and local
 
 Value options:

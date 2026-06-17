@@ -666,6 +666,40 @@ function isRealSkillDir(skillsDir, name) {
 }
 
 /**
+ * One-way migration: copy config files from the legacy `.impeccable/` folder to
+ * `.fk-skills/`. Idempotent — skips files that already exist in the destination.
+ * Does not delete the old folder so rollback is possible. Returns the number of
+ * files migrated.
+ */
+function migrateImpeccableConfigDir(root) {
+  const oldDir = join(root, '.impeccable');
+  const newDir = join(root, '.fk-skills');
+  if (!existsSync(oldDir)) return 0;
+
+  const filesToMigrate = [
+    'config.json',
+    'config.local.json',
+    'design.json',
+    'hook.cache.json',
+    'hook.pending.json',
+  ];
+
+  let migrated = 0;
+  for (const file of filesToMigrate) {
+    const src = join(oldDir, file);
+    const dest = join(newDir, file);
+    if (!existsSync(src)) continue;
+    if (existsSync(dest)) continue;
+    try {
+      mkdirSync(dirname(dest), { recursive: true });
+      writeFileSync(dest, readFileSync(src));
+      migrated++;
+    } catch {}
+  }
+  return migrated;
+}
+
+/**
  * One-way migration for installs from the era when the CLI offered a command
  * prefix (default `i-`), renaming the skill to e.g. `i-impeccable`. The prefix
  * only earned its keep when every command was its own skill; with a single
@@ -1315,7 +1349,7 @@ const HOOK_EXPLAINER = [
 ].join('\n');
 
 // Decide whether to install the design hook. Prompts once (default yes) the
-// first time, records the answer in .impeccable/config.local.json, and never
+// first time, records the answer in .fk-skills/config.local.json, and never
 // re-asks: a recorded decision or an already-installed hook short-circuits, and
 // non-interactive runs keep the historical install-by-default behavior.
 async function decideHookInstall(root, targets, { yes } = {}) {
@@ -1564,6 +1598,9 @@ async function install(flags) {
     process.exit(1);
   }
 
+  const configMigrated = migrateImpeccableConfigDir(hookRoot);
+  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .impeccable/ to .fk-skills/.`);
+
   const wantHooks = installHooks && await decideHookInstall(hookRoot, targets, { yes });
 
   console.log('\nDownloading fk skills...');
@@ -1704,6 +1741,9 @@ async function update(flags = []) {
     if (copyProviders.length === 0) process.exit(0);
     console.log(`Continuing with copied installs in: ${copyProviders.join(', ')}\n`);
   }
+
+  const configMigrated = migrateImpeccableConfigDir(root);
+  if (configMigrated > 0) console.log(`Migrated ${configMigrated} config file(s) from .impeccable/ to .fk-skills/.`);
 
   console.log('Checking for updates...');
 
