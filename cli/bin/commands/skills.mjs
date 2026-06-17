@@ -20,7 +20,7 @@ import { unzipSync } from 'fflate';
 import { getHookConsent, setHookConsent } from '../../lib/impeccable-config.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const API_BASE = 'https://impeccable.style';
+const API_BASE = 'https://github.com/ThinhTP204/fk-skills';
 
 // Provider folder names in project roots
 const PROVIDER_DIRS = ['.claude', '.cursor', '.gemini', '.agents', '.github', '.kiro', '.opencode', '.pi', '.qoder', '.trae', '.trae-cn', '.rovodev'];
@@ -80,11 +80,11 @@ const IGNORED_SKILL_DIR_NAMES = new Set([
   'codex-primary-runtime',
 ]);
 const IMPECCABLE_HOOK_COMMAND_MARKERS = [
-  'skills/impeccable/scripts/hook-probe.mjs',
-  'skills/impeccable/scripts/hook.mjs',
-  'skills/impeccable/scripts/hook-before-edit.mjs',
-  'skills/impeccable/scripts/hook-after-edit.mjs',
-  'skills/impeccable/scripts/hook-stop.mjs',
+  'skills/fk/scripts/hook-probe.mjs',
+  'skills/fk/scripts/hook.mjs',
+  'skills/fk/scripts/hook-before-edit.mjs',
+  'skills/fk/scripts/hook-after-edit.mjs',
+  'skills/fk/scripts/hook-stop.mjs',
 ];
 const PROVIDER_HOOK_ARTIFACTS = {
   '.claude': [
@@ -380,17 +380,17 @@ async function showHelp() {
     const res = await fetch(`${API_BASE}/api/commands`);
     commands = await res.json();
   } catch {
-    console.error('Could not fetch command list from impeccable.style. Check your network connection.');
+    console.error('Could not fetch command list. Check your network connection. Check your network connection.');
     process.exit(1);
   }
 
   const pad = (s, n) => s + ' '.repeat(Math.max(0, n - s.length));
 
-  console.log('\n  Impeccable Skills & Commands\n');
-  console.log('  Install:  npx impeccable install');
-  console.log('  Link:     npx impeccable link --source=.impeccable');
-  console.log('  Update:   npx impeccable update');
-  console.log('  Docs:     https://impeccable.style/cheatsheet\n');
+  console.log('\n  fk Skills & Commands\n');
+  console.log('  Install:  npx fk-skills install');
+  console.log('  Link:     npx fk-skills link --source=.fk-skills');
+  console.log('  Update:   npx fk-skills update');
+  console.log('  Docs:     https://github.com/ThinhTP204/fk-skills\n');
   console.log(`  ${pad('Command', 22)} Description`);
   console.log(`  ${'-'.repeat(22)} ${'-'.repeat(52)}`);
 
@@ -411,7 +411,7 @@ async function showHelp() {
  */
 function getSkillsVersion(root) {
   for (const d of PROVIDER_DIRS) {
-    const skillMd = join(root, d, 'skills', 'impeccable', 'SKILL.md');
+    const skillMd = join(root, d, 'skills', 'fk', 'SKILL.md');
     if (!existsSync(skillMd)) continue;
     const content = readFileSync(skillMd, 'utf-8');
     const match = content.match(/^version:\s*(.+)$/m);
@@ -586,8 +586,8 @@ async function check() {
   const installed = isAlreadyInstalled(root);
 
   if (!installed) {
-    console.log('Impeccable is not installed in this project.');
-    console.log('Run `npx impeccable install` to install.');
+    console.log('fk is not installed in this project.');
+    console.log('Run `npx fk-skills install` to install.');
     process.exit(0);
   }
 
@@ -604,7 +604,7 @@ async function check() {
       console.log(`Skills are up to date${v ? ` (v${v})` : ''}.`);
     } else {
       console.log('Updates available.');
-      console.log('Run `npx impeccable update` to update.');
+      console.log('Run `npx fk-skills update` to update.');
     }
   } catch (e) {
     console.error(`Could not check for updates: ${e.message}`);
@@ -623,8 +623,8 @@ function isAlreadyInstalled(root) {
       const entries = readdirSync(skillsDir);
       // Look for 'impeccable' skill (or prefixed variant, or legacy 'teach-impeccable')
       if (entries.some(e =>
-        e === 'impeccable' || e.endsWith('-impeccable') ||
-        e === 'teach-impeccable' || e.endsWith('-teach-impeccable')
+        e === 'fk' || e.endsWith('-fk') ||
+        e === 'teach-fk' || e.endsWith('-teach-fk')
       )) {
         return d;
       }
@@ -682,11 +682,11 @@ function migrateUnprefixImpeccable(root) {
     for (const name of entries) {
       // A prefixed impeccable skill is `<prefix>impeccable`, not the canonical
       // `impeccable` and not an unrelated legacy skill name.
-      if (name === 'impeccable' || name === 'teach-impeccable') continue;
-      if (!name.endsWith('-impeccable')) continue;
+      if (name === 'fk' || name === 'teach-fk') continue;
+      if (!name.endsWith('-fk')) continue;
       if (!isRealSkillDir(skillsDir, name)) continue;
 
-      const dest = join(skillsDir, 'impeccable');
+      const dest = join(skillsDir, 'fk');
       try {
         rmSync(dest, { recursive: true, force: true });
         renameSync(join(skillsDir, name), dest);
@@ -865,7 +865,7 @@ function installRootForScope(scope, projectRoot) {
 
 function printInstallIntro() {
   if (!isInteractivePrompt()) return;
-  console.log(`${ui.accent(ui.bold('impeccable'))} ${ui.dim('install')}`);
+  console.log(`${ui.accent(ui.bold('fk'))} ${ui.dim('install')}`);
   console.log('');
 }
 
@@ -1073,10 +1073,10 @@ function hookArtifactsForProvider(bundleDir, root, provider) {
 
 function hookScriptPathForProvider(skillRoot, provider) {
   if (provider === '.cursor') {
-    return join(skillRoot, provider, 'skills', 'impeccable', 'scripts', 'hook-before-edit.mjs');
+    return join(skillRoot, provider, 'skills', 'fk', 'scripts', 'hook-before-edit.mjs');
   }
   if (provider === '.claude' || provider === '.agents') {
-    return join(skillRoot, provider, 'skills', 'impeccable', 'scripts', 'hook.mjs');
+    return join(skillRoot, provider, 'skills', 'fk', 'scripts', 'hook.mjs');
   }
   return null;
 }
@@ -1302,11 +1302,11 @@ function copyProviderHooks(bundleDir, root, providers, { force = false, skillRoo
 
 const HOOK_EXPLAINER = [
   '',
-  'Impeccable can install a design hook for this project. In Claude/Codex it',
+  'fk-skills can install a design hook for this project. In Claude/Codex it',
   'checks UI files after edits; in Cursor it checks proposed writes before they',
   'land and can block writes with detector findings. It feeds results back to',
   'your agent so design slop gets caught as you build. Change it later with',
-  '/impeccable hooks on|off.',
+  '/fk hooks on|off.',
   '',
 ].join('\n');
 
@@ -1335,7 +1335,7 @@ async function decideHookInstall(root, targets, { yes } = {}) {
 }
 
 function resolveLinkSource(sourceValue, root) {
-  const sourcePath = sourceValue || '.impeccable';
+  const sourcePath = sourceValue || '.fk-skills';
   const checkoutRoot = isAbsolute(sourcePath) ? sourcePath : resolve(root, sourcePath);
   const universalRoot = join(checkoutRoot, 'dist', 'universal');
   if (existsSync(universalRoot)) {
@@ -1442,7 +1442,7 @@ async function link(flags) {
   if (!yes) {
     console.log(`Source checkout: ${source.checkoutRoot}`);
     console.log(`Target harness folder(s): ${targets.join(', ')}`);
-    const ans = await ask(`Link impeccable skills into ${targets.length} folder(s)? (Y/n) `);
+    const ans = await ask(`Link fk skills into ${targets.length} folder(s)? (Y/n) `);
     if (ans === 'n' || ans === 'no') {
       console.log('Aborted. Re-run with --providers=<names> to choose explicitly (e.g. --providers=claude,cursor).');
       process.exit(0);
@@ -1464,7 +1464,7 @@ async function link(flags) {
   if (result.linked > 0) parts.push(`${result.linked} linked`);
   if (result.already > 0) parts.push(`${result.already} already linked`);
   if (result.skipped > 0) parts.push(`${result.skipped} skipped`);
-  console.log(`Linked impeccable into: ${targets.join(', ')} (${parts.join(', ')}).`);
+  console.log(`Linked fk into: ${targets.join(', ')} (${parts.join(', ')}).`);
   console.log('Update with `git submodule update --remote` from your project root, then rerun this command if new skills are added.\n');
 }
 
@@ -1488,7 +1488,7 @@ async function install(flags) {
   const existing = isAlreadyInstalled(installRoot);
 
   if (existing && !force) {
-    console.log(`Impeccable skills are already installed (found in ${existing}/).`);
+    console.log(`fk skills are already installed (found in ${existing}/).`);
     const installedTargets = findInstalledProviders(installRoot);
     const selectedInstalledTargets = targets.filter(provider => installedTargets.includes(provider));
     const linkedTargets = findLinkedProviders(installRoot, selectedInstalledTargets);
@@ -1499,7 +1499,7 @@ async function install(flags) {
     try {
       if (linkedTargets.length > 0) {
         console.log(`Linked skills found in: ${linkedTargets.join(', ')}`);
-        console.log('Update the source checkout with `git submodule update --remote`, then rerun `npx impeccable link --source=.impeccable` if new skills are added.');
+        console.log('Update the source checkout with `git submodule update --remote`, then rerun `npx fk-skills link --source=.fk-skills` if new skills are added.');
         if (copyTargets.length > 0) console.log(`Continuing with copied installs in: ${copyTargets.join(', ')}\n`);
       }
 
@@ -1562,7 +1562,7 @@ async function install(flags) {
 
   const wantHooks = installHooks && await decideHookInstall(hookRoot, targets, { yes });
 
-  console.log('\nDownloading impeccable skills...');
+  console.log('\nDownloading fk skills...');
   let bundleDir;
   try {
     bundleDir = await downloadAndExtractBundle();
@@ -1591,10 +1591,10 @@ async function install(flags) {
     console.error(`Nothing was installed: the bundle had no variants for ${targets.join(', ')}.`);
     process.exit(1);
   }
-  console.log(`Installed impeccable into: ${targets.join(', ')} (${scope === 'user' ? 'global' : 'project'})`);
+  console.log(`Installed fk into: ${targets.join(', ')} (${scope === 'user' ? 'global' : 'project'})`);
   if (hookTargets.length > 0) console.log(`Installed hooks into: ${hookTargets.join(', ')}`);
 
-  console.log('\nDone! Run /impeccable init in your AI harness to set up design context.\n');
+  console.log('\nDone! Run /fk setup in your AI harness to set up design context.\n');
 }
 
 // ─── skills update ────────────────────────────────────────────────────────────
@@ -1623,7 +1623,7 @@ function findInstalledProviders(root) {
 
 function findLinkedProviders(root, providers) {
   return providers.filter(provider => {
-    const skillDir = join(root, provider, 'skills', 'impeccable');
+    const skillDir = join(root, provider, 'skills', 'fk');
     try {
       return lstatSync(skillDir).isSymbolicLink();
     } catch {
@@ -1689,14 +1689,14 @@ async function update(flags = []) {
   const copyProviders = providers.filter(provider => !linkedProviders.includes(provider));
 
   if (providers.length === 0) {
-    console.log('No impeccable skill folders found in this project.');
-    console.log('Run `npx impeccable install` to install first.');
+    console.log('No fk skill folders found in this project.');
+    console.log('Run `npx fk-skills install` to install first.');
     process.exit(1);
   }
 
   if (linkedProviders.length > 0) {
     console.log(`Linked skills found in: ${linkedProviders.join(', ')}`);
-    console.log('Update the source checkout with `git submodule update --remote`, then rerun `npx impeccable link --source=.impeccable` if new skills are added.');
+    console.log('Update the source checkout with `git submodule update --remote`, then rerun `npx fk-skills link --source=.fk-skills` if new skills are added.');
     if (copyProviders.length === 0) process.exit(0);
     console.log(`Continuing with copied installs in: ${copyProviders.join(', ')}\n`);
   }
