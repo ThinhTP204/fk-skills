@@ -3377,7 +3377,7 @@ if (IS_BROWSER) {
 
   function repositionOverlays() {
     for (const o of overlays) {
-      if (!o._targetEl || o.classList.contains('impeccable-banner')) continue;
+      if (!o._targetEl || o.classList.contains('fk-banner')) continue;
       // Skip overlays whose target is currently hidden (display: none on the overlay)
       if (o.style.display === 'none') continue;
       positionOverlay(o);
@@ -3450,7 +3450,7 @@ if (IS_BROWSER) {
   document.addEventListener('transitionend', (e) => {
     if (e.propertyName !== 'transform') return;
     for (const o of overlays) {
-      if (!o._targetEl || o.classList.contains('impeccable-banner') || o.style.display === 'none') continue;
+      if (!o._targetEl || o.classList.contains('fk-banner') || o.style.display === 'none') continue;
       if (e.target === o._targetEl || e.target.contains(o._targetEl)) {
         positionOverlay(o);
       }
@@ -3464,7 +3464,7 @@ if (IS_BROWSER) {
     const fixed = isInFixedContext(el);
     const rect = el.getBoundingClientRect();
     const outline = document.createElement('div');
-    outline.className = 'impeccable-overlay';
+    outline.className = 'fk-overlay';
     outline._targetEl = el;
     outline._isFixed = fixed;
     Object.assign(outline.style, {
@@ -3484,7 +3484,7 @@ if (IS_BROWSER) {
     const allText = entries.map(e => e.name).join(', ');
 
     const label = document.createElement('div');
-    label.className = 'impeccable-label';
+    label.className = 'fk-label';
     Object.assign(label.style, {
       position: 'absolute', bottom: '100%', left: '-2px',
       display: 'flex', alignItems: 'center',
@@ -3607,7 +3607,7 @@ if (IS_BROWSER) {
   const showPageBanner = function(findings) {
     if (!findings.length) return;
     const banner = document.createElement('div');
-    banner.className = 'impeccable-overlay impeccable-banner';
+    banner.className = 'fk-overlay fk-banner';
     Object.assign(banner.style, {
       position: 'fixed', top: '0', left: '0', right: '0', zIndex: '100000',
       background: LABEL_BG, color: LABEL_INK,
@@ -5083,7 +5083,7 @@ if (IS_BROWSER) {
               target.scrollIntoView({ behavior: 'instant', block: 'center' });
             }
             for (const o of overlays) {
-              if (o.classList.contains('impeccable-banner')) continue;
+              if (o.classList.contains('fk-banner')) continue;
               const isMatch = o._targetEl === target;
               o.classList.toggle('impeccable-spotlight', isMatch);
               o.classList.toggle('impeccable-spotlight-dimmed', !isMatch);
