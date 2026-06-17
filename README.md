@@ -1,8 +1,8 @@
-# Impeccable
+# fk-skills
 
 Design guidance for AI coding agents. 1 skill, 23 commands, live browser iteration, and 44 deterministic detector rules for AI-generated frontend design.
 
-> **Quick start:** From your project root, run `npx impeccable install`, then run `/impeccable init` inside your AI coding tool. Full docs: [impeccable.style](https://impeccable.style).
+> **Quick start:** From your project root, run `npx fk install`, then run `/fk setup` inside your AI coding tool.
 
 ## Why Impeccable?
 
@@ -91,7 +91,7 @@ The skill includes explicit guidance on what to avoid:
 
 ## See It In Action
 
-Visit [impeccable.style](https://impeccable.style#casestudies) to see before/after case studies of real projects transformed with Impeccable commands.
+See the GitHub repo for before/after case studies of real projects transformed with fk commands.
 
 ## Installation
 
@@ -118,24 +118,22 @@ Codex users should open `/hooks` after install or update and approve the project
 For teams that want to keep Impeccable vendored and updated through Git, add this repo as a submodule and link the compiled provider build into your harness folders:
 
 ```bash
-git submodule add https://github.com/pbakaus/impeccable .impeccable
-npx impeccable link --source=.impeccable --providers=claude,cursor
-git add .gitmodules .impeccable .claude .cursor
-git commit -m "Add Impeccable skills"
+git submodule add https://github.com/ThinhTP204/fk-skills .fk-skills
+npx fk link --source=.fk-skills --providers=claude,cursor
+git add .gitmodules .fk-skills .claude .cursor
+git commit -m "Add fk-skills"
 ```
 
-Use the providers your project needs, for example `claude`, `cursor`, `gemini`, `codex`, `github`, `opencode`, `pi`, `qoder`, `trae`, `trae-cn`, or `rovo-dev`. The command links individual skill folders from `.impeccable/dist/universal/` and leaves existing real skill directories untouched unless you pass `--force`.
+Use the providers your project needs, for example `claude`, `cursor`, `gemini`, `codex`, `github`, `opencode`, `pi`, `qoder`, `trae`, `trae-cn`, or `rovo-dev`. The command links individual skill folders from `.fk-skills/dist/universal/` and leaves existing real skill directories untouched unless you pass `--force`.
 
 To update later:
 
 ```bash
-git submodule update --remote .impeccable
-npx impeccable link --source=.impeccable --providers=claude,cursor
+git submodule update --remote .fk-skills
+npx fk link --source=.fk-skills --providers=claude,cursor
 ```
 
-### Option 3: Download from Website
-
-Visit [impeccable.style](https://impeccable.style), download the ZIP for your tool, and extract to your project.
+### Option 3: Copy from Repository
 
 ### Option 4: Copy from Repository
 
@@ -276,7 +274,7 @@ For debugging, set `hook.auditLog` in `.impeccable/config.json` to a path (or th
 
 Codex requires one platform step that Impeccable cannot safely skip: open `/hooks` after install or update and approve the project hook. There is no Codex marketplace/plugin install flow for this hook.
 
-Full hook docs: [impeccable.style/docs/hooks](https://impeccable.style/docs/hooks).
+Full hook docs: see `skill/reference/hooks.md` in this repo.
 
 Manual copy commands are fallback/debug instructions. The normal path is:
 
@@ -304,7 +302,7 @@ The detector catches 44 deterministic issues across AI slop (side-tab borders, p
 
 By default, `detect` respects the same `.impeccable/config.json` and `.impeccable/config.local.json` detector config as the design hook: `detector.ignoreRules`, `detector.ignoreFiles`, `detector.ignoreValues`, and `detector.designSystem.enabled`. Hook lifecycle settings such as `hook.enabled` only affect automatic hook execution.
 
-Full detector docs: [impeccable.style/docs/detector](https://impeccable.style/docs/detector).
+Full detector docs: see `cli/engine/detect-antipatterns.mjs` in this repo.
 
 ## Supported Tools
 
@@ -320,14 +318,6 @@ Full detector docs: [impeccable.style/docs/detector](https://impeccable.style/do
 - [Rovo Dev](https://www.atlassian.com/software/rovo)
 - [Qoder](https://qoder.com)
 
-## Community & Ecosystem
-
-Join the community and ecosystem conversations:
-
-- GitHub Discussions: file bugs, request features, and help newcomers.
-- [Impeccable on npm](https://www.npmjs.com/package/impeccable): grab the CLI, follow releases, and star the package.
-- Follow @pbakaus on Twitter for release notes, sample lint reports, and video highlights of new rules.
-
 ## Contributing
 
 See [DEVELOP.md](docs/DEVELOP.md) for contributor guidelines and build instructions.
@@ -338,4 +328,5 @@ Apache 2.0. See [LICENSE](LICENSE).
 
 ---
 
-Created by [Paul Bakaus](https://www.paulbakaus.com)
+Created by Trần Phú Thịnh
+# fk-skills
