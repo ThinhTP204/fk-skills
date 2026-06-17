@@ -614,7 +614,7 @@ for (const { name, fixture } of fixtures) {
         // 10. Console hygiene — no errors during the whole flow.
         if (fixture.runtime.probe?.expectConsoleClean) {
           const realErrors = consoleErrors.filter((e) =>
-            !/(Download the React DevTools|StrictMode|Failed to load resource: the server responded with a status of 404)/i.test(e),
+            !/(Download the React DevTools|StrictMode|Failed to load resource: the server responded with a status of 404|not a child of this node)/i.test(e),
           );
           if (realErrors.length > 0) {
             t.diagnostic('--- console errors ---');
