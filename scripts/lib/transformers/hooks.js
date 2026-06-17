@@ -16,14 +16,14 @@
  * correct wherever Claude Code unpacks the plugin.
  */
 
-export const IMPECCABLE_HOOK_COMMAND_MARKER = 'skills/impeccable/scripts/hook.mjs';
+export const IMPECCABLE_HOOK_COMMAND_MARKER = 'skills/fk/scripts/hook.mjs';
 
 const TIMEOUT_SECONDS = 5;
 const STATUS_MESSAGE = 'Checking UI changes';
-const CLAUDE_PROJECT_HOOK = '${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs';
-const CLAUDE_PLUGIN_HOOK = '${CLAUDE_PLUGIN_ROOT}/skills/impeccable/scripts/hook.mjs';
-const CODEX_PROJECT_HOOK = '$(git rev-parse --show-toplevel)/.agents/skills/impeccable/scripts/hook.mjs';
-const CURSOR_BEFORE_EDIT_SCRIPT = '.cursor/skills/impeccable/scripts/hook-before-edit.mjs';
+const CLAUDE_PROJECT_HOOK = '${CLAUDE_PROJECT_DIR}/.claude/skills/fk/scripts/hook.mjs';
+const CLAUDE_PLUGIN_HOOK = '${CLAUDE_PLUGIN_ROOT}/skills/fk/scripts/hook.mjs';
+const CODEX_PROJECT_HOOK = '$(git rev-parse --show-toplevel)/.agents/skills/fk/scripts/hook.mjs';
+const CURSOR_BEFORE_EDIT_SCRIPT = '.cursor/skills/fk/scripts/hook-before-edit.mjs';
 
 export function buildClaudeSettingsManifest() {
   return {

@@ -32,7 +32,7 @@ describe('cli/lib/impeccable-config', () => {
   });
 
   test('setHookConsent preserves unrelated keys in config.local.json', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getLocalConfigPath(root), JSON.stringify({ updateCheck: false, hook: { quiet: true } }));
     setHookConsent(root, 'declined');
     const raw = JSON.parse(readFileSync(getLocalConfigPath(root), 'utf-8'));
@@ -42,14 +42,14 @@ describe('cli/lib/impeccable-config', () => {
   });
 
   test('config.local.json (per-developer) overrides config.json for consent', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getConfigPath(root), JSON.stringify({ hook: { consent: 'accepted' } }));
     writeFileSync(getLocalConfigPath(root), JSON.stringify({ hook: { consent: 'declined' } }));
     expect(getHookConsent(root)).toBe('declined');
   });
 
   test('malformed config is tolerated (no throw, undefined consent)', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getLocalConfigPath(root), '{ not json');
     expect(getHookConsent(root)).toBeUndefined();
   });
@@ -58,7 +58,7 @@ describe('cli/lib/impeccable-config', () => {
     execFileSync('git', ['init', '-q'], { cwd: root });
     setHookConsent(root, 'declined');
     const exclude = readFileSync(join(root, '.git', 'info', 'exclude'), 'utf-8');
-    expect(exclude).toContain('.impeccable/config.local.json');
+    expect(exclude).toContain('.fk-skills/config.local.json');
     // Idempotent: a second write does not duplicate the marker block.
     ensureConfigGitExclude(root);
     const again = readFileSync(join(root, '.git', 'info', 'exclude'), 'utf-8');
@@ -72,7 +72,7 @@ describe('cli/lib/impeccable-config', () => {
   });
 
   test('readDetectionConfig merges shared and local detector filters', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getConfigPath(root), JSON.stringify({
       detector: {
         ignoreRules: ['side-tab'],
@@ -108,7 +108,7 @@ describe('cli/lib/impeccable-config', () => {
   });
 
   test('readDetectionConfig remains backward-compatible with legacy hook filters', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getConfigPath(root), JSON.stringify({
       hook: {
         ignoreRules: ['side-tab'],
@@ -125,7 +125,7 @@ describe('cli/lib/impeccable-config', () => {
   });
 
   test('writeDetectionConfig writes detector config and strips legacy hook filters', () => {
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getConfigPath(root), JSON.stringify({
       updateCheck: false,
       hook: {
@@ -153,7 +153,7 @@ describe('cli/lib/impeccable-config', () => {
 
   test('writeDetectionConfig local ignores do not create an implicit design-system override', () => {
     execFileSync('git', ['init', '-q'], { cwd: root });
-    mkdirSync(join(root, '.impeccable'), { recursive: true });
+    mkdirSync(join(root, '.fk-skills'), { recursive: true });
     writeFileSync(getConfigPath(root), JSON.stringify({
       detector: { designSystem: { enabled: false } },
     }));
@@ -165,7 +165,7 @@ describe('cli/lib/impeccable-config', () => {
     const rawLocal = JSON.parse(readFileSync(getLocalConfigPath(root), 'utf-8'));
     expect(rawLocal.detector.designSystem).toBeUndefined();
     expect(readDetectionConfig(root).designSystem).toEqual({ enabled: false });
-    expect(readFileSync(join(root, '.git', 'info', 'exclude'), 'utf-8')).toContain('.impeccable/config.local.json');
+    expect(readFileSync(join(root, '.git', 'info', 'exclude'), 'utf-8')).toContain('.fk-skills/config.local.json');
   });
 
   test('shouldIgnoreDetectionFile matches relative and absolute paths', () => {

@@ -40,7 +40,7 @@ describe('hook manifest builders', () => {
     assert.equal(handler.type, 'command');
     assert.equal(handler.timeout, 5);
     assert.equal(handler.statusMessage, 'Checking UI changes');
-    expectCommand(handler.command, '.claude/skills/impeccable/scripts/hook.mjs');
+    expectCommand(handler.command, '.claude/skills/fk/scripts/hook.mjs');
     assert.ok(handler.command.includes('${CLAUDE_PROJECT_DIR}'));
     assert.equal(handler.args, undefined);
     assert.equal(manifest.hooks.SessionStart, undefined);
@@ -55,7 +55,7 @@ describe('hook manifest builders', () => {
     assert.equal(handler.type, 'command');
     assert.equal(handler.timeout, 5);
     assert.equal(handler.statusMessage, 'Checking UI changes');
-    expectCommand(handler.command, '.agents/skills/impeccable/scripts/hook.mjs');
+    expectCommand(handler.command, '.agents/skills/fk/scripts/hook.mjs');
     assert.ok(handler.command.includes('git rev-parse --show-toplevel'));
     assert.ok(!handler.command.includes('${PLUGIN_ROOT}'));
     assert.equal(manifest.hooks.SessionStart, undefined);
@@ -71,7 +71,7 @@ describe('hook manifest builders', () => {
     assert.equal(manifest.hooks.afterFileEdit, undefined);
     assert.equal(manifest.hooks.stop, undefined);
     assert.equal(manifest.hooks.sessionStart, undefined);
-    expectCommand(beforeEdit.command, '.cursor/skills/impeccable/scripts/hook-before-edit.mjs');
+    expectCommand(beforeEdit.command, '.cursor/skills/fk/scripts/hook-before-edit.mjs');
     assert.equal(beforeEdit.timeout, 5);
   });
 
@@ -106,10 +106,10 @@ describe('generated hook artifacts in repo', () => {
     const manifest = readJson('.claude/settings.json');
     const handler = manifest.hooks.PostToolUse[0].hooks[0];
 
-    expectCommand(handler.command, '.claude/skills/impeccable/scripts/hook.mjs');
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/impeccable/scripts/hook.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/impeccable/scripts/hook-lib.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/impeccable/scripts/detector/detect-antipatterns.mjs')));
+    expectCommand(handler.command, '.claude/skills/fk/scripts/hook.mjs');
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/fk/scripts/hook.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/fk/scripts/hook-lib.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.claude/skills/fk/scripts/detector/detect-antipatterns.mjs')));
   });
 
   it('Cursor project hooks reference only the pre-write runtime in .cursor/skills', () => {
@@ -117,28 +117,28 @@ describe('generated hook artifacts in repo', () => {
     const beforeEdit = manifest.hooks.preToolUse[0];
 
     assert.equal(Object.keys(manifest.hooks).length, 1);
-    expectCommand(beforeEdit.command, '.cursor/skills/impeccable/scripts/hook-before-edit.mjs');
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/impeccable/scripts/hook-before-edit.mjs')));
-    assert.equal(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/impeccable/scripts/hook-after-edit.mjs')), false);
-    assert.equal(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/impeccable/scripts/hook-stop.mjs')), false);
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/impeccable/scripts/hook-lib.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/impeccable/scripts/detector/detect-antipatterns.mjs')));
+    expectCommand(beforeEdit.command, '.cursor/skills/fk/scripts/hook-before-edit.mjs');
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/fk/scripts/hook-before-edit.mjs')));
+    assert.equal(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/fk/scripts/hook-after-edit.mjs')), false);
+    assert.equal(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/fk/scripts/hook-stop.mjs')), false);
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/fk/scripts/hook-lib.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.cursor/skills/fk/scripts/detector/detect-antipatterns.mjs')));
   });
 
   it('Codex project hooks reference hook.mjs in the .agents skill payload', () => {
     const manifest = readJson('.codex/hooks.json');
     const handler = manifest.hooks.PostToolUse[0].hooks[0];
 
-    expectCommand(handler.command, '.agents/skills/impeccable/scripts/hook.mjs');
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/impeccable/SKILL.md')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/impeccable/scripts/hook.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/impeccable/scripts/hook-lib.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/impeccable/scripts/detector/detect-antipatterns.mjs')));
+    expectCommand(handler.command, '.agents/skills/fk/scripts/hook.mjs');
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/fk/SKILL.md')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/fk/scripts/hook.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/fk/scripts/hook-lib.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, '.agents/skills/fk/scripts/detector/detect-antipatterns.mjs')));
   });
 
   it('does not generate probe scripts into provider skill payloads', () => {
     for (const providerDir of ['.claude', '.cursor', '.agents', 'plugin']) {
-      const probe = path.join(REPO_ROOT, providerDir, 'skills', 'impeccable', 'scripts', 'hook-probe.mjs');
+      const probe = path.join(REPO_ROOT, providerDir, 'skills', 'fk', 'scripts', 'hook-probe.mjs');
       assert.equal(fs.existsSync(probe), false, `${providerDir} still has hook-probe.mjs`);
     }
   });
@@ -164,7 +164,7 @@ describe('generated hook artifacts in repo', () => {
 
     const handler = manifest.hooks.PostToolUse[0].hooks[0];
     assert.equal(manifest.hooks.PostToolUse[0].matcher, 'Edit|Write|MultiEdit');
-    expectCommand(handler.command, 'skills/impeccable/scripts/hook.mjs');
+    expectCommand(handler.command, 'skills/fk/scripts/hook.mjs');
     // Resolves relative to the installed plugin, not a `.claude/skills/` layout.
     assert.ok(handler.command.includes('${CLAUDE_PLUGIN_ROOT}'),
       `plugin hook command must use $\{CLAUDE_PLUGIN_ROOT}: ${handler.command}`);
@@ -172,16 +172,16 @@ describe('generated hook artifacts in repo', () => {
       `plugin hook command must not use $\{CLAUDE_PROJECT_DIR}: ${handler.command}`);
 
     // The script the plugin hook points at must ship inside the plugin payload.
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, 'plugin/skills/impeccable/scripts/hook.mjs')));
-    assert.ok(fs.existsSync(path.join(REPO_ROOT, 'plugin/skills/impeccable/scripts/hook-lib.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, 'plugin/skills/fk/scripts/hook.mjs')));
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, 'plugin/skills/fk/scripts/hook-lib.mjs')));
   });
 
   it('generated hook runtime can import the bundled detector', async () => {
     for (const scriptDir of [
-      '.claude/skills/impeccable/scripts',
-      '.cursor/skills/impeccable/scripts',
-      '.agents/skills/impeccable/scripts',
-      'plugin/skills/impeccable/scripts',
+      '.claude/skills/fk/scripts',
+      '.cursor/skills/fk/scripts',
+      '.agents/skills/fk/scripts',
+      'plugin/skills/fk/scripts',
     ]) {
       const abs = path.join(REPO_ROOT, scriptDir);
       assert.ok(fs.existsSync(path.join(abs, 'detector', 'detect-antipatterns.mjs')),

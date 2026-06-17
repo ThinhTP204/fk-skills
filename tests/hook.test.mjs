@@ -134,7 +134,7 @@ describe('readConfig()', () => {
   });
 
   it('parses hook runtime and legacy hook detector filters', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       hook: {
         enabled: false,
@@ -154,7 +154,7 @@ describe('readConfig()', () => {
   });
 
   it('merges shared config first and local config second', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       hook: {
         enabled: false,
@@ -198,14 +198,14 @@ describe('readConfig()', () => {
   });
 
   it('tolerates malformed JSON and falls back to defaults', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), '{ not json');
     const cfg = readConfig(cwd);
     assert.equal(cfg.enabled, true);
   });
 
   it('ignores malformed local config while preserving valid shared config', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       hook: {
         enabled: false,
@@ -221,7 +221,7 @@ describe('readConfig()', () => {
   });
 
   it('parses the new quiet and auditLog fields from the unified config', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       hook: { quiet: true, auditLog: '~/hook.ndjson' },
       detector: { designSystem: { enabled: false } },
@@ -296,9 +296,9 @@ describe('ensureHookGitExcludes()', () => {
     assert.equal(fs.existsSync(path.join(cwd, '.gitignore')), false);
 
     const exclude = fs.readFileSync(path.join(cwd, '.git', 'info', 'exclude'), 'utf-8');
-    assert.match(exclude, /\.impeccable\/hook\.cache\.json/);
-    assert.match(exclude, /\.impeccable\/hook\.pending\.json/);
-    assert.match(exclude, /\.impeccable\/config\.local\.json/);
+    assert.match(exclude, /\.fk-skills\/hook\.cache\.json/);
+    assert.match(exclude, /\.fk-skills\/hook\.pending\.json/);
+    assert.match(exclude, /\.fk-skills\/config\.local\.json/);
 
     const second = ensureHookGitExcludes(cwd);
     assert.equal(second.changed, false);
@@ -513,12 +513,12 @@ describe('hook-admin.mjs', () => {
     assert.equal(local.ignoreValues[0].reason, 'Still intentional');
 
     const status = runAdmin(['status']);
-    assert.match(status, /local file:\s+\.impeccable\/config\.local\.json/);
+    assert.match(status, /local file:\s+\.fk-skills\/config\.local\.json/);
     assert.match(status, /ignoreValues:\s+overused-font=inter/);
   });
 
   it('a /impeccable hooks edit preserves sibling hook fields (consent, quiet)', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     // A recorded per-developer consent in the local file...
     fs.writeFileSync(getLocalConfigPath(cwd), JSON.stringify({ hook: { consent: 'declined' } }));
     runAdmin(['ignore-value', 'overused-font', 'Inter', '--local']);
@@ -535,17 +535,17 @@ describe('hook-admin.mjs', () => {
   });
 
   it('hooks on accepts declined consent and installs missing provider manifests', () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getLocalConfigPath(cwd), JSON.stringify({ hook: { consent: 'declined', quiet: true } }));
     for (const provider of ['.claude', '.agents', '.cursor']) {
-      fs.mkdirSync(path.join(cwd, provider, 'skills', 'impeccable', 'scripts'), { recursive: true });
+      fs.mkdirSync(path.join(cwd, provider, 'skills', 'fk', 'scripts'), { recursive: true });
     }
     fs.mkdirSync(path.join(cwd, '.claude'), { recursive: true });
     fs.writeFileSync(path.join(cwd, '.claude', 'settings.local.json'), JSON.stringify({
       hooks: {
         PostToolUse: [
           { matcher: 'OtherTool', hooks: [{ type: 'command', command: 'node "./local-hook.mjs"' }] },
-          { matcher: 'Edit', hooks: [{ type: 'command', command: 'node ".claude/skills/impeccable/scripts/hook.mjs"' }] },
+          { matcher: 'Edit', hooks: [{ type: 'command', command: 'node ".claude/skills/fk/scripts/hook.mjs"' }] },
         ],
       },
     }));
@@ -562,12 +562,12 @@ describe('hook-admin.mjs', () => {
 
     const claude = fs.readFileSync(path.join(cwd, '.claude', 'settings.local.json'), 'utf-8');
     assert.match(claude, /local-hook\.mjs/);
-    assert.equal(claude.split('skills/impeccable/scripts/hook.mjs').length - 1, 1);
+    assert.equal(claude.split('skills/fk/scripts/hook.mjs').length - 1, 1);
 
     const codex = fs.readFileSync(path.join(cwd, '.codex', 'hooks.json'), 'utf-8');
-    assert.match(codex, /\.agents\/skills\/impeccable\/scripts\/hook\.mjs/);
+    assert.match(codex, /\.agents\/skills\/fk\/scripts\/hook\.mjs/);
     const cursor = fs.readFileSync(path.join(cwd, '.cursor', 'hooks.json'), 'utf-8');
-    assert.match(cursor, /\.cursor\/skills\/impeccable\/scripts\/hook-before-edit\.mjs/);
+    assert.match(cursor, /\.cursor\/skills\/fk\/scripts\/hook-before-edit\.mjs/);
   });
 
   it('ignore-rule overused-font requires explicit broad suppression', () => {
@@ -733,7 +733,7 @@ describe('writeAuditLog()', () => {
 
   it('falls back to the unified config hook.auditLog when the env var is unset', () => {
     const log = path.join(cwd, 'from-config.ndjson');
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({ hook: { auditLog: log } }));
     assert.equal(writeAuditLog({}, { event: 'PostToolUse' }, cwd), true);
     assert.equal(fs.readFileSync(log, 'utf-8').trim().split('\n').length, 1);
@@ -742,7 +742,7 @@ describe('writeAuditLog()', () => {
   it('prefers the env var over config hook.auditLog', () => {
     const envLog = path.join(cwd, 'from-env.ndjson');
     const cfgLog = path.join(cwd, 'from-config.ndjson');
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({ hook: { auditLog: cfgLog } }));
     writeAuditLog({ IMPECCABLE_HOOK_LOG: envLog }, { event: 'PostToolUse' }, cwd);
     assert.equal(fs.existsSync(envLog), true);
@@ -752,8 +752,8 @@ describe('writeAuditLog()', () => {
   it('resolves config auditLog from entry.cwd (the event project root), not the fallback cwd', () => {
     const projectDir = path.join(cwd, 'project');
     const log = path.join(cwd, 'event-cwd.ndjson');
-    fs.mkdirSync(path.join(projectDir, '.impeccable'), { recursive: true });
-    fs.writeFileSync(path.join(projectDir, '.impeccable', 'config.json'),
+    fs.mkdirSync(path.join(projectDir, '.fk-skills'), { recursive: true });
+    fs.writeFileSync(path.join(projectDir, '.fk-skills', 'config.json'),
       JSON.stringify({ hook: { auditLog: log } }));
     // The fallback cwd (root) has no config; entry.cwd points at the project.
     assert.equal(writeAuditLog({}, { event: 'PostToolUse', cwd: projectDir }, cwd), true);
@@ -762,8 +762,8 @@ describe('writeAuditLog()', () => {
 
   it('resolves a relative auditLog path against the project root, not the process cwd', () => {
     const projectDir = path.join(cwd, 'project');
-    fs.mkdirSync(path.join(projectDir, '.impeccable'), { recursive: true });
-    fs.writeFileSync(path.join(projectDir, '.impeccable', 'config.json'),
+    fs.mkdirSync(path.join(projectDir, '.fk-skills'), { recursive: true });
+    fs.writeFileSync(path.join(projectDir, '.fk-skills', 'config.json'),
       JSON.stringify({ hook: { auditLog: 'logs/hook.ndjson' } }));
     assert.equal(writeAuditLog({}, { event: 'PostToolUse', cwd: projectDir }, cwd), true);
     // Written under the project root, not the fallback cwd.
@@ -954,7 +954,7 @@ rounded:
   });
 
   it('config quiet:true suppresses the clean ack like the env switch', async () => {
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({ hook: { quiet: true } }));
     const file = writeFixture('src/Quiet.tsx', 'noop');
     const r = await runHook({
@@ -1008,7 +1008,7 @@ rounded:
 
   it('config-disabled silences cleanly', async () => {
     const file = writeFixture('src/Card.tsx', 'noop');
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({ hook: { enabled: false } }));
     const det = fakeDetector([finding('side-tab', 1)]);
     const r = await runHook({ stdinJson: JSON.stringify(eventFor(file)), env: {}, cwd, detector: det });
@@ -1043,7 +1043,7 @@ rounded:
 
   it('respects detector.designSystem.enabled=false', async () => {
     writeDesignMd();
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       detector: { designSystem: { enabled: false } },
     }));
@@ -1062,7 +1062,7 @@ rounded:
 
   it('suppresses design-system findings through ignore-value', async () => {
     writeDesignMd();
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       detector: {
         ignoreValues: [
@@ -1100,8 +1100,8 @@ rounded:
     });
 
     assert.match(r.stdout, /No anti-patterns/);
-    assert.match(r.stdout, /DESIGN\.md is newer than \.impeccable\/design\.json/);
-    assert.match(r.stdout, /\/impeccable document/);
+    assert.match(r.stdout, /DESIGN\.md is newer than \.fk-skills\/design\.json/);
+    assert.match(r.stdout, /\/fk document/);
   });
 
   it('rejects sensitive paths before reading file content', async () => {
@@ -1137,7 +1137,7 @@ rounded:
 
   it('config ignoreFiles glob suppresses', async () => {
     const file = writeFixture('src/legacy/Foo.tsx', 'noop');
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     fs.writeFileSync(getConfigPath(cwd), JSON.stringify({
       detector: { ignoreFiles: ['src/legacy/**'] },
     }));

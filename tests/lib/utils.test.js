@@ -621,8 +621,8 @@ describe('replacePlaceholders', () => {
     expect(result).toBe('Commands: /audit, /polish, /optimize');
   });
 
-  test('should exclude impeccable from {{available_commands}}', () => {
-    const result = replacePlaceholders('Commands: {{available_commands}}', 'claude-code', ['audit', 'impeccable', 'polish']);
+  test('should exclude fk from {{available_commands}}', () => {
+    const result = replacePlaceholders('Commands: {{available_commands}}', 'claude-code', ['audit', 'fk', 'polish']);
     expect(result).toBe('Commands: /audit, /polish');
   });
 
@@ -631,13 +631,13 @@ describe('replacePlaceholders', () => {
     expect(result).toBe('Commands: /audit, /polish');
   });
 
-  test('lists /impeccable sub-commands for {{available_commands}} when no command names are passed', () => {
+  test('lists /fk sub-commands for {{available_commands}} when no command names are passed', () => {
     // v3.0 single-skill architecture: with no command names, the list falls back
-    // to the IMPECCABLE_SUB_COMMANDS sub-commands rendered as `/impeccable <sub>`.
+    // to the IMPECCABLE_SUB_COMMANDS sub-commands rendered as `/fk <sub>`.
     const result = replacePlaceholders('Commands: {{available_commands}}', 'claude-code', []);
-    expect(result.startsWith('Commands: /impeccable ')).toBe(true);
-    expect(result).toContain('/impeccable audit');
-    expect(result).toContain('/impeccable polish');
+    expect(result.startsWith('Commands: /fk ')).toBe(true);
+    expect(result).toContain('/fk check');
+    expect(result).toContain('/fk responsive');
   });
 
   test('should replace multiple placeholders in the same string', () => {

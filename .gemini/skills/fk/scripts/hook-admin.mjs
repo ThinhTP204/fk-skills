@@ -36,11 +36,11 @@ import {
 
 const ACTIONS = new Set(['status', 'on', 'off', 'ignore-rule', 'ignore-file', 'ignore-value', 'reset']);
 const IMPECCABLE_HOOK_COMMAND_MARKERS = [
-  'skills/impeccable/scripts/hook-probe.mjs',
-  'skills/impeccable/scripts/hook.mjs',
-  'skills/impeccable/scripts/hook-before-edit.mjs',
-  'skills/impeccable/scripts/hook-after-edit.mjs',
-  'skills/impeccable/scripts/hook-stop.mjs',
+  'skills/fk/scripts/hook-probe.mjs',
+  'skills/fk/scripts/hook.mjs',
+  'skills/fk/scripts/hook-before-edit.mjs',
+  'skills/fk/scripts/hook-after-edit.mjs',
+  'skills/fk/scripts/hook-stop.mjs',
 ];
 const TIMEOUT_SECONDS = 5;
 const STATUS_MESSAGE = 'Checking UI changes';
@@ -48,7 +48,7 @@ const STATUS_MESSAGE = 'Checking UI changes';
 const HOOK_MANIFEST_TARGETS = [
   {
     provider: '.claude',
-    skillRel: '.claude/skills/impeccable',
+    skillRel: '.claude/skills/fk',
     destRel: '.claude/settings.local.json',
     sharedDestRel: '.claude/settings.json',
     manifest: () => ({
@@ -60,7 +60,7 @@ const HOOK_MANIFEST_TARGETS = [
             hooks: [
               {
                 type: 'command',
-                command: 'node "${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs"',
+                command: 'node "${CLAUDE_PROJECT_DIR}/.claude/skills/fk/scripts/hook.mjs"',
                 timeout: TIMEOUT_SECONDS,
                 statusMessage: STATUS_MESSAGE,
               },
@@ -72,7 +72,7 @@ const HOOK_MANIFEST_TARGETS = [
   },
   {
     provider: '.agents',
-    skillRel: '.agents/skills/impeccable',
+    skillRel: '.agents/skills/fk',
     destRel: '.codex/hooks.json',
     manifest: () => ({
       description: 'Impeccable design detector: runs after Edit/Write/apply_patch on UI files and surfaces findings as system reminders.',
@@ -83,7 +83,7 @@ const HOOK_MANIFEST_TARGETS = [
             hooks: [
               {
                 type: 'command',
-                command: 'node "$(git rev-parse --show-toplevel)/.agents/skills/impeccable/scripts/hook.mjs"',
+                command: 'node "$(git rev-parse --show-toplevel)/.agents/skills/fk/scripts/hook.mjs"',
                 timeout: TIMEOUT_SECONDS,
                 statusMessage: STATUS_MESSAGE,
               },
@@ -95,14 +95,14 @@ const HOOK_MANIFEST_TARGETS = [
   },
   {
     provider: '.cursor',
-    skillRel: '.cursor/skills/impeccable',
+    skillRel: '.cursor/skills/fk',
     destRel: '.cursor/hooks.json',
     manifest: () => ({
       version: 1,
       hooks: {
         preToolUse: [
           {
-            command: 'node ".cursor/skills/impeccable/scripts/hook-before-edit.mjs"',
+            command: 'node ".cursor/skills/fk/scripts/hook-before-edit.mjs"',
             timeout: TIMEOUT_SECONDS,
           },
         ],
