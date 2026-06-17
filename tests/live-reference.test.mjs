@@ -30,7 +30,7 @@ describe('live reference authoring contract', () => {
     );
     // Keep the parent prompt tiny: it routes work to the subagent and owns the reply.
     assert.match(liveMd, /The user already clicked Apply\. Do not ask what to do/);
-    assert.match(liveMd, /delegate source edits to `impeccable_manual_edit_applier`/);
+    assert.match(liveMd, /delegate source edits to `fk_manual_edit_applier`/);
     assert.match(liveMd, /The subagent must not poll or reply/);
     assert.match(liveMd, /parent live thread keeps the foreground poll loop/);
     assert.match(liveMd, /live-accept\.mjs --page-url PAGE_URL/);
@@ -41,7 +41,7 @@ describe('live reference authoring contract', () => {
     // The dense source-editing rules live in the manual-edit applier subagent.
     assert.match(liveMd, /--reply EVENT_ID done --data '\{"status":"done"/);
     assert.match(liveMd, /evidencePath/);
-    assert.match(manualAgentMd, /codex-name: impeccable_manual_edit_applier/);
+    assert.match(manualAgentMd, /codex-name: fk_manual_edit_applier/);
     assert.doesNotMatch(manualAgentMd, /^providers:/m);
     assert.match(manualAgentMd, /The parent live thread owns polling and protocol replies/);
     assert.match(manualAgentMd, /Do not ask what to do/);

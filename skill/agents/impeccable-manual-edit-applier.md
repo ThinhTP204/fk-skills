@@ -1,6 +1,6 @@
 ---
-name: impeccable-manual-edit-applier
-codex-name: impeccable_manual_edit_applier
+name: fk-manual-edit-applier
+codex-name: fk_manual_edit_applier
 description: Applies leased Impeccable live manual copy-edit batches to source and returns canonical Apply results.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
