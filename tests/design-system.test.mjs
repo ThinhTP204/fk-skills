@@ -100,11 +100,11 @@ describe('normalizeDesignSystem()', () => {
 });
 
 describe('loadDesignSystemForCwd()', () => {
-  it('loads DESIGN.md plus .impeccable/design.json and marks stale sidecars', () => {
+  it('loads DESIGN.md plus .fk-skills/design.json and marks stale sidecars', () => {
     const cwd = mkTmp();
-    fs.mkdirSync(path.join(cwd, '.impeccable'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.fk-skills'), { recursive: true });
     const designMd = path.join(cwd, 'DESIGN.md');
-    const sidecarJson = path.join(cwd, '.impeccable', 'design.json');
+    const sidecarJson = path.join(cwd, '.fk-skills', 'design.json');
 
     fs.writeFileSync(designMd, `---
 typography:

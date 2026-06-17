@@ -8,7 +8,7 @@ const ROOT = process.cwd();
 describe('skill detector bundle', () => {
   test('adds the detector wrapper and engine files to skill scripts', () => {
     const { skills } = readSourceFiles(ROOT);
-    const skill = skills.find(s => s.name === 'impeccable');
+    const skill = skills.find(s => s.name === 'fk');
     const scriptNames = new Set(skill.scripts.map(s => s.name));
 
     expect(scriptNames.has('detect.mjs')).toBe(true);
@@ -18,10 +18,10 @@ describe('skill detector bundle', () => {
     expect(scriptNames.has('detector/engines/static-html/detect-html.mjs')).toBe(true);
   });
 
-  test('critique references the bundled detector command', () => {
-    const critique = fs.readFileSync(path.join(ROOT, 'skill/reference/critique.md'), 'utf-8');
+  test('review references the bundled detector command', () => {
+    const review = fs.readFileSync(path.join(ROOT, 'skill/reference/review.md'), 'utf-8');
 
-    expect(critique).toContain('node {{scripts_path}}/detect.mjs --json [target]');
-    expect(critique).not.toContain('npx impeccable detect');
+    expect(review).toContain('node {{scripts_path}}/detect.mjs --json [target]');
+    expect(review).not.toContain('npx fk-skills detect');
   });
 });

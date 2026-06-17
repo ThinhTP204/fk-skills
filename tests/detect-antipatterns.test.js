@@ -972,8 +972,8 @@ rounded:
   test('detector designSystem.enabled=false disables CLI design-system rules', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'impeccable-cli-design-disabled-'));
     try {
-      fs.mkdirSync(path.join(dir, '.impeccable'), { recursive: true });
-      fs.writeFileSync(path.join(dir, '.impeccable', 'config.json'), JSON.stringify({
+      fs.mkdirSync(path.join(dir, '.fk-skills'), { recursive: true });
+      fs.writeFileSync(path.join(dir, '.fk-skills', 'config.json'), JSON.stringify({
         detector: { designSystem: { enabled: false } },
       }));
       fs.writeFileSync(path.join(dir, 'DESIGN.md'), `---
@@ -1003,9 +1003,9 @@ rounded:
     }
   });
 
-  test('respects .impeccable config ignoreFiles like the hook', async () => {
+  test('respects .fk-skills config ignoreFiles like the hook', async () => {
     await withStaticFixture({
-      '.impeccable/config.json': JSON.stringify({
+      '.fk-skills/config.json': JSON.stringify({
         detector: { ignoreFiles: ['src/noisy.css'] },
       }),
       'src/noisy.css': "body { font-family: 'Inter', sans-serif; }",
@@ -1016,9 +1016,9 @@ rounded:
     });
   });
 
-  test('respects .impeccable config ignoreRules like the hook', async () => {
+  test('respects .fk-skills config ignoreRules like the hook', async () => {
     await withStaticFixture({
-      '.impeccable/config.json': JSON.stringify({
+      '.fk-skills/config.json': JSON.stringify({
         detector: { ignoreRules: ['side-tab'] },
       }),
       'src/card.css': '.card { border-left: 4px solid #3b82f6; border-radius: 12px; }',
@@ -1029,9 +1029,9 @@ rounded:
     });
   });
 
-  test('respects .impeccable config ignoreValues like the hook', async () => {
+  test('respects .fk-skills config ignoreValues like the hook', async () => {
     await withStaticFixture({
-      '.impeccable/config.json': JSON.stringify({
+      '.fk-skills/config.json': JSON.stringify({
         detector: {
           ignoreValues: [
             { rule: 'overused-font', value: 'Inter' },
@@ -1053,7 +1053,7 @@ rounded:
 
   test('respects scoped wildcard ignoreValues like the hook', async () => {
     await withStaticFixture({
-      '.impeccable/config.json': JSON.stringify({
+      '.fk-skills/config.json': JSON.stringify({
         detector: {
           ignoreValues: [
             { rule: 'overused-font', value: '*', files: ['src/main.css'] },
