@@ -204,6 +204,10 @@ function sseEvent(res, event, data) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
+function stripAnsi(s) {
+  return s.replace(/\x1B\[[0-9;]*[A-Za-z]/g, '').replace(/\r/g, '');
+}
+
 function extractJson(text) {
   const fenced = text.match(/```(?:json)?\s*([\s\S]+?)```/);
   if (fenced) return fenced[1].trim();
@@ -246,13 +250,17 @@ async function handleScan(body, config, res) {
   sseEvent(res, 'status', { text: `Đang chấm điểm với ${config.agent}...` });
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
-  const args = config.agent === 'claude'
-    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions', '--output-format', 'stream-json', '--verbose']
-    : ['--no-git', '--full-auto', '-q', fullPrompt];
+  const claudeArgs = ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions', '--output-format', 'stream-json'];
+  // macOS: wrap with `script -q /dev/null` to allocate a PTY so Claude writes to stdout
+  const [cmd, args] = config.agent === 'claude'
+    ? process.platform === 'darwin'
+      ? ['script', ['-q', '/dev/null', 'claude', ...claudeArgs]]
+      : ['claude', claudeArgs]
+    : [config.agent, ['--no-git', '--full-auto', '-q', fullPrompt]];
 
   await new Promise((resolve) => {
     let buffer = '', streamText = '', done = false;
-    const proc = spawn(config.agent, args, { env: process.env });
+    const proc = spawn(cmd, args, { env: process.env });
     proc.stdin.end();
     const timer = setTimeout(() => {
       if (done) return;
@@ -264,7 +272,7 @@ async function handleScan(body, config, res) {
       resolve();
     }, 180000);
     proc.stdout.on('data', chunk => {
-      buffer += chunk.toString();
+      buffer += stripAnsi(chunk.toString());
       // stream-json: each line is a JSON event, flush immediately
       const lines = buffer.split('\n');
       buffer = lines.pop(); // keep incomplete last line
