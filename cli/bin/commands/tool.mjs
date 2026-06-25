@@ -51,32 +51,32 @@ async function setupWizard() {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   const ask = q => new Promise(r => rl.question(q, r));
 
-  console.log('\n  fk-skills tool — setup\n');
+  console.log('\n  fk-skills tool — cài đặt\n');
   const clis = detectAvailableClis();
 
   if (!clis.length) {
-    console.log('  No AI CLI detected (claude / codex).\n');
-    console.log('  Install Claude Code: npm install -g @anthropic-ai/claude-code');
-    console.log('  Install Codex CLI:   npm i -g @openai/codex\n');
+    console.log('  Không tìm thấy AI CLI (claude / codex).\n');
+    console.log('  Cài Claude Code: npm install -g @anthropic-ai/claude-code');
+    console.log('  Cài Codex CLI:   npm i -g @openai/codex\n');
     rl.close(); process.exit(1);
   }
 
   let agent = clis[0];
   if (clis.length > 1) {
-    console.log(`  Detected: ${clis.join(', ')}`);
-    const ans = await ask(`  Use which? [${clis[0]}] `);
+    console.log(`  Phát hiện: ${clis.join(', ')}`);
+    const ans = await ask(`  Dùng cái nào? [${clis[0]}] `);
     if (clis.includes(ans.trim())) agent = ans.trim();
   } else {
-    console.log(`  Detected: ${agent} ✓`);
+    console.log(`  Phát hiện: ${agent} ✓`);
   }
 
-  const scopeAns = await ask('  Scope — global or project? [global] ');
+  const scopeAns = await ask('  Phạm vi — global hay project? [global] ');
   const scope = scopeAns.trim() === 'project' ? 'project' : 'global';
   rl.close();
 
   const config = { agent, scope };
   const saved = writeConfig(config, scope);
-  console.log(`\n  Saved to ${saved}`);
+  console.log(`\n  Đã lưu tại ${saved}`);
   return config;
 }
 
@@ -105,16 +105,16 @@ async function renderWithBrowser(url, onStatus) {
   try {
     ({ chromium } = await import('playwright'));
   } catch {
-    throw new Error('playwright package missing — run: npm install in the fk-skills repo');
+    throw new Error('Thiếu playwright — chạy: npm install');
   }
 
-  onStatus('Launching headless browser...');
+  onStatus('Khởi động trình duyệt ảo...');
   let browser;
   try {
     browser = await chromium.launch({ headless: true });
   } catch (err) {
     if (err.message?.includes('Executable') || err.message?.includes('not found')) {
-      onStatus('Installing Chromium browser (one-time setup ~100MB)...');
+      onStatus('Cài Chromium lần đầu (khoảng 100MB)...');
       await ensurePlaywrightBrowser(onStatus);
       browser = await chromium.launch({ headless: true });
     } else {
@@ -128,7 +128,7 @@ async function renderWithBrowser(url, onStatus) {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
     await page.waitForTimeout(800);
     const html = await page.content();
-    onStatus('Browser render complete.');
+    onStatus('Render hoàn tất.');
     return html;
   } finally {
     await browser.close();
@@ -151,7 +151,13 @@ function prepareHtml(raw) {
 
 // ─── Scoring prompt ────────────────────────────────────────────────────────
 
-const SCORE_PROMPT = `You are a senior design director doing a full UI/UX critique. Analyze the HTML and return ONLY valid JSON — no markdown, no explanation, no code fences.
+const SCORE_PROMPT = `You are a senior design director applying fk-skills design standards. Analyze the HTML and return ONLY valid JSON — no markdown, no explanation, no code fences.
+
+Evaluate against these standards:
+- Absolute bans: side-stripe borders (border-left/right >1px as accent), gradient text (background-clip:text + gradient), glassmorphism decoratively, hero-metric template, identical card grids, tracked eyebrow above every section, numbered section scaffolding, text overflow
+- Slop tells: gradient-text, glassmorphism-overuse, identical-card-grids, hero-metrics-row, eyebrow-every-section, excessive-border-radius, everything-in-cards, bento-grid, emoji-overuse, oversized-h1, side-stripe-border
+- Technical: accessibility (WCAG 2.1 AA), performance, theming/color tokens, responsive design, anti-patterns
+- UX: Nielsen's 10 heuristics
 
 Required JSON schema:
 {
@@ -160,26 +166,26 @@ Required JSON schema:
     "technical": {
       "total": <0-20>,
       "breakdown": [
-        { "id": "accessibility", "label": "Accessibility", "score": <0-4>, "keyFinding": "<specific finding>" },
-        { "id": "performance",   "label": "Performance",   "score": <0-4>, "keyFinding": "<specific finding>" },
-        { "id": "theming",       "label": "Theming",       "score": <0-4>, "keyFinding": "<specific finding>" },
-        { "id": "responsive",    "label": "Responsive",    "score": <0-4>, "keyFinding": "<specific finding>" },
-        { "id": "antiPatterns",  "label": "Anti-Patterns", "score": <0-4>, "keyFinding": "<specific finding>" }
+        { "id": "accessibility", "label": "Khả năng tiếp cận", "score": <0-4>, "keyFinding": "<specific finding>" },
+        { "id": "performance",   "label": "Hiệu suất",         "score": <0-4>, "keyFinding": "<specific finding>" },
+        { "id": "theming",       "label": "Màu sắc & Giao diện","score": <0-4>, "keyFinding": "<specific finding>" },
+        { "id": "responsive",    "label": "Responsive",         "score": <0-4>, "keyFinding": "<specific finding>" },
+        { "id": "antiPatterns",  "label": "Anti-Pattern",       "score": <0-4>, "keyFinding": "<specific finding>" }
       ]
     },
     "ux": {
       "total": <0-40>,
       "heuristics": [
-        { "id": 1,  "name": "Visibility of System Status",     "score": <0-4>, "keyIssue": "<finding or solid>" },
-        { "id": 2,  "name": "Match System and Real World",     "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 3,  "name": "User Control and Freedom",       "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 4,  "name": "Consistency and Standards",      "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 5,  "name": "Error Prevention",               "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 6,  "name": "Recognition Rather Than Recall", "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 7,  "name": "Flexibility and Efficiency",     "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 8,  "name": "Aesthetic and Minimalist Design","score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 9,  "name": "Error Recovery",                 "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 10, "name": "Help and Documentation",         "score": <0-4>, "keyIssue": "<finding>" }
+        { "id": 1,  "name": "Trạng thái hệ thống rõ ràng",       "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 2,  "name": "Phù hợp thực tế người dùng",         "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 3,  "name": "Kiểm soát và tự do",                 "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 4,  "name": "Nhất quán và chuẩn mực",             "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 5,  "name": "Ngăn ngừa lỗi",                     "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 6,  "name": "Nhận diện thay vì ghi nhớ",         "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 7,  "name": "Linh hoạt và hiệu quả",             "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 8,  "name": "Thiết kế tối giản",                  "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 9,  "name": "Xử lý lỗi",                         "score": <0-4>, "keyIssue": "<finding>" },
+        { "id": 10, "name": "Tài liệu và hỗ trợ",                "score": <0-4>, "keyIssue": "<finding>" }
       ]
     },
     "slopTest": {
@@ -192,25 +198,25 @@ Required JSON schema:
     {
       "id": "kebab-id",
       "priority": "P0"|"P1"|"P2"|"P3",
-      "title": "<short name>",
+      "title": "<short name in Vietnamese>",
       "location": "<selector or area>",
-      "category": "Accessibility"|"Performance"|"Theming"|"Responsive"|"Anti-Pattern"|"UX",
-      "impact": "<user impact, 1 sentence>",
-      "recommendation": "<actionable fix, 1-2 sentences>"
+      "category": "Khả năng tiếp cận"|"Hiệu suất"|"Giao diện"|"Responsive"|"Anti-Pattern"|"UX",
+      "impact": "<user impact in Vietnamese, 1 sentence>",
+      "recommendation": "<actionable fix in Vietnamese, 1-2 sentences>"
     }
   ],
-  "positiveFindings": ["<strength 1>", "<strength 2>"],
-  "systemicIssues": ["<recurring pattern>"],
-  "summary": "<2-3 sentence executive summary>"
+  "positiveFindings": ["<strength in Vietnamese>"],
+  "systemicIssues": ["<recurring pattern in Vietnamese>"],
+  "summary": "<2-3 sentence executive summary in Vietnamese>"
 }
 
 Rules:
 - register: brand=marketing/landing, product=app/dashboard/tool
-- technical scores 0-4: 4=excellent, 3=good, 2=partial, 1=poor, 0=failing
-- slopTest tells: gradient-text, everything-in-cards, glassmorphism-overuse, sparkle-icons, bento-grid, excessive-border-radius, emoji-overuse, oversized-h1, hero-eyebrow-label, hero-metrics-row
-- issues: P0=blocking, P1=major, P2=minor, P3=polish. Include 6-10 issues.
+- All issues, findings, and summary MUST be in Vietnamese
+- technical scores 0-4: 4=xuất sắc, 3=tốt, 2=trung bình, 1=kém, 0=lỗi nghiêm trọng
+- P0=chặn hoàn toàn, P1=nghiêm trọng, P2=nhỏ, P3=tinh chỉnh. Include 6-10 issues.
 - positiveFindings: 2-4 genuine strengths
-- systemicIssues: recurring patterns (omit array if none)`;
+- systemicIssues: recurring patterns (omit if none)`;
 
 // ─── detectHtml via temp file ──────────────────────────────────────────────
 
@@ -243,13 +249,13 @@ function extractJson(text) {
 // ─── Scan handler (SSE stream) ─────────────────────────────────────────────
 
 async function handleScan(body, config, res) {
-  const { url, mode = 'score' } = body;
-  if (!url) { sseEvent(res, 'error', { text: 'url is required' }); return; }
+  const { url } = body;
+  if (!url) { sseEvent(res, 'error', { text: 'Vui lòng nhập URL' }); return; }
 
   const start = Date.now();
 
   // 1. Fetch (with SPA fallback)
-  sseEvent(res, 'status', { text: 'Fetching page...' });
+  sseEvent(res, 'status', { text: 'Đang tải trang...' });
   let html;
   try {
     const r = await fetch(url, {
@@ -260,16 +266,16 @@ async function handleScan(body, config, res) {
     html = await r.text();
 
     if (isSpaShell(html)) {
-      sseEvent(res, 'status', { text: 'SPA detected — rendering with headless browser...' });
+      sseEvent(res, 'status', { text: 'Phát hiện SPA — đang render bằng trình duyệt ảo...' });
       html = await renderWithBrowser(url, text => sseEvent(res, 'status', { text }));
     }
   } catch (err) {
-    sseEvent(res, 'error', { text: `Fetch failed: ${err.message}` });
+    sseEvent(res, 'error', { text: `Không thể tải trang: ${err.message}` });
     return;
   }
 
   // 2. Static analysis
-  sseEvent(res, 'status', { text: 'Detecting anti-patterns...' });
+  sseEvent(res, 'status', { text: 'Đang phát hiện anti-pattern...' });
   let findings = [];
   try {
     findings = await runDetectHtml(html, url);
@@ -279,16 +285,11 @@ async function handleScan(body, config, res) {
       return a;
     }, {}) });
   } catch (err) {
-    sseEvent(res, 'status', { text: `Static analysis warning: ${err.message}` });
-  }
-
-  if (mode === 'check') {
-    sseEvent(res, 'done', { durationMs: Date.now() - start });
-    return;
+    sseEvent(res, 'status', { text: `Cảnh báo phân tích tĩnh: ${err.message}` });
   }
 
   // 3. LLM scoring with streaming
-  sseEvent(res, 'status', { text: `Scoring with ${config.agent}...` });
+  sseEvent(res, 'status', { text: `Đang chấm điểm với ${config.agent}...` });
 
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
@@ -304,7 +305,7 @@ async function handleScan(body, config, res) {
       if (done) return;
       done = true;
       proc.kill('SIGTERM');
-      sseEvent(res, 'error', { text: `${config.agent} timed out after 3 minutes` });
+      sseEvent(res, 'error', { text: `${config.agent} hết thời gian chờ (3 phút)` });
       resolve();
     }, 180000);
 
@@ -323,7 +324,7 @@ async function handleScan(body, config, res) {
       if (done) return;
       done = true;
       clearTimeout(timer);
-      sseEvent(res, 'error', { text: `${config.agent} error: ${err.message}` });
+      sseEvent(res, 'error', { text: `Lỗi ${config.agent}: ${err.message}` });
       resolve();
     });
 
@@ -333,7 +334,7 @@ async function handleScan(body, config, res) {
       clearTimeout(timer);
 
       if (code !== 0 && !buffer.trim()) {
-        sseEvent(res, 'error', { text: `${config.agent} exited with code ${code}` });
+        sseEvent(res, 'error', { text: `${config.agent} thoát với mã lỗi ${code}` });
         resolve();
         return;
       }
@@ -347,7 +348,7 @@ async function handleScan(body, config, res) {
           durationMs: Date.now() - start,
         });
       } catch {
-        sseEvent(res, 'error', { text: 'Could not parse JSON from response — try again' });
+        sseEvent(res, 'error', { text: 'Không thể đọc kết quả — vui lòng thử lại' });
       }
       resolve();
     });
@@ -398,7 +399,7 @@ async function startServer(config, port) {
 
   await new Promise((resolve, reject) => {
     server.on('error', err => {
-      if (err.code === 'EADDRINUSE') reject(new Error(`Port ${port} in use. Try --port <other>`));
+      if (err.code === 'EADDRINUSE') reject(new Error(`Cổng ${port} đang được sử dụng. Thử --port <khác>`));
       else reject(err);
     });
     server.listen(port, '127.0.0.1', resolve);
@@ -411,11 +412,11 @@ async function startServer(config, port) {
 
 function buildUI(config) {
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Impeccable Tool</title>
+<title>fk skills — Kiểm tra Giao diện</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -445,12 +446,14 @@ function buildUI(config) {
   --patina-border: oklch(86% 0.058 188);
 
   --p0-color:  oklch(46% 0.2 25);
-  --p0-bg:     oklch(98.5% 0.012 25);
-  --p0-border: oklch(87% 0.048 25);
+  --p0-bg:     oklch(97.5% 0.022 25);
+  --p0-border: oklch(86% 0.055 25);
+  --p0-title:  oklch(40% 0.22 25);
 
   --p1-color:  oklch(47% 0.17 46);
-  --p1-bg:     oklch(98.5% 0.016 58);
+  --p1-bg:     oklch(98% 0.018 58);
   --p1-border: oklch(87% 0.05 58);
+  --p1-title:  oklch(42% 0.18 46);
 
   --font-display: 'Alumni Sans Pinstripe', 'Albert Sans', Arial, sans-serif;
   --font-body:    'Albert Sans', 'Avenir Next', Helvetica, Arial, system-ui, sans-serif;
@@ -505,16 +508,16 @@ header {
 .wordmark {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 11.5px;
-  letter-spacing: 0.2em;
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
 }
+.wordmark span { color: var(--gold-text); }
 .gold-seam {
   height: 2px;
   background: var(--gold);
   width: 100%;
-  flex-shrink: 0;
 }
 .header-right {
   margin-left: auto;
@@ -555,15 +558,14 @@ main {
   gap: 10px;
   padding-bottom: 40px;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 0;
 }
 .url-input {
   flex: 1;
   min-width: 0;
-  height: 44px;
+  height: 46px;
   border: 1px solid var(--rule-mid);
   border-radius: 3px;
-  padding: 0 16px;
+  padding: 0 18px;
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--text);
@@ -577,51 +579,36 @@ main {
 }
 .url-input::placeholder { color: var(--faint); font-style: italic; }
 
-.mode-group {
-  display: flex;
-  border: 1px solid var(--rule-mid);
-  border-radius: 3px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.mode-btn {
-  height: 44px;
-  padding: 0 16px;
-  border: none;
-  background: var(--surface);
-  font-family: var(--font-body);
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-.mode-btn + .mode-btn { border-left: 1px solid var(--rule-mid); }
-.mode-btn.active { background: var(--surface2); color: var(--ink); font-weight: 600; }
-.mode-btn:hover:not(.active) { background: var(--surface2); }
-
 .scan-btn {
-  height: 44px;
-  padding: 0 28px;
+  height: 46px;
+  padding: 0 32px;
   background: var(--gold);
   color: var(--ink);
   border: none;
   border-radius: 3px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+}
+.scan-btn.ready {
+  box-shadow: 0 0 0 3px oklch(84% 0.19 80.46 / 0.22);
 }
 .scan-btn:hover {
   background: var(--gold-pale);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px oklch(84% 0.19 80.46 / 0.3);
+  box-shadow: 0 4px 18px oklch(84% 0.19 80.46 / 0.32);
 }
 .scan-btn:active { transform: translateY(0); box-shadow: none; }
-.scan-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.scan-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 
 /* ── Error ── */
 .error-bar {
@@ -665,12 +652,23 @@ main {
   100% { width: 84%; }
 }
 
-.progress-inner { padding: 20px 24px; }
+.progress-inner { padding: 22px 26px; }
 .progress-status {
   font-size: 13px;
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 14px;
+}
+.progress-dots::after {
+  content: '';
+  animation: dots 1.4s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
 }
 .stream-box {
   background: var(--surface2);
@@ -691,6 +689,18 @@ main {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes warnPulse {
+  0%, 100% { background: var(--p0-bg); }
+  50%       { background: oklch(95.5% 0.03 25); }
+}
+@keyframes warnPulseP1 {
+  0%, 100% { background: var(--p1-bg); }
+  50%       { background: oklch(96.5% 0.025 55); }
+}
+@keyframes interpretIn {
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -733,8 +743,20 @@ main {
   font-size: 13px;
   color: var(--faint);
   margin-top: 6px;
-  margin-bottom: 20px;
+  margin-bottom: 6px;
 }
+.score-interpret {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: none;
+  animation: interpretIn 0.4s ease 0.9s both;
+}
+.score-interpret.show { display: block; }
+.si-great  { color: var(--patina-text); }
+.si-good   { color: var(--gold-text); }
+.si-mid    { color: var(--p1-color); }
+.si-bad    { color: var(--p0-color); }
 .score-track {
   height: 2px;
   background: var(--rule);
@@ -791,6 +813,7 @@ main {
   color: var(--muted);
   line-height: 1.8;
   max-width: 66ch;
+  text-wrap: pretty;
 }
 
 /* ── Section heading ── */
@@ -800,7 +823,6 @@ main {
   gap: 10px;
   border-top: 1px solid var(--rule);
   padding-top: 32px;
-  margin-bottom: 0;
 }
 .sec-head-label {
   font-family: var(--font-mono);
@@ -827,20 +849,15 @@ main {
   border-bottom: 1px solid var(--rule);
 }
 .htable thead th:last-child { text-align: right; }
-.htable tbody tr { border-bottom: 1px solid var(--rule); }
+.htable tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.1s; }
 .htable tbody tr:last-child { border-bottom: none; }
-.htable tbody tr { transition: background 0.1s; }
 .htable tbody tr:hover { background: oklch(99.5% 0 0); }
 .htable tbody td { padding: 14px 0 13px; vertical-align: top; }
 .htable tbody td:last-child { text-align: right; }
 .hnum  { font-family: var(--font-mono); font-size: 11px; color: var(--faint); width: 30px; }
-.hname { font-weight: 600; font-size: 13px; color: var(--ink); padding-right: 24px; min-width: 170px; }
+.hname { font-weight: 600; font-size: 13px; color: var(--ink); padding-right: 24px; min-width: 160px; }
 .hfind { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
-.schip {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
-}
+.schip { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
 .schip.s4 { color: var(--patina-text); }
 .schip.s3 { color: oklch(40% 0.12 145); }
 .schip.s2 { color: var(--gold-text); }
@@ -850,13 +867,39 @@ main {
 
 /* ── Issues ── */
 .issues-wrap { margin-bottom: 8px; }
+
 .issue-row {
   display: grid;
   grid-template-columns: 52px 1fr;
   padding: 24px 0;
   border-bottom: 1px solid var(--rule);
+  transition: background 0.2s;
 }
 .issue-row:last-child { border-bottom: none; }
+
+/* P0: severe — full background + pulse */
+.issue-row.sev-p0 {
+  background: var(--p0-bg);
+  border: 1px solid var(--p0-border);
+  border-radius: 3px;
+  padding: 20px 16px;
+  margin-bottom: 8px;
+}
+.issue-row.sev-p0.pulse {
+  animation: warnPulse 1.6s ease-in-out 2;
+}
+
+/* P1: major — tinted but subtle */
+.issue-row.sev-p1 {
+  background: var(--p1-bg);
+  border: 1px solid var(--p1-border);
+  border-radius: 3px;
+  padding: 20px 16px;
+  margin-bottom: 6px;
+}
+.issue-row.sev-p1.pulse {
+  animation: warnPulseP1 1.8s ease-in-out 1;
+}
 
 .p-chip {
   font-family: var(--font-mono);
@@ -869,37 +912,34 @@ main {
   width: fit-content;
   margin-top: 2px;
 }
-.p-chip.P0 { color: var(--p0-color); background: var(--p0-bg); border: 1px solid var(--p0-border); }
-.p-chip.P1 { color: var(--p1-color); background: var(--p1-bg); border: 1px solid var(--p1-border); }
+.p-chip.P0 { color: var(--p0-color); background: oklch(94% 0.04 25); border: 1.5px solid var(--p0-border); }
+.p-chip.P1 { color: var(--p1-color); background: oklch(94% 0.03 50); border: 1.5px solid var(--p1-border); }
 .p-chip.P2 { color: var(--gold-text); background: var(--gold-bg); border: 1px solid var(--gold-border); }
 .p-chip.P3 { color: var(--faint); background: var(--surface2); border: 1px solid var(--rule); }
 
 .issue-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ink);
   line-height: 1.35;
   margin-bottom: 8px;
+  color: var(--ink);
 }
+.sev-p0 .issue-title { color: var(--p0-title); }
+.sev-p1 .issue-title { color: var(--p1-title); }
+
 .issue-meta-row {
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
   margin-bottom: 9px;
 }
-.meta-item {
-  font-size: 11px;
-  color: var(--faint);
-  display: flex;
-  gap: 5px;
-}
+.meta-item { font-size: 11px; color: var(--faint); display: flex; gap: 5px; }
 .meta-item b { color: var(--muted); font-weight: 600; }
-.issue-impact {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.65;
-  margin-bottom: 10px;
-}
+
+.issue-impact { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 10px; }
+.sev-p0 .issue-impact { color: oklch(38% 0.05 25); }
+.sev-p1 .issue-impact { color: oklch(38% 0.04 46); }
+
 .issue-fix {
   padding: 11px 14px;
   background: var(--gold-bg);
@@ -909,6 +949,7 @@ main {
   line-height: 1.65;
   color: var(--text);
 }
+.sev-p0 .issue-fix { background: var(--surface); }
 .fix-label {
   display: block;
   font-family: var(--font-mono);
@@ -951,21 +992,17 @@ main {
 /* ── Sections ── */
 .section { display: none; }
 .section.show { display: block; }
-.section + .section.show { margin-top: 0; }
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
   main { padding: 28px 20px 80px; }
   header { padding: 0 20px; }
-  .form-strip { flex-wrap: wrap; }
-  .url-input { min-width: 100%; }
   .score-trio { grid-template-columns: 1fr; }
-  .score-col-divider { height: 1px; width: 100%; background: var(--rule); }
+  .score-col-divider { height: 1px; width: 100%; }
   .score-cell { padding: 24px 0; }
   .score-cell:first-child { padding-top: 36px; }
 }
 
-/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -979,10 +1016,10 @@ main {
 <header>
   <div class="brand">
     <div class="brand-mark"></div>
-    <div class="wordmark">Impeccable</div>
+    <div class="wordmark">fk <span>skills</span></div>
   </div>
   <div class="header-right">
-    <span class="local-tag">local</span>
+    <span class="local-tag">cục bộ</span>
     <span class="agent-tag">${config.agent}</span>
   </div>
 </header>
@@ -991,13 +1028,9 @@ main {
 <main>
   <div class="form-strip">
     <input id="url" class="url-input" type="url"
-      placeholder="https://your-app.com or http://localhost:3000"
+      placeholder="https://trang-web.com hoặc http://localhost:3000"
       autocomplete="off" spellcheck="false">
-    <div class="mode-group">
-      <button class="mode-btn active" data-mode="score">Full scan</button>
-      <button class="mode-btn" data-mode="check">Static only</button>
-    </div>
-    <button id="scan" class="scan-btn">Scan</button>
+    <button id="scan" class="scan-btn">Quét</button>
   </div>
 
   <div id="error" class="error-bar"></div>
@@ -1007,21 +1040,22 @@ main {
       <div id="sweep" class="sweep-fill"></div>
     </div>
     <div class="progress-inner">
-      <div id="progress-label" class="progress-status">Scanning...</div>
+      <div id="progress-label" class="progress-status">Đang quét<span class="progress-dots"></span></div>
       <div id="stream-area" class="stream-box"></div>
     </div>
   </div>
 
   <div id="results" class="results-wrap">
 
-    <!-- Scores -->
+    <!-- Điểm số -->
     <div id="sec-scores" class="section">
       <div class="score-section">
         <div class="score-trio">
           <div class="score-cell">
-            <div class="score-eyebrow">Technical</div>
+            <div class="score-eyebrow">Kỹ thuật</div>
             <div class="score-number" id="tech-num">—</div>
             <div class="score-denom">/20</div>
+            <div class="score-interpret" id="tech-interp"></div>
             <div class="score-track"><div class="score-fill" id="tech-bar"></div></div>
           </div>
           <div class="score-col-divider"></div>
@@ -1029,6 +1063,7 @@ main {
             <div class="score-eyebrow">UX · Nielsen</div>
             <div class="score-number" id="ux-num">—</div>
             <div class="score-denom">/40</div>
+            <div class="score-interpret" id="ux-interp"></div>
             <div class="score-track"><div class="score-fill" id="ux-bar"></div></div>
           </div>
           <div class="score-col-divider"></div>
@@ -1042,7 +1077,7 @@ main {
       </div>
     </div>
 
-    <!-- Summary -->
+    <!-- Tóm tắt -->
     <div id="sec-summary" class="section">
       <div class="summary-section">
         <div id="reg-tag" class="reg-tag" style="display:none"></div>
@@ -1050,83 +1085,79 @@ main {
       </div>
     </div>
 
-    <!-- Technical table -->
+    <!-- Đánh giá kỹ thuật -->
     <div id="sec-tech" class="section">
       <div class="sec-head">
-        <span class="sec-head-label">Technical Audit</span>
-        <span class="sec-head-count sec-head-label">5 dimensions</span>
+        <span class="sec-head-label">Đánh giá kỹ thuật</span>
+        <span class="sec-head-count sec-head-label">5 chiều</span>
       </div>
       <div class="htable-wrap">
         <table class="htable">
           <thead><tr>
             <th class="hnum">#</th>
-            <th class="hname">Dimension</th>
-            <th class="hfind">Key Finding</th>
-            <th>Score</th>
+            <th class="hname">Chiều</th>
+            <th class="hfind">Phát hiện chính</th>
+            <th>Điểm</th>
           </tr></thead>
           <tbody id="tech-body"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- UX table -->
+    <!-- UX Heuristics -->
     <div id="sec-ux" class="section">
       <div class="sec-head">
-        <span class="sec-head-label">UX · Nielsen Heuristics</span>
-        <span class="sec-head-count sec-head-label">10 dimensions</span>
+        <span class="sec-head-label">Nguyên tắc UX · Nielsen</span>
+        <span class="sec-head-count sec-head-label">10 nguyên tắc</span>
       </div>
       <div class="htable-wrap">
         <table class="htable">
           <thead><tr>
             <th class="hnum">#</th>
-            <th class="hname">Heuristic</th>
-            <th class="hfind">Key Issue</th>
-            <th>Score</th>
+            <th class="hname">Nguyên tắc</th>
+            <th class="hfind">Vấn đề chính</th>
+            <th>Điểm</th>
           </tr></thead>
           <tbody id="ux-body"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Issues -->
+    <!-- Vấn đề -->
     <div id="sec-issues" class="section">
       <div class="sec-head">
-        <span class="sec-head-label" id="issues-head">Issues</span>
+        <span class="sec-head-label" id="issues-head">Vấn đề</span>
       </div>
       <div class="issues-wrap" id="issues-list"></div>
     </div>
 
-    <!-- Positive -->
+    <!-- Điểm mạnh -->
     <div id="sec-positive" class="section">
       <div class="sec-head">
-        <span class="sec-head-label">Positive Findings</span>
+        <span class="sec-head-label">Điểm mạnh</span>
       </div>
       <ul id="positive-list" class="callout-list positive"></ul>
     </div>
 
-    <!-- Systemic -->
+    <!-- Vấn đề hệ thống -->
     <div id="sec-systemic" class="section">
       <div class="sec-head">
-        <span class="sec-head-label">Systemic Issues</span>
+        <span class="sec-head-label">Vấn đề hệ thống</span>
       </div>
       <ul id="systemic-list" class="callout-list systemic"></ul>
     </div>
 
-  </div><!-- /results -->
+  </div>
 </main>
 
 <script>
 const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let mode = 'score';
 
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    mode = btn.dataset.mode;
-  });
+// Nút Quét "thức dậy" khi có URL
+document.getElementById('url').addEventListener('input', () => {
+  const has = document.getElementById('url').value.trim().length > 7;
+  document.getElementById('scan').classList.toggle('ready', has);
 });
-
 document.getElementById('url').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('scan').click();
 });
@@ -1140,7 +1171,7 @@ document.getElementById('scan').addEventListener('click', async () => {
     const res = await fetch('/api/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, mode }),
+      body: JSON.stringify({ url }),
     });
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -1168,7 +1199,8 @@ document.getElementById('scan').addEventListener('click', async () => {
 
 function handleEvent(event, data) {
   if (event === 'status') {
-    document.getElementById('progress-label').textContent = data.text;
+    const lbl = document.getElementById('progress-label');
+    lbl.innerHTML = \`\${esc(data.text)}<span class="progress-dots"></span>\`;
   } else if (event === 'stream') {
     const area = document.getElementById('stream-area');
     area.textContent += data.text;
@@ -1193,6 +1225,7 @@ function handleEvent(event, data) {
 
 function setScanning(on) {
   document.getElementById('scan').disabled = on;
+  document.getElementById('scan').classList.remove('ready');
   const prog = document.getElementById('progress');
   const sweep = document.getElementById('sweep');
   if (on) {
@@ -1203,10 +1236,7 @@ function setScanning(on) {
     sweep.classList.remove('running');
     sweep.style.transition = 'width 0.4s ease-out';
     sweep.style.width = '100%';
-    setTimeout(() => {
-      sweep.style.transition = 'opacity 0.5s';
-      sweep.style.opacity = '0';
-    }, 420);
+    setTimeout(() => { sweep.style.transition = 'opacity 0.5s'; sweep.style.opacity = '0'; }, 420);
     setTimeout(() => prog.classList.remove('show'), 980);
   }
 }
@@ -1214,7 +1244,7 @@ function setScanning(on) {
 function reset() {
   document.getElementById('error').classList.remove('show');
   document.getElementById('stream-area').textContent = '';
-  document.getElementById('progress-label').textContent = 'Scanning...';
+  document.getElementById('progress-label').innerHTML = 'Đang quét<span class="progress-dots"></span>';
   document.getElementById('results').classList.remove('show');
   ['sec-scores','sec-summary','sec-tech','sec-ux','sec-issues','sec-positive','sec-systemic']
     .forEach(id => document.getElementById(id).classList.remove('show'));
@@ -1222,6 +1252,10 @@ function reset() {
     .forEach(id => { document.getElementById(id).innerHTML = ''; });
   document.getElementById('slop-tags').textContent = '';
   document.getElementById('slop-verdict').textContent = '';
+  ['tech-interp','ux-interp'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = ''; el.className = 'score-interpret';
+  });
   window._staticFindings = [];
 }
 
@@ -1236,9 +1270,7 @@ function show(id) {
   el.classList.add('show');
   if (!rm) {
     el.style.animation = 'none';
-    requestAnimationFrame(() => {
-      el.style.animation = 'slideUp 0.35s ease forwards';
-    });
+    requestAnimationFrame(() => { el.style.animation = 'slideUp 0.35s ease forwards'; });
   }
 }
 
@@ -1247,16 +1279,40 @@ function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function countUp(el, target, dur) {
-  if (rm || typeof target !== 'number') { el.textContent = target; return; }
+function interpret(score, max) {
+  const p = score / max;
+  if (p >= 0.85) return { text: 'Xuất sắc', cls: 'si-great' };
+  if (p >= 0.70) return { text: 'Khá tốt', cls: 'si-good' };
+  if (p >= 0.50) return { text: 'Cần cải thiện', cls: 'si-mid' };
+  return { text: 'Cần xem lại', cls: 'si-bad' };
+}
+
+function countUp(el, target, dur, interpEl, interpMax) {
+  if (rm || typeof target !== 'number') {
+    el.textContent = target;
+    if (interpEl && interpMax != null) {
+      const r = interpret(target, interpMax);
+      interpEl.textContent = r.text;
+      interpEl.className = \`score-interpret show \${r.cls}\`;
+    }
+    return;
+  }
   const d = dur || 950;
   const t0 = performance.now();
   function tick(now) {
     const progress = Math.min((now - t0) / d, 1);
     const ease = 1 - Math.pow(1 - progress, 4);
     el.textContent = Math.round(ease * target);
-    if (progress < 1) requestAnimationFrame(tick);
-    else el.textContent = target;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = target;
+      if (interpEl && interpMax != null) {
+        const r = interpret(target, interpMax);
+        interpEl.textContent = r.text;
+        interpEl.className = \`score-interpret show \${r.cls}\`;
+      }
+    }
   }
   requestAnimationFrame(tick);
 }
@@ -1272,20 +1328,26 @@ function renderResult(data) {
     const { technical: tech, ux, slopTest: slop } = scores;
 
     if (tech) {
-      countUp(document.getElementById('tech-num'), tech.total, 900);
+      countUp(
+        document.getElementById('tech-num'), tech.total, 900,
+        document.getElementById('tech-interp'), 20
+      );
       const bar = document.getElementById('tech-bar');
       const p = tech.total / 20;
       setTimeout(() => { bar.style.width = (p * 100) + '%'; bar.className = 'score-fill ' + barClass(p); }, 120);
     }
     if (ux) {
-      countUp(document.getElementById('ux-num'), ux.total, 980);
+      countUp(
+        document.getElementById('ux-num'), ux.total, 980,
+        document.getElementById('ux-interp'), 40
+      );
       const bar = document.getElementById('ux-bar');
       const p = ux.total / 40;
       setTimeout(() => { bar.style.width = (p * 100) + '%'; bar.className = 'score-fill ' + barClass(p); }, 160);
     }
     if (slop) {
       const el = document.getElementById('slop-val');
-      el.textContent = slop.passed ? 'Pass' : 'Fail';
+      el.textContent = slop.passed ? 'Đạt' : 'Không đạt';
       el.className = 'score-number ' + (slop.passed ? 'slop-pass' : 'slop-fail');
       if (slop.tells?.length) document.getElementById('slop-tags').textContent = slop.tells.join(' · ');
       if (slop.verdict) document.getElementById('slop-verdict').textContent = slop.verdict;
@@ -1319,7 +1381,10 @@ function renderResult(data) {
 
   if (summary || register) {
     const tag = document.getElementById('reg-tag');
-    if (register) { tag.textContent = register; tag.style.display = 'inline-block'; }
+    if (register) {
+      tag.textContent = register === 'brand' ? 'Thương hiệu' : register === 'product' ? 'Sản phẩm' : register;
+      tag.style.display = 'inline-block';
+    }
     document.getElementById('summary-text').textContent = summary || '';
     show('sec-summary');
   }
@@ -1353,29 +1418,42 @@ function renderIssues(allIssues) {
   const list = document.getElementById('issues-list');
   allIssues.forEach((f, idx) => {
     const p = f.priority || 'P2';
+    const isCritical = p === 'P0';
+    const isMajor = p === 'P1';
+    const sevClass = isCritical ? 'sev-p0' : isMajor ? 'sev-p1' : '';
     const el = document.createElement('div');
-    el.className = 'issue-row';
+    el.className = \`issue-row \${sevClass}\`;
     el.innerHTML = \`
       <div><span class="p-chip \${p}">\${p}</span></div>
       <div>
         <div class="issue-title">\${esc(f.title || f.id)}</div>
         \${(f.location || f.category) ? \`<div class="issue-meta-row">
-          \${f.location ? \`<span class="meta-item"><b>Location</b>\${esc(f.location)}</span>\` : ''}
-          \${f.category ? \`<span class="meta-item"><b>Category</b>\${esc(f.category)}</span>\` : ''}
+          \${f.location ? \`<span class="meta-item"><b>Vị trí</b>\${esc(f.location)}</span>\` : ''}
+          \${f.category ? \`<span class="meta-item"><b>Loại</b>\${esc(f.category)}</span>\` : ''}
         </div>\` : ''}
         \${f.impact ? \`<div class="issue-impact">\${esc(f.impact)}</div>\` : ''}
-        \${f.recommendation ? \`<div class="issue-fix"><span class="fix-label">Fix</span>\${esc(f.recommendation)}</div>\` : ''}
+        \${f.recommendation ? \`<div class="issue-fix"><span class="fix-label">Cách sửa</span>\${esc(f.recommendation)}</div>\` : ''}
       </div>\`;
-    if (!rm) {
-      el.style.cssText = \`opacity:0;transform:translateY(7px);transition:opacity 0.32s \${idx * 38}ms ease,transform 0.32s \${idx * 38}ms ease\`;
+    list.appendChild(el);
+
+    // Pulse P0/P1 after stagger to draw eye
+    if ((isCritical || isMajor) && !rm) {
+      const delay = idx * 38;
+      el.style.cssText = \`opacity:0;transform:translateY(7px);transition:opacity 0.32s \${delay}ms ease,transform 0.32s \${delay}ms ease\`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        setTimeout(() => el.classList.add('pulse'), delay + 400);
+      }));
+    } else if (!rm) {
+      el.style.cssText = \`opacity:0;transform:translateY(7px);transition:opacity 0.3s \${idx * 38}ms ease,transform 0.3s \${idx * 38}ms ease\`;
       requestAnimationFrame(() => requestAnimationFrame(() => {
         el.style.opacity = '1';
         el.style.transform = 'none';
       }));
     }
-    list.appendChild(el);
   });
-  document.getElementById('issues-head').textContent = \`Issues (\${allIssues.length})\`;
+  document.getElementById('issues-head').textContent = \`Vấn đề (\${allIssues.length})\`;
   show('sec-issues');
 }
 </script>
@@ -1396,13 +1474,13 @@ export async function run(args = []) {
     config = await setupWizard();
   } else {
     const ok = spawnSync('which', [config.agent], { encoding: 'utf-8' }).status === 0;
-    if (!ok) { console.log(`\n  "${config.agent}" not found in PATH.`); config = await setupWizard(); }
+    if (!ok) { console.log(`\n  "${config.agent}" không tìm thấy.`); config = await setupWizard(); }
   }
 
   const server = await startServer(config, port);
   const url = `http://localhost:${port}`;
   console.log(`\n  fk-skills tool  →  ${url}`);
-  console.log(`  Agent: ${config.agent}  |  Ctrl+C to stop\n`);
+  console.log(`  Agent: ${config.agent}  |  Ctrl+C để dừng\n`);
 
   try {
     const open = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
