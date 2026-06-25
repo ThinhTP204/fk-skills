@@ -1,6 +1,6 @@
 {
   "name": "fk-skills",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "author": "Trần Phú Thịnh <tptvt.2002@gmail.com>",
   "description": "Design skills, commands, and anti-pattern detection for AI coding agents",
   "keywords": [
