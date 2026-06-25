@@ -26,6 +26,7 @@ async function main() {
 
 Commands:
   detect [file-or-dir-or-url...]   Scan for UI anti-patterns and design quality issues
+  tool                             Start local UI checker at http://localhost:4444
   ignores                          Manage detector ignore rules, files, and values
   help                             List all available skills and commands
   install                          Install fk skills into your project or global harness
@@ -54,6 +55,9 @@ Compatibility:
     await detectCli();
   } else if (command === 'ignores' || command === 'ignore') {
     const { run } = await import('./commands/ignores.mjs');
+    await run(args.slice(1));
+  } else if (command === 'tool') {
+    const { run } = await import('./commands/tool.mjs');
     await run(args.slice(1));
   } else if (command === 'skills') {
     const { run } = await import('./commands/skills.mjs');
