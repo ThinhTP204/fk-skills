@@ -744,6 +744,7 @@ body {
   </aside>
 
   <main class="main-panel" id="main-panel">
+    <div id="error-bar" class="error-bar"></div>
     <div id="panel-idle" class="panel-empty">
       <div class="empty-mark"></div>
       Nhập URL và nhấn Quét để bắt đầu.
@@ -753,7 +754,6 @@ body {
       <div class="progress-label" id="panel-status">Đang quét<span class="progress-dots"></span></div>
       <div class="stream-box" id="stream-area"></div>
     </div>
-    <div id="error-bar" class="error-bar"></div>
     <div class="panel-content" id="panel-overview"></div>
     <div class="panel-content" id="panel-critical"></div>
     <div class="panel-content" id="panel-all"></div>
@@ -878,9 +878,9 @@ function handleEvent(event, data) {
 function setScanning(on) {
   document.getElementById('scan').disabled = on;
   if (!on) document.getElementById('scan').classList.remove('ready');
-  document.getElementById('panel-idle').style.display = on ? 'none' : '';
+  if (on) document.getElementById('panel-idle').style.display = 'none';
   document.getElementById('panel-scanning').style.display = on ? 'block' : 'none';
-  document.getElementById('sidebar-idle').style.display = on ? 'none' : '';
+  if (on) document.getElementById('sidebar-idle').style.display = 'none';
   document.getElementById('sidebar-scanning').style.display = on ? 'block' : 'none';
   const sweep = document.getElementById('sweep');
   if (on) { sweep.style.cssText = 'width:0%;opacity:1;transition:none;'; sweep.classList.add('running'); }
@@ -908,8 +908,12 @@ function resetAll() {
 
 function showError(msg) {
   const el = document.getElementById('error-bar');
-  el.textContent = msg; el.classList.add('show');
-  document.getElementById('panel-idle').style.display = 'flex';
+  const hint = msg.includes('thời gian') || msg.includes('timeout')
+    ? '<br><span style="font-size:12px;font-weight:400;margin-top:6px;display:block;opacity:0.8">Gợi ý: kiểm tra <code style="font-family:monospace">claude --version</code> trong terminal, hoặc chạy <code style="font-family:monospace">claude -p "test"</code> riêng để xác nhận hoạt động.</span>'
+    : '';
+  el.innerHTML = esc(msg) + hint;
+  el.classList.add('show');
+  document.getElementById('panel-idle').style.display = 'none';
   document.getElementById('sidebar-idle').style.display = 'block';
 }
 
