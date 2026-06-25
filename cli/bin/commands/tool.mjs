@@ -126,7 +126,7 @@ function prepareHtml(raw) {
   return html.slice(0, 12000);
 }
 
-const SCORE_PROMPT = `You are a senior design director applying fk-skills design standards. Analyze the HTML and return ONLY valid JSON — no markdown, no explanation, no code fences.
+const SCORE_PROMPT = `You are a senior design director applying fk-skills design standards. Analyze the HTML and return ONLY valid JSON — no markdown, no explanation, no code fences. Do NOT use any tools, bash commands, web fetches, or file reads. Work only from the HTML provided below.
 
 Evaluate rigorously against:
 1. Absolute bans (fk-skills): side-stripe borders (border-left/right >1px as colored accent on cards/alerts), gradient text (background-clip:text + linear-gradient), glassmorphism used decoratively, hero-metric template (big number + small label grid), identical card grids (same icon+heading+text repeated), tracked uppercase eyebrow above every section, numbered section markers (01/02/03) as scaffolding
