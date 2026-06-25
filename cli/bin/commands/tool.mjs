@@ -95,11 +95,9 @@ function isSpaShell(html) {
 
 async function ensurePlaywrightBrowser(onStatus) {
   const { execSync } = await import('node:child_process');
-  try {
-    execSync('npx playwright install chromium --with-deps 2>/dev/null', {
-      stdio: 'pipe', timeout: 120000,
-    });
-  } catch { /* may already be installed */ }
+  execSync('npx playwright install chromium', {
+    stdio: 'inherit', timeout: 180000, shell: true,
+  });
 }
 
 async function renderWithBrowser(url, onStatus) {
