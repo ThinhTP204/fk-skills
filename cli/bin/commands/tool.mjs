@@ -82,8 +82,41 @@ async function setupWizard() {
 
 // ─── HTML prep ─────────────────────────────────────────────────────────────
 
+function isSpaShell(html) {
+  const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] ?? html;
+  const stripped = body
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return stripped.length < 200;
+}
+
+async function renderWithBrowser(url, onStatus) {
+  let chromium;
+  try {
+    ({ chromium } = await import('playwright'));
+  } catch {
+    throw new Error('Playwright not installed. Run: npx playwright install chromium');
+  }
+  onStatus('Launching browser to render JavaScript...');
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+    // Extra wait for late-rendering SPAs
+    await page.waitForTimeout(800);
+    const html = await page.content();
+    onStatus('Browser render complete.');
+    return html;
+  } finally {
+    await browser.close();
+  }
+}
+
 function prepareHtml(raw) {
-  // Strip scripts, styles (keep class/id attributes for structure clues)
   let html = raw
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
@@ -91,7 +124,6 @@ function prepareHtml(raw) {
     .replace(/\s{3,}/g, '  ')
     .trim();
 
-  // Extract body if present
   const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   if (body) html = body[1].trim();
 
@@ -197,7 +229,7 @@ async function handleScan(body, config, res) {
 
   const start = Date.now();
 
-  // 1. Fetch
+  // 1. Fetch (with SPA fallback)
   sseEvent(res, 'status', { text: 'Fetching page...' });
   let html;
   try {
@@ -207,6 +239,11 @@ async function handleScan(body, config, res) {
     });
     if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
     html = await r.text();
+
+    if (isSpaShell(html)) {
+      sseEvent(res, 'status', { text: 'SPA detected — rendering with headless browser...' });
+      html = await renderWithBrowser(url, text => sseEvent(res, 'status', { text }));
+    }
   } catch (err) {
     sseEvent(res, 'error', { text: `Fetch failed: ${err.message}` });
     return;
