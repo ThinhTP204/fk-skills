@@ -1,10 +1,5 @@
 /**
  * `fk-skills tool` — local UI checker with SSE streaming
- *
- * Usage:
- *   npx fk-skills tool              Start at http://localhost:4444
- *   npx fk-skills tool --setup      Re-run setup wizard
- *   npx fk-skills tool --port 3333  Custom port
  */
 
 import { createServer } from 'node:http';
@@ -16,8 +11,6 @@ import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// ─── Config ────────────────────────────────────────────────────────────────
 
 function globalConfigPath() { return join(homedir(), '.config', 'fk-skills', 'tool.json'); }
 function projectConfigPath() { return join(process.cwd(), '.fk-skills', 'tool.json'); }
@@ -36,16 +29,12 @@ function writeConfig(config, scope = 'global') {
   return p;
 }
 
-// ─── CLI detection ─────────────────────────────────────────────────────────
-
 function detectAvailableClis() {
   return ['claude', 'codex'].filter(cli => {
     try { return spawnSync('which', [cli], { encoding: 'utf-8', timeout: 3000 }).status === 0; }
     catch { return false; }
   });
 }
-
-// ─── Setup wizard ──────────────────────────────────────────────────────────
 
 async function setupWizard() {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -80,8 +69,6 @@ async function setupWizard() {
   return config;
 }
 
-// ─── HTML prep ─────────────────────────────────────────────────────────────
-
 function isSpaShell(html) {
   const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] ?? html;
   const stripped = body
@@ -95,18 +82,13 @@ function isSpaShell(html) {
 
 async function ensurePlaywrightBrowser() {
   const { execSync } = await import('node:child_process');
-  execSync('npx playwright install chromium', {
-    stdio: 'inherit', timeout: 180000, shell: true,
-  });
+  execSync('npx playwright install chromium', { stdio: 'inherit', timeout: 180000, shell: true });
 }
 
 async function renderWithBrowser(url, onStatus) {
   let chromium;
-  try {
-    ({ chromium } = await import('playwright'));
-  } catch {
-    throw new Error('Thiếu playwright — chạy: npm install');
-  }
+  try { ({ chromium } = await import('playwright')); }
+  catch { throw new Error('Thiếu playwright — chạy: npm install'); }
 
   onStatus('Khởi động trình duyệt ảo...');
   let browser;
@@ -117,9 +99,7 @@ async function renderWithBrowser(url, onStatus) {
       onStatus('Cài Chromium lần đầu (khoảng 100MB)...');
       await ensurePlaywrightBrowser();
       browser = await chromium.launch({ headless: true });
-    } else {
-      throw err;
-    }
+    } else { throw err; }
   }
 
   try {
@@ -130,9 +110,7 @@ async function renderWithBrowser(url, onStatus) {
     const html = await page.content();
     onStatus('Render hoàn tất.');
     return html;
-  } finally {
-    await browser.close();
-  }
+  } finally { await browser.close(); }
 }
 
 function prepareHtml(raw) {
@@ -142,79 +120,75 @@ function prepareHtml(raw) {
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\s{3,}/g, '  ')
     .trim();
-
   const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   if (body) html = body[1].trim();
-
   return html.slice(0, 12000);
 }
 
-// ─── Scoring prompt ────────────────────────────────────────────────────────
-
 const SCORE_PROMPT = `You are a senior design director applying fk-skills design standards. Analyze the HTML and return ONLY valid JSON — no markdown, no explanation, no code fences.
 
-Evaluate against:
-- Absolute bans: side-stripe borders, gradient text (background-clip:text), glassmorphism decoratively, hero-metric template, identical card grids, tracked eyebrow on every section, numbered section scaffolding
-- Slop tells: gradient-text, glassmorphism-overuse, identical-card-grids, hero-metrics-row, eyebrow-every-section, excessive-border-radius, everything-in-cards, bento-grid, emoji-overuse, oversized-h1, side-stripe-border
-- Technical: accessibility (WCAG 2.1 AA), performance, theming/color tokens, responsive design, anti-patterns
-- UX: Nielsen's 10 heuristics
+Evaluate rigorously against:
+1. Absolute bans (fk-skills): side-stripe borders (border-left/right >1px as colored accent on cards/alerts), gradient text (background-clip:text + linear-gradient), glassmorphism used decoratively, hero-metric template (big number + small label grid), identical card grids (same icon+heading+text repeated), tracked uppercase eyebrow above every section, numbered section markers (01/02/03) as scaffolding
+2. Slop tells: gradient-text, glassmorphism-overuse, identical-card-grids, hero-metrics-row, eyebrow-every-section, excessive-border-radius, everything-in-cards, bento-grid, emoji-overuse, oversized-h1, side-stripe-border
+3. Technical: WCAG 2.1 AA accessibility (color contrast ≥4.5:1, ARIA labels, keyboard navigation), performance (unoptimized images, render-blocking fonts), color system coherence, responsive design, anti-patterns
+4. UX: Nielsen's 10 heuristics — evaluate each with specific evidence from the HTML
 
-Required JSON schema (all issues/findings/summary MUST be in Vietnamese):
+Return ONLY valid JSON. ALL text MUST be in Vietnamese with full diacritics (tiếng Việt đầy đủ dấu).
+
 {
   "register": "brand" | "product",
   "scores": {
     "technical": {
-      "total": <0-20>,
+      "total": <sum of breakdown scores 0-20>,
       "breakdown": [
-        { "id": "accessibility", "label": "Kha nang tiep can", "score": <0-4>, "keyFinding": "<finding>" },
-        { "id": "performance",   "label": "Hieu suat",         "score": <0-4>, "keyFinding": "<finding>" },
-        { "id": "theming",       "label": "Mau sac & Giao dien","score": <0-4>, "keyFinding": "<finding>" },
-        { "id": "responsive",    "label": "Responsive",         "score": <0-4>, "keyFinding": "<finding>" },
-        { "id": "antiPatterns",  "label": "Anti-Pattern",       "score": <0-4>, "keyFinding": "<finding>" }
+        { "id": "accessibility", "label": "Khả năng tiếp cận", "score": <0-4>, "keyFinding": "<specific finding with element names and failure reason, in Vietnamese>" },
+        { "id": "performance",   "label": "Hiệu suất",          "score": <0-4>, "keyFinding": "<specific finding, in Vietnamese>" },
+        { "id": "theming",       "label": "Màu sắc & Giao diện", "score": <0-4>, "keyFinding": "<specific finding, in Vietnamese>" },
+        { "id": "responsive",    "label": "Responsive",          "score": <0-4>, "keyFinding": "<specific finding, in Vietnamese>" },
+        { "id": "antiPatterns",  "label": "Anti-Pattern",        "score": <0-4>, "keyFinding": "<specific finding, in Vietnamese>" }
       ]
     },
     "ux": {
-      "total": <0-40>,
+      "total": <sum of heuristic scores 0-40>,
       "heuristics": [
-        { "id": 1,  "name": "Trang thai he thong ro rang",       "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 2,  "name": "Phu hop thuc te nguoi dung",        "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 3,  "name": "Kiem soat va tu do",                "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 4,  "name": "Nhat quan va chuan muc",            "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 5,  "name": "Ngan ngua loi",                     "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 6,  "name": "Nhan dien thay vi ghi nho",         "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 7,  "name": "Linh hoat va hieu qua",             "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 8,  "name": "Thiet ke toi gian",                 "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 9,  "name": "Xu ly loi",                         "score": <0-4>, "keyIssue": "<finding>" },
-        { "id": 10, "name": "Tai lieu va ho tro",                "score": <0-4>, "keyIssue": "<finding>" }
+        { "id": 1,  "name": "Trạng thái hệ thống rõ ràng",  "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 2,  "name": "Phù hợp thực tế người dùng",   "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 3,  "name": "Kiểm soát và tự do",            "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 4,  "name": "Nhất quán và chuẩn mực",        "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 5,  "name": "Ngăn ngừa lỗi",                 "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 6,  "name": "Nhận diện thay vì ghi nhớ",     "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 7,  "name": "Linh hoạt và hiệu quả",         "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 8,  "name": "Thiết kế tối giản",             "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 9,  "name": "Xử lý lỗi",                     "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" },
+        { "id": 10, "name": "Tài liệu và hỗ trợ",            "score": <0-4>, "keyIssue": "<evidence-based finding in Vietnamese>" }
       ]
     },
     "slopTest": {
       "passed": true | false,
-      "tells": [],
-      "verdict": "<1-2 sentence honest verdict in Vietnamese>"
+      "tells": ["<exact ban or slop tell found, e.g. 'gradient-text on .hero h1'>"],
+      "verdict": "<2-3 sentence verdict with named specific evidence, in Vietnamese>"
     }
   },
   "issues": [
     {
       "id": "kebab-id",
       "priority": "P0"|"P1"|"P2"|"P3",
-      "title": "<short name in Vietnamese>",
-      "location": "<selector or area>",
-      "category": "Kha nang tiep can"|"Hieu suat"|"Giao dien"|"Responsive"|"Anti-Pattern"|"UX",
-      "impact": "<user impact in Vietnamese, 1 sentence>",
-      "recommendation": "<actionable fix in Vietnamese, 1-2 sentences>"
+      "title": "<clear short name in Vietnamese>",
+      "location": "<CSS selector, component name, or page area>",
+      "category": "Khả năng tiếp cận"|"Hiệu suất"|"Giao diện"|"Responsive"|"Anti-Pattern"|"UX",
+      "impact": "<who is affected and exactly how — 1-2 sentences in Vietnamese>",
+      "recommendation": "<what exactly to change, specific and actionable — 2-3 sentences in Vietnamese>"
     }
   ],
-  "positiveFindings": ["<strength in Vietnamese>"],
-  "systemicIssues": ["<recurring pattern in Vietnamese>"],
-  "summary": "<2-3 sentence executive summary in Vietnamese>"
+  "positiveFindings": ["<what works well and why — specific, not generic, in Vietnamese>"],
+  "systemicIssues": ["<recurring pattern across multiple locations — name the locations, in Vietnamese>"],
+  "summary": "<3-4 sentence summary — overall quality level, top strength, top gap, priority recommendation, in Vietnamese>"
 }
 
-P0=blocks completely, P1=severe, P2=minor, P3=polish. Include 6-10 issues.
-register: brand=marketing/landing, product=app/dashboard/tool
-technical scores 0-4: 4=excellent, 3=good, 2=fair, 1=poor, 0=critical failure`;
-
-// ─── detectHtml via temp file ──────────────────────────────────────────────
+P0=completely blocks task completion, P1=severe usability harm, P2=notable friction, P3=polish opportunity.
+Minimum 8 issues. Be specific and evidence-based — "could be improved" is not a finding.
+register: brand=marketing/landing/portfolio, product=app/dashboard/admin/tool
+Scores: 4=no issues, 3=minor, 2=moderate needs attention, 1=significant problems, 0=critical failure.`;
 
 async function runDetectHtml(html, url) {
   const { detectHtml } = await import('../../engine/detect-antipatterns.mjs');
@@ -222,12 +196,8 @@ async function runDetectHtml(html, url) {
   try {
     writeFileSync(tmp, html, 'utf-8');
     return await detectHtml(tmp, { url });
-  } finally {
-    try { unlinkSync(tmp); } catch {}
-  }
+  } finally { try { unlinkSync(tmp); } catch {} }
 }
-
-// ─── SSE helpers ───────────────────────────────────────────────────────────
 
 function sseEvent(res, event, data) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
@@ -242,14 +212,10 @@ function extractJson(text) {
   return text;
 }
 
-// ─── Scan handler ─────────────────────────────────────────────────────────
-
 async function handleScan(body, config, res) {
   const { url } = body;
   if (!url) { sseEvent(res, 'error', { text: 'Vui lòng nhập URL' }); return; }
-
   const start = Date.now();
-
   sseEvent(res, 'status', { text: 'Đang tải trang...' });
   let html;
   try {
@@ -259,14 +225,12 @@ async function handleScan(body, config, res) {
     });
     if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
     html = await r.text();
-
     if (isSpaShell(html)) {
       sseEvent(res, 'status', { text: 'Phát hiện SPA — đang render bằng trình duyệt ảo...' });
       html = await renderWithBrowser(url, text => sseEvent(res, 'status', { text }));
     }
   } catch (err) {
-    sseEvent(res, 'error', { text: `Không thể tải trang: ${err.message}` });
-    return;
+    sseEvent(res, 'error', { text: `Không thể tải trang: ${err.message}` }); return;
   }
 
   sseEvent(res, 'status', { text: 'Đang phát hiện anti-pattern...' });
@@ -279,74 +243,48 @@ async function handleScan(body, config, res) {
   }
 
   sseEvent(res, 'status', { text: `Đang chấm điểm với ${config.agent}...` });
-
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
   const args = config.agent === 'claude' ? ['-p', fullPrompt] : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
-    let buffer = '';
-    let done = false;
-
+    let buffer = '', done = false;
     const proc = spawn(config.agent, args, { env: process.env });
-
     const timer = setTimeout(() => {
       if (done) return;
-      done = true;
-      proc.kill('SIGTERM');
+      done = true; proc.kill('SIGTERM');
       sseEvent(res, 'error', { text: `${config.agent} hết thời gian chờ (3 phút)` });
       resolve();
     }, 180000);
-
     proc.stdout.on('data', chunk => {
       const text = chunk.toString();
       buffer += text;
       sseEvent(res, 'stream', { text });
     });
-
     proc.stderr.on('data', chunk => {
       const t = chunk.toString().trim();
       if (t) sseEvent(res, 'status', { text: t });
     });
-
     proc.on('error', err => {
-      if (done) return;
-      done = true;
-      clearTimeout(timer);
-      sseEvent(res, 'error', { text: `Lỗi ${config.agent}: ${err.message}` });
-      resolve();
+      if (done) return; done = true; clearTimeout(timer);
+      sseEvent(res, 'error', { text: `Lỗi ${config.agent}: ${err.message}` }); resolve();
     });
-
     proc.on('close', code => {
-      if (done) return;
-      done = true;
-      clearTimeout(timer);
-
+      if (done) return; done = true; clearTimeout(timer);
       if (code !== 0 && !buffer.trim()) {
-        sseEvent(res, 'error', { text: `${config.agent} thoát với mã lỗi ${code}` });
-        resolve();
-        return;
+        sseEvent(res, 'error', { text: `${config.agent} thoát với mã lỗi ${code}` }); resolve(); return;
       }
-
       try {
         const parsed = JSON.parse(extractJson(buffer));
-        sseEvent(res, 'result', {
-          ...parsed,
-          findings,
-          agent: config.agent,
-          durationMs: Date.now() - start,
-        });
+        sseEvent(res, 'result', { ...parsed, findings, agent: config.agent, durationMs: Date.now() - start });
       } catch {
         sseEvent(res, 'error', { text: 'Không thể đọc kết quả — vui lòng thử lại' });
       }
       resolve();
     });
   });
-
   sseEvent(res, 'done', { durationMs: Date.now() - start });
 }
-
-// ─── HTTP server ───────────────────────────────────────────────────────────
 
 function parseBody(req) {
   return new Promise((resolve, reject) => {
@@ -359,33 +297,21 @@ function parseBody(req) {
 
 async function startServer(config, port) {
   const ui = buildUI(config);
-
   const server = createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(ui);
-      return;
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(ui); return;
     }
-
     if (req.method === 'POST' && req.url === '/api/scan') {
       let body;
       try { body = await parseBody(req); } catch (e) { res.writeHead(400); res.end(e.message); return; }
-
       res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*',
       });
-
-      await handleScan(body, config, res);
-      res.end();
-      return;
+      await handleScan(body, config, res); res.end(); return;
     }
-
     res.writeHead(404); res.end('Not found');
   });
-
   await new Promise((resolve, reject) => {
     server.on('error', err => {
       if (err.code === 'EADDRINUSE') reject(new Error(`Cổng ${port} đang được sử dụng. Thử --port <khác>`));
@@ -393,11 +319,10 @@ async function startServer(config, port) {
     });
     server.listen(port, '127.0.0.1', resolve);
   });
-
   return server;
 }
 
-// ─── Inline HTML UI ───────────────────────────────────────────────────────
+// ─── UI ────────────────────────────────────────────────────────────────────
 
 function buildUI(config) {
   return `<!DOCTYPE html>
@@ -407,151 +332,121 @@ function buildUI(config) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>fk skills — Kiểm tra Giao diện</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:          oklch(100% 0 0);
-  --sidebar-bg:  oklch(96.5% 0 0);
-  --surface2:    oklch(97.5% 0 0);
-  --rule:        oklch(91% 0 0);
-  --rule-faint:  oklch(95% 0 0);
+  --bg:         oklch(100% 0 0);
+  --sidebar-bg: oklch(97% 0 0);
+  --surface:    oklch(97.5% 0 0);
+  --rule:       oklch(90% 0 0);
+  --rule-faint: oklch(94% 0 0);
 
-  --ink:   oklch(13% 0.016 95);
-  --text:  oklch(21% 0.014 95);
-  --muted: oklch(42% 0.01 95);
-  --faint: oklch(60% 0.008 95);
+  --ink:   oklch(12% 0.012 95);
+  --text:  oklch(18% 0.012 95);
+  --muted: oklch(34% 0.01 95);
+  --faint: oklch(52% 0.008 95);
 
   --gold:        oklch(84% 0.19 80.46);
-  --gold-pale:   oklch(93% 0.05 82);
-  --gold-text:   oklch(50% 0.13 76);
+  --gold-text:   oklch(46% 0.13 72);
   --gold-bg:     oklch(98.5% 0.016 82);
-  --gold-border: oklch(88% 0.055 82);
+  --gold-border: oklch(87% 0.055 82);
 
-  --patina:        oklch(70% 0.12 188);
-  --patina-text:   oklch(34% 0.1 188);
-  --patina-bg:     oklch(97% 0.025 188);
-  --patina-border: oklch(86% 0.058 188);
+  --patina:      oklch(70% 0.12 188);
+  --patina-text: oklch(30% 0.1 188);
+  --patina-bg:   oklch(97% 0.025 188);
 
-  --p0-color:  oklch(45% 0.2 25);
-  --p0-bg:     oklch(98% 0.014 25);
-  --p0-border: oklch(87% 0.05 25);
-  --p0-title:  oklch(38% 0.22 25);
+  --p0-color:  oklch(40% 0.22 25);
+  --p0-bg:     oklch(98.5% 0.012 25);
+  --p0-border: oklch(86% 0.055 25);
+  --p0-title:  oklch(34% 0.24 25);
 
-  --p1-color:  oklch(46% 0.17 46);
-  --p1-bg:     oklch(98.5% 0.01 58);
-  --p1-title:  oklch(41% 0.18 46);
+  --p1-color:  oklch(43% 0.18 46);
+  --p1-bg:     oklch(98.5% 0.01 55);
+  --p1-border: oklch(87% 0.048 55);
+  --p1-title:  oklch(37% 0.19 46);
 
-  --font-display: 'Alumni Sans Pinstripe', 'Albert Sans', Arial, sans-serif;
-  --font-body:    'Albert Sans', 'Avenir Next', Helvetica, Arial, system-ui, sans-serif;
+  --font-display: 'Alumni Sans Pinstripe', Georgia, serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
   --font-mono:    'SF Mono', 'Roboto Mono', Consolas, monospace;
 }
 
 html, body { height: 100%; overflow: hidden; }
 body {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-body); font-size: 14px; line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ── Top bar ── */
 .top-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 52px;
-  padding: 0 20px;
+  display: flex; align-items: center; gap: 12px;
+  height: 52px; padding: 0 20px;
   border-bottom: 1px solid var(--rule);
-  background: var(--bg);
-  flex-shrink: 0;
+  background: var(--bg); flex-shrink: 0;
 }
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  width: 148px;
-}
+.brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; width: 148px; }
 .brand-mark {
-  width: 18px; height: 18px;
-  background: var(--ink);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
+  width: 18px; height: 18px; background: var(--ink);
+  position: relative; overflow: hidden; flex-shrink: 0;
 }
 .brand-mark::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  border-style: solid;
-  border-width: 0 18px 18px 0;
+  content: ''; position: absolute; top: 0; right: 0;
+  border-style: solid; border-width: 0 18px 18px 0;
   border-color: transparent var(--gold) transparent transparent;
 }
 .wordmark {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
+  font-family: var(--font-body); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); white-space: nowrap;
 }
 .wordmark span { color: var(--gold-text); }
 
+/* Scan form (visible before scan / during scan) */
 .form-row { flex: 1; display: flex; gap: 8px; min-width: 0; }
 .url-input {
-  flex: 1;
-  min-width: 0;
-  height: 36px;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  padding: 0 14px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
+  flex: 1; min-width: 0; height: 36px;
+  border: 1px solid var(--rule); border-radius: 3px;
+  padding: 0 14px; font-family: var(--font-body); font-size: 13px;
+  color: var(--text); background: var(--bg); outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.url-input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px oklch(84% 0.19 80.46 / 0.14);
-}
+.url-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px oklch(84% 0.19 80.46 / 0.14); }
 .url-input::placeholder { color: var(--faint); }
 .scan-btn {
-  height: 36px;
-  padding: 0 22px;
-  background: var(--ink);
-  color: oklch(96% 0 0);
-  border: none;
-  border-radius: 3px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.14s, box-shadow 0.2s;
+  height: 36px; padding: 0 22px; background: var(--ink); color: oklch(97% 0 0);
+  border: none; border-radius: 3px; font-family: var(--font-body); font-size: 13px;
+  font-weight: 600; cursor: pointer; flex-shrink: 0; transition: background 0.14s, box-shadow 0.2s;
 }
 .scan-btn.ready { box-shadow: 0 0 0 2px oklch(84% 0.19 80.46 / 0.3); }
-.scan-btn:hover { background: oklch(22% 0.02 95); }
+.scan-btn:hover { background: oklch(22% 0.015 95); }
 .scan-btn:disabled { opacity: 0.38; cursor: not-allowed; box-shadow: none; }
+
+/* Result row (visible after scan) */
+.result-row { flex: 1; display: none; align-items: center; gap: 12px; min-width: 0; }
+.result-row.show { display: flex; }
+.result-url-wrap { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: center; gap: 8px; }
+.result-url-tag {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--faint); flex-shrink: 0;
+}
+.result-url-val {
+  font-size: 13px; color: var(--muted); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.rescan-btn {
+  height: 30px; padding: 0 14px; background: transparent; color: var(--muted);
+  border: 1px solid var(--rule); border-radius: 3px; font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.rescan-btn:hover { border-color: var(--faint); color: var(--text); }
+
 .agent-tag {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: var(--gold-text);
-  background: var(--gold-bg);
-  border: 1px solid var(--gold-border);
-  padding: 3px 8px;
-  border-radius: 2px;
-  text-transform: uppercase;
-  flex-shrink: 0;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--gold-text); background: var(--gold-bg); border: 1px solid var(--gold-border);
+  padding: 3px 8px; border-radius: 2px; text-transform: uppercase; flex-shrink: 0;
 }
 
 /* ── Workspace ── */
@@ -559,382 +454,252 @@ body {
 
 /* ── Sidebar ── */
 .sidebar {
-  width: 220px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--rule);
-  background: var(--sidebar-bg);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  width: 220px; flex-shrink: 0; border-right: 1px solid var(--rule);
+  background: var(--sidebar-bg); overflow-y: auto; display: flex; flex-direction: column;
 }
-.sidebar-idle {
-  padding: 40px 20px 20px;
-  color: var(--faint);
-  font-size: 12px;
-  line-height: 1.7;
-}
+.sidebar-idle { padding: 40px 20px 20px; color: var(--faint); font-size: 12px; line-height: 1.7; }
 
 /* Score blocks */
-.score-block {
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--rule);
-}
+.score-block { padding: 20px 20px 16px; border-bottom: 1px solid var(--rule); }
 .score-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin-bottom: 8px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--faint); margin-bottom: 8px;
 }
 .score-num {
-  font-family: var(--font-display);
-  font-size: 2.6rem;
-  line-height: 1;
-  color: var(--ink);
-  font-weight: 300;
+  font-family: var(--font-display); font-size: 2.4rem; line-height: 1;
+  color: var(--ink); font-weight: 300;
 }
 .score-denom { font-size: 12px; color: var(--faint); margin-top: 2px; margin-bottom: 8px; }
-.score-interp { font-size: 11px; font-weight: 600; margin-bottom: 8px; display: none; }
+.score-interp { font-size: 11.5px; font-weight: 600; margin-bottom: 8px; display: none; }
 .score-interp.show { display: block; }
 .si-great { color: var(--patina-text); }
 .si-good  { color: var(--gold-text); }
 .si-mid   { color: var(--p1-color); }
 .si-bad   { color: var(--p0-color); }
 .score-bar-track { height: 2px; background: var(--rule); border-radius: 1px; overflow: hidden; }
-.score-bar-fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 1px;
-  transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
-}
+.score-bar-fill { height: 100%; width: 0%; border-radius: 1px; transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
 .bar-great { background: var(--patina); }
 .bar-good  { background: var(--gold); }
 .bar-mid   { background: var(--p1-color); }
 .bar-bad   { background: var(--p0-color); }
-.slop-result {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 300;
-  line-height: 1;
-  margin-bottom: 4px;
-}
+.slop-result { font-family: var(--font-display); font-size: 1.8rem; font-weight: 300; line-height: 1; margin-bottom: 4px; }
 .slop-pass { color: var(--patina-text); }
 .slop-fail { color: var(--p0-color); }
 
-/* Nav */
+/* Sidebar nav */
 .sidebar-nav { padding: 8px 0 20px; }
 .nav-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 20px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--muted);
-  transition: background 0.1s, color 0.1s;
-  user-select: none;
+  display: flex; align-items: center; padding: 8px 20px;
+  font-size: 13px; cursor: pointer; color: var(--muted);
+  transition: background 0.1s, color 0.1s; user-select: none;
 }
 .nav-item:hover { background: oklch(94% 0 0); color: var(--text); }
 .nav-item.active {
-  background: var(--bg);
-  color: var(--ink);
-  font-weight: 600;
+  background: var(--bg); color: var(--ink); font-weight: 600;
   box-shadow: inset 2px 0 0 var(--gold);
 }
-.nav-count {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--faint);
-}
-.nav-item.has-critical .nav-count { color: var(--p0-color); font-weight: 600; }
+.nav-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+.nav-item.has-critical .nav-count { color: var(--p0-color); font-weight: 700; }
 
 /* ── Main panel ── */
-.main-panel {
-  flex: 1;
-  overflow-y: auto;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-}
+.main-panel { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
 .panel-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--faint);
-  font-size: 13px;
-  gap: 10px;
-  padding: 60px 40px;
-  text-align: center;
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--faint); font-size: 13px; gap: 10px; padding: 60px 40px; text-align: center;
 }
 .empty-mark {
-  width: 32px; height: 32px;
-  background: var(--sidebar-bg);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-  margin-bottom: 4px;
+  width: 32px; height: 32px; background: var(--sidebar-bg);
+  position: relative; overflow: hidden; margin-bottom: 4px;
 }
 .empty-mark::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  border-style: solid;
-  border-width: 0 32px 32px 0;
+  content: ''; position: absolute; top: 0; right: 0;
+  border-style: solid; border-width: 0 32px 32px 0;
   border-color: transparent var(--rule) transparent transparent;
 }
 
 /* Progress */
-.panel-progress { padding: 32px 40px; }
-.progress-label { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px; }
-.progress-dots::after {
-  content: '';
-  animation: dots 1.4s steps(4, end) infinite;
-}
-@keyframes dots {
-  0%   { content: ''; }
-  25%  { content: '.'; }
-  50%  { content: '..'; }
-  75%  { content: '...'; }
-}
+.panel-progress { padding: 32px 48px; }
+.progress-label { font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 12px; }
+.progress-dots::after { content: ''; animation: dots 1.4s steps(4, end) infinite; }
+@keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
 .sweep-track { height: 2px; background: var(--rule); overflow: hidden; margin-bottom: 16px; }
 .sweep-fill { height: 100%; background: var(--gold); width: 0%; }
 .sweep-fill.running { animation: sweep 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-@keyframes sweep {
-  0%   { width: 0%; }
-  45%  { width: 68%; }
-  75%  { width: 84%; }
-  100% { width: 84%; }
-}
+@keyframes sweep { 0%{width:0%} 45%{width:68%} 75%{width:84%} 100%{width:84%} }
 .stream-box {
-  background: var(--surface2);
-  border-radius: 2px;
-  padding: 14px 16px;
-  max-height: 200px;
-  overflow-y: auto;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.7;
-  color: var(--muted);
-  white-space: pre-wrap;
-  word-break: break-all;
+  background: var(--surface); border-radius: 2px; padding: 14px 16px;
+  max-height: 180px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px;
+  line-height: 1.7; color: var(--muted); white-space: pre-wrap; word-break: break-all;
 }
 .stream-box:empty { display: none; }
 
 /* Error */
 .error-bar {
-  margin: 20px 40px 0;
-  padding: 12px 16px;
-  background: var(--p0-bg);
-  border: 1px solid var(--p0-border);
-  border-radius: 3px;
-  color: var(--p0-color);
-  font-size: 13px;
-  font-weight: 500;
-  display: none;
+  margin: 20px 48px 0; padding: 12px 16px; background: var(--p0-bg);
+  border: 1px solid var(--p0-border); border-radius: 3px;
+  color: var(--p0-color); font-size: 13.5px; font-weight: 500; display: none;
 }
 .error-bar.show { display: block; }
 
 /* Panel content */
-.panel-content { padding: 32px 40px 60px; display: none; }
+.panel-content { padding: 36px 48px 64px; display: none; }
 .panel-content.show { display: block; }
 
-/* Overview */
-.overview-summary {
-  max-width: 66ch;
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.8;
-  text-wrap: pretty;
-  margin-bottom: 24px;
+/* Panel heading */
+.panel-head {
+  font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--faint); margin-bottom: 24px;
 }
-.reg-badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold-text);
-  border: 1px solid var(--gold-border);
-  padding: 3px 8px;
-  border-radius: 2px;
-  margin-bottom: 14px;
+.panel-sub-head {
+  font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--faint); margin: 32px 0 16px;
 }
-.overview-hint { font-size: 12px; color: var(--faint); font-style: italic; margin-top: 16px; }
 
-/* Dimension tables */
+/* ── Overview ── */
+.reg-badge {
+  display: inline-block; font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text);
+  border: 1px solid var(--gold-border); padding: 3px 8px; border-radius: 2px; margin-bottom: 16px;
+}
+.overview-summary {
+  font-size: 15px; color: var(--text); line-height: 1.75;
+  text-wrap: pretty; max-width: 68ch; margin-bottom: 28px; font-weight: 400;
+}
+
+/* Overview score lines */
+.ov-scores { margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; max-width: 520px; }
+.ov-score-row { display: flex; align-items: center; gap: 12px; }
+.ov-score-label { font-size: 12.5px; font-weight: 500; color: var(--muted); width: 110px; flex-shrink: 0; }
+.ov-bar-wrap { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+.ov-bar-fill { height: 100%; border-radius: 2px; transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s; }
+.ov-score-val { font-family: var(--font-mono); font-size: 12px; color: var(--text); font-weight: 600; width: 44px; text-align: right; flex-shrink: 0; }
+.ov-score-interp { font-size: 11.5px; font-weight: 600; width: 110px; flex-shrink: 0; }
+
+.ov-slop-row { display: flex; align-items: center; gap: 12px; }
+.ov-slop-label { font-size: 12.5px; font-weight: 500; color: var(--muted); width: 110px; flex-shrink: 0; }
+.ov-slop-val { font-size: 13px; font-weight: 700; }
+
+.overview-hint {
+  font-size: 13px; color: var(--muted); line-height: 1.65;
+  padding: 12px 16px; background: var(--gold-bg); border: 1px solid var(--gold-border);
+  border-radius: 3px; max-width: 560px; margin-bottom: 20px;
+}
+.ov-systemic { margin-top: 20px; }
+.ov-systemic-head { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); margin-bottom: 12px; }
+.ov-systemic-item { font-size: 13px; color: var(--muted); padding: 8px 0 8px 20px; position: relative; border-bottom: 1px solid var(--rule-faint); line-height: 1.55; }
+.ov-systemic-item:last-child { border-bottom: none; }
+.ov-systemic-item::before { content: '◆'; position: absolute; left: 0; color: var(--p1-color); font-size: 9px; top: 12px; }
+
+/* ── Issue blocks (P0/P1 — fully visible, no accordion) ── */
+.issue-blocks { display: flex; flex-direction: column; gap: 16px; margin-bottom: 8px; }
+
+.issue-block {
+  border-radius: 4px; overflow: hidden;
+  border: 1px solid var(--rule);
+}
+.issue-block.sev-p0 {
+  background: var(--p0-bg); border-color: var(--p0-border);
+  border-top: 3px solid var(--p0-color);
+}
+.issue-block.sev-p1 {
+  background: var(--p1-bg); border-color: var(--p1-border);
+  border-top: 3px solid var(--p1-color);
+}
+.issue-block-head {
+  display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px 12px;
+}
+.issue-block-title { font-size: 14.5px; font-weight: 700; line-height: 1.3; margin-bottom: 5px; color: var(--ink); }
+.sev-p0 .issue-block-title { color: var(--p0-title); }
+.sev-p1 .issue-block-title { color: var(--p1-title); }
+.issue-block-body { padding: 0 20px 18px 52px; }
+
+/* ── Compact rows (P2/P3) ── */
+.issue-compacts { display: flex; flex-direction: column; }
+.issue-compact {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--rule-faint);
+}
+.issue-compact:last-child { border-bottom: none; }
+.issue-compact-body { flex: 1; min-width: 0; }
+.issue-compact-title { font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; margin-bottom: 4px; }
+.issue-compact-cat { font-size: 11px; font-family: var(--font-mono); color: var(--faint); flex-shrink: 0; margin-top: 3px; }
+
+/* Shared issue components */
+.p-chip {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.06em; padding: 3px 6px; border-radius: 2px; flex-shrink: 0; margin-top: 2px;
+}
+.p-chip.P0 { color: var(--p0-color); background: oklch(95% 0.03 25); border: 1.5px solid var(--p0-border); }
+.p-chip.P1 { color: var(--p1-color); background: oklch(95% 0.025 50); border: 1.5px solid var(--p1-border); }
+.p-chip.P2 { color: var(--gold-text); background: var(--gold-bg); border: 1px solid var(--gold-border); }
+.p-chip.P3 { color: var(--faint); background: var(--surface); border: 1px solid var(--rule); }
+
+.issue-meta { font-size: 11.5px; color: var(--faint); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 3px; }
+.issue-meta code { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+
+.issue-impact { font-size: 13.5px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
+.issue-impact strong { color: var(--text); font-weight: 600; }
+.issue-compact-impact { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 5px; }
+.issue-compact-fix { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.issue-compact-fix .fix-arrow { color: var(--gold-text); font-weight: 700; }
+
+.issue-fix {
+  padding: 12px 16px; background: var(--gold-bg); border: 1px solid var(--gold-border);
+  border-radius: 3px; font-size: 13.5px; line-height: 1.7; color: var(--text);
+}
+.fix-label {
+  display: block; font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.15em; font-weight: 700; text-transform: uppercase;
+  color: var(--gold-text); margin-bottom: 5px;
+}
+
+/* ── Dimension tables ── */
 .dim-table { width: 100%; border-collapse: collapse; }
 .dim-table thead th {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.13em;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: var(--faint);
-  padding: 0 0 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.13em;
+  font-weight: 500; text-transform: uppercase; color: var(--faint);
+  padding: 0 0 12px; text-align: left; border-bottom: 1px solid var(--rule);
 }
 .dim-table thead th:last-child { text-align: right; }
 .dim-table tbody tr { border-bottom: 1px solid var(--rule-faint); }
 .dim-table tbody tr:last-child { border-bottom: none; }
 .dim-table tbody tr:hover { background: oklch(99.5% 0 0); }
 .dim-table tbody td { padding: 14px 0 13px; vertical-align: top; }
-.dim-table tbody td:last-child { text-align: right; }
+.dim-table tbody td:last-child { text-align: right; white-space: nowrap; }
 .col-num  { font-family: var(--font-mono); font-size: 11px; color: var(--faint); width: 28px; }
-.col-name { font-weight: 600; font-size: 13px; color: var(--ink); padding-right: 20px; min-width: 130px; }
-.col-find { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
-.schip { font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.s4 { color: var(--patina-text); }
-.s3 { color: oklch(38% 0.12 145); }
-.s2 { color: var(--gold-text); }
-.s1 { color: var(--p1-color); }
-.s0 { color: var(--p0-color); }
+.col-name { font-weight: 600; font-size: 13.5px; color: var(--ink); padding-right: 20px; min-width: 130px; }
+.col-find { font-size: 13px; color: var(--text); line-height: 1.6; }
+.schip { font-family: var(--font-mono); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.s4 { color: var(--patina-text); } .s3 { color: oklch(33% 0.13 145); }
+.s2 { color: var(--gold-text); }   .s1 { color: var(--p1-color); } .s0 { color: var(--p0-color); }
 .chip-max { font-weight: 400; color: var(--faint); }
 
-/* Panel head label */
-.panel-head {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin-bottom: 20px;
-}
-
-/* ── Issue rows (accordion, no cards) ── */
-.issue-row {
-  border-bottom: 1px solid var(--rule-faint);
-  cursor: pointer;
-  transition: background 0.1s;
-}
-.issue-row:last-child { border-bottom: none; }
-.issue-row:hover { background: oklch(99% 0 0); }
-
-/* P0/P1: row background tint only — not a card */
-.issue-row.sev-p0 { background: var(--p0-bg); }
-.issue-row.sev-p0:hover { background: oklch(97% 0.018 25); }
-.issue-row.sev-p1 { background: var(--p1-bg); }
-.issue-row.sev-p1:hover { background: oklch(97.5% 0.014 58); }
-
-.issue-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 18px 0 16px;
-}
-.sev-p0 .issue-head,
-.sev-p1 .issue-head { padding-left: 16px; padding-right: 16px; }
-
-.p-chip {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 3px 6px;
-  border-radius: 2px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.p-chip.P0 { color: var(--p0-color); background: oklch(94% 0.04 25); border: 1.5px solid var(--p0-border); }
-.p-chip.P1 { color: var(--p1-color); background: oklch(94% 0.03 50); border: 1.5px solid oklch(87% 0.045 58); }
-.p-chip.P2 { color: var(--gold-text); background: var(--gold-bg); border: 1px solid var(--gold-border); }
-.p-chip.P3 { color: var(--faint); background: var(--surface2); border: 1px solid var(--rule); }
-
-.issue-title-area { flex: 1; min-width: 0; }
-.issue-title { font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; margin-bottom: 4px; }
-.sev-p0 .issue-title { color: var(--p0-title); }
-.sev-p1 .issue-title { color: var(--p1-title); }
-.issue-meta {
-  font-size: 11px;
-  color: var(--faint);
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.issue-meta b { color: var(--muted); font-weight: 600; margin-right: 3px; }
-
-.issue-toggle {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--faint);
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: transform 0.2s;
-}
-.issue-row.open .issue-toggle { transform: rotate(180deg); }
-
-.issue-body { max-height: 0; overflow: hidden; transition: max-height 0.24s cubic-bezier(0.4, 0, 0.2, 1); }
-.issue-row.open .issue-body { max-height: 400px; }
-.issue-body-inner { padding: 0 0 20px 50px; }
-.sev-p0 .issue-body-inner,
-.sev-p1 .issue-body-inner { padding-left: 66px; padding-right: 16px; }
-.issue-impact { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
-.issue-fix {
-  padding: 11px 14px;
-  background: var(--gold-bg);
-  border: 1px solid var(--gold-border);
-  border-radius: 3px;
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--text);
-}
-.fix-label {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--gold-text);
-  margin-bottom: 4px;
-}
-
-/* Positive/systemic lists */
+/* Positive/systemic */
 .callout-list { list-style: none; }
 .callout-list li {
-  font-size: 13px;
-  line-height: 1.65;
-  padding: 13px 0 13px 26px;
-  border-bottom: 1px solid var(--rule-faint);
-  position: relative;
-  color: var(--muted);
+  font-size: 13.5px; line-height: 1.7; padding: 13px 0 13px 26px;
+  border-bottom: 1px solid var(--rule-faint); position: relative; color: var(--muted);
 }
 .callout-list li:last-child { border-bottom: none; }
 .callout-list.positive li { color: var(--patina-text); }
 .callout-list.positive li::before { content: '✓'; position: absolute; left: 0; color: var(--patina); font-weight: 700; }
 .callout-list.systemic li::before { content: '◆'; position: absolute; left: 0; color: var(--p1-color); font-size: 9px; top: 17px; }
 
-.slop-verdict-panel {
-  font-size: 13px; color: var(--muted); line-height: 1.7;
-  font-style: italic; max-width: 60ch; margin-bottom: 16px; text-wrap: pretty;
-}
-.slop-tells { font-family: var(--font-mono); font-size: 11px; color: var(--muted); line-height: 1.8; }
+.slop-verdict-panel { font-size: 13.5px; color: var(--muted); line-height: 1.75; font-style: italic; max-width: 62ch; margin-bottom: 16px; text-wrap: pretty; }
+.slop-tells-list { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); line-height: 1.9; }
 
 /* Animations */
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
-}
-@keyframes interpretIn {
-  from { opacity: 0; transform: translateY(3px); }
-  to   { opacity: 1; transform: none; }
-}
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes interpretIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 @keyframes warnPulse {
   0%, 100% { background: var(--p0-bg); }
-  50%       { background: oklch(96% 0.026 25); }
+  50%       { background: oklch(96.5% 0.024 25); }
 }
 
-@media (max-width: 700px) {
-  .sidebar { width: 180px; }
-  .panel-content { padding: 24px 20px 50px; }
-}
+@media (max-width: 700px) { .sidebar { width: 180px; } .panel-content { padding: 24px 20px 50px; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-  .issue-body { transition: none; }
-  .issue-row.open .issue-body { max-height: 400px; }
 }
 </style>
 </head>
@@ -945,11 +710,18 @@ body {
     <div class="brand-mark"></div>
     <div class="wordmark">fk <span>skills</span></div>
   </div>
-  <div class="form-row">
+  <div id="top-scan" class="form-row">
     <input id="url" class="url-input" type="url"
       placeholder="https://trang-web.com hoặc http://localhost:3000"
       autocomplete="off" spellcheck="false">
     <button id="scan" class="scan-btn">Quét</button>
+  </div>
+  <div id="top-result" class="result-row">
+    <div class="result-url-wrap">
+      <span class="result-url-tag">Đã quét</span>
+      <span id="result-url-val" class="result-url-val"></span>
+    </div>
+    <button id="rescan" class="rescan-btn">Quét lại</button>
   </div>
   <span class="agent-tag">${config.agent}</span>
 </div>
@@ -1008,22 +780,19 @@ function esc(s) {
 
 function interpret(score, max) {
   const p = score / max;
-  if (p >= 0.85) return { text: 'Xuất sắc',       cls: 'si-great', bar: 'bar-great' };
-  if (p >= 0.70) return { text: 'Khá tốt',         cls: 'si-good',  bar: 'bar-good'  };
-  if (p >= 0.50) return { text: 'Cần cải thiện',   cls: 'si-mid',   bar: 'bar-mid'   };
-  return             { text: 'Cần xem lại',     cls: 'si-bad',   bar: 'bar-bad'   };
+  if (p >= 0.85) return { text: 'Xuất sắc',     cls: 'si-great', bar: 'bar-great' };
+  if (p >= 0.70) return { text: 'Khá tốt',       cls: 'si-good',  bar: 'bar-good'  };
+  if (p >= 0.50) return { text: 'Cần cải thiện', cls: 'si-mid',   bar: 'bar-mid'   };
+  return             { text: 'Cần xem lại',   cls: 'si-bad',   bar: 'bar-bad'   };
 }
 
-function sc(s) {
-  return ['s0','s1','s2','s3','s4'][Math.max(0, Math.min(4, Math.round(s || 0)))];
-}
+function sc(s) { return ['s0','s1','s2','s3','s4'][Math.max(0,Math.min(4,Math.round(s||0)))]; }
 
 function countUp(el, target, dur, onDone) {
   if (rm || typeof target !== 'number') { el.textContent = target; if (onDone) onDone(); return; }
-  const d = dur || 900;
   const t0 = performance.now();
   (function tick(now) {
-    const progress = Math.min((now - t0) / d, 1);
+    const progress = Math.min((now - t0) / (dur || 900), 1);
     const ease = 1 - Math.pow(1 - progress, 4);
     el.textContent = Math.round(ease * target);
     if (progress < 1) requestAnimationFrame(tick);
@@ -1039,16 +808,22 @@ document.getElementById('url').addEventListener('input', () => {
 document.getElementById('url').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('scan').click();
 });
+document.getElementById('rescan').addEventListener('click', () => {
+  document.getElementById('top-result').classList.remove('show');
+  document.getElementById('top-scan').style.display = 'flex';
+  resetAll();
+  document.getElementById('url').focus();
+});
 
 document.getElementById('scan').addEventListener('click', async () => {
   const url = document.getElementById('url').value.trim();
   if (!url) return;
+  window._scanUrl = url;
   resetUI();
   setScanning(true);
   try {
     const res = await fetch('/api/scan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url }),
     });
     const reader = res.body.getReader();
@@ -1068,11 +843,8 @@ document.getElementById('scan').addEventListener('click', async () => {
         }
       }
     }
-  } catch (err) {
-    showError(err.message);
-  } finally {
-    setScanning(false);
-  }
+  } catch (err) { showError(err.message); }
+  finally { setScanning(false); }
 });
 
 function handleEvent(event, data) {
@@ -1121,10 +893,17 @@ function resetUI() {
   document.getElementById('sidebar-results').style.display = 'none';
   document.getElementById('panel-idle').style.display = 'none';
   ['panel-overview','panel-critical','panel-all','panel-tech','panel-ux','panel-positive'].forEach(id => {
-    const el = document.getElementById(id);
-    el.innerHTML = ''; el.classList.remove('show');
+    const el = document.getElementById(id); el.innerHTML = ''; el.classList.remove('show');
   });
   window._findings = []; window._data = null;
+}
+
+function resetAll() {
+  resetUI();
+  document.getElementById('panel-idle').style.display = 'flex';
+  document.getElementById('sidebar-idle').style.display = 'block';
+  document.getElementById('sidebar-scanning').style.display = 'none';
+  document.getElementById('sidebar-results').style.display = 'none';
 }
 
 function showError(msg) {
@@ -1141,6 +920,11 @@ function renderResults(data) {
   const issues = mergeIssues(data.issues || [], window._findings || []);
   window._allIssues = issues;
   const critical = issues.filter(i => i.priority === 'P0' || i.priority === 'P1');
+
+  // Swap top bar: hide scan form, show result URL
+  document.getElementById('top-scan').style.display = 'none';
+  document.getElementById('top-result').classList.add('show');
+  document.getElementById('result-url-val').textContent = window._scanUrl || '';
 
   buildSidebarScores(data);
   buildSidebarNav(issues, critical, data);
@@ -1161,8 +945,7 @@ function renderResults(data) {
 }
 
 function mergeIssues(llm, statics) {
-  const seen = new Set();
-  const out = [];
+  const seen = new Set(), out = [];
   for (const i of llm) {
     const key = (i.title || i.id || '').toLowerCase().slice(0, 40);
     if (!seen.has(key)) { seen.add(key); out.push(i); }
@@ -1179,43 +962,35 @@ function mergeIssues(llm, statics) {
 function buildSidebarScores(data) {
   const el = document.getElementById('sidebar-scores');
   const scores = data.scores || {};
-  const tech = scores.technical;
-  const ux   = scores.ux;
-  const slop = scores.slopTest;
+  const tech = scores.technical, ux = scores.ux, slop = scores.slopTest;
   let html = '';
 
-  if (tech) {
-    html += \`<div class="score-block">
-      <div class="score-eyebrow">Kỹ thuật</div>
-      <div class="score-num" id="snum-tech">0</div>
-      <div class="score-denom">/20</div>
-      <div class="score-interp" id="sinterp-tech"></div>
-      <div class="score-bar-track"><div class="score-bar-fill" id="sbar-tech"></div></div>
-    </div>\`;
-  }
-  if (ux) {
-    html += \`<div class="score-block">
-      <div class="score-eyebrow">UX · Nielsen</div>
-      <div class="score-num" id="snum-ux">0</div>
-      <div class="score-denom">/40</div>
-      <div class="score-interp" id="sinterp-ux"></div>
-      <div class="score-bar-track"><div class="score-bar-fill" id="sbar-ux"></div></div>
-    </div>\`;
-  }
-  if (slop) {
-    html += \`<div class="score-block">
-      <div class="score-eyebrow">Slop Test</div>
-      <div class="slop-result \${slop.passed ? 'slop-pass' : 'slop-fail'}">\${slop.passed ? 'Đạt' : 'Không đạt'}</div>
-    </div>\`;
-  }
+  if (tech) html += \`<div class="score-block">
+    <div class="score-eyebrow">Kỹ thuật</div>
+    <div class="score-num" id="snum-tech">0</div>
+    <div class="score-denom">/20</div>
+    <div class="score-interp" id="sinterp-tech"></div>
+    <div class="score-bar-track"><div class="score-bar-fill" id="sbar-tech"></div></div>
+  </div>\`;
+  if (ux) html += \`<div class="score-block">
+    <div class="score-eyebrow">UX · Nielsen</div>
+    <div class="score-num" id="snum-ux">0</div>
+    <div class="score-denom">/40</div>
+    <div class="score-interp" id="sinterp-ux"></div>
+    <div class="score-bar-track"><div class="score-bar-fill" id="sbar-ux"></div></div>
+  </div>\`;
+  if (slop) html += \`<div class="score-block">
+    <div class="score-eyebrow">Slop Test</div>
+    <div class="slop-result \${slop.passed ? 'slop-pass' : 'slop-fail'}">\${slop.passed ? 'Đạt' : 'Không đạt'}</div>
+  </div>\`;
+
   el.innerHTML = html;
 
   if (tech) {
     const interp = interpret(tech.total, 20);
     countUp(document.getElementById('snum-tech'), tech.total, 900, () => {
       const si = document.getElementById('sinterp-tech');
-      si.textContent = interp.text;
-      si.className = 'score-interp show ' + interp.cls;
+      si.textContent = interp.text; si.className = 'score-interp show ' + interp.cls;
       if (!rm) si.style.animation = 'interpretIn 0.35s ease both';
     });
     setTimeout(() => {
@@ -1228,8 +1003,7 @@ function buildSidebarScores(data) {
     const interp = interpret(ux.total, 40);
     countUp(document.getElementById('snum-ux'), ux.total, 960, () => {
       const si = document.getElementById('sinterp-ux');
-      si.textContent = interp.text;
-      si.className = 'score-interp show ' + interp.cls;
+      si.textContent = interp.text; si.className = 'score-interp show ' + interp.cls;
       if (!rm) si.style.animation = 'interpretIn 0.35s ease both';
     });
     setTimeout(() => {
@@ -1252,7 +1026,7 @@ function buildSidebarNav(issues, critical, data) {
   if (critical.length > 0) {
     html += \`<div class="nav-item has-critical" data-view="critical">Nghiêm trọng<span class="nav-count">\${critical.length}</span></div>\`;
   }
-  html += \`<div class="nav-item" data-view="overview">Tổng quan</div>\`;
+  html += '<div class="nav-item" data-view="overview">Tổng quan</div>';
   html += \`<div class="nav-item" data-view="all">Tất cả vấn đề<span class="nav-count">\${issues.length}</span></div>\`;
   if (tech) html += '<div class="nav-item" data-view="tech">Kỹ thuật</div>';
   if (ux)   html += '<div class="nav-item" data-view="ux">UX · Nielsen</div>';
@@ -1285,75 +1059,158 @@ function activateNav(view) {
 
 function buildPanelOverview(data, issues, critical) {
   const el = document.getElementById('panel-overview');
+  const scores = data.scores || {};
+  const tech = scores.technical, ux = scores.ux, slop = scores.slopTest;
   let html = '';
+
   if (data.register) {
     const label = data.register === 'brand' ? 'Thương hiệu' : data.register === 'product' ? 'Sản phẩm' : data.register;
     html += \`<div class="reg-badge">\${esc(label)}</div>\`;
   }
   if (data.summary) html += \`<p class="overview-summary">\${esc(data.summary)}</p>\`;
-  if (critical.length > 0) {
-    html += \`<p class="overview-hint">Có \${critical.length} vấn đề nghiêm trọng — nhấn <strong>Nghiêm trọng</strong> ở thanh bên để xem.</p>\`;
-  } else if (issues.length > 0) {
-    html += \`<p class="overview-hint">Tìm thấy \${issues.length} vấn đề — nhấn <strong>Tất cả vấn đề</strong> để xem chi tiết.</p>\`;
+
+  // Score lines in overview
+  if (tech || ux || slop) {
+    html += '<div class="ov-scores">';
+    if (tech) {
+      const interp = interpret(tech.total, 20);
+      const pct = (tech.total / 20 * 100).toFixed(1);
+      html += \`<div class="ov-score-row">
+        <span class="ov-score-label">Kỹ thuật</span>
+        <div class="ov-bar-wrap"><div class="ov-bar-fill \${interp.bar}" id="ovbar-tech" style="width:0%"></div></div>
+        <span class="ov-score-val">\${tech.total}<span style="font-weight:400;color:var(--faint)">/20</span></span>
+        <span class="ov-score-interp \${interp.cls}">\${interp.text}</span>
+      </div>\`;
+    }
+    if (ux) {
+      const interp = interpret(ux.total, 40);
+      html += \`<div class="ov-score-row">
+        <span class="ov-score-label">UX · Nielsen</span>
+        <div class="ov-bar-wrap"><div class="ov-bar-fill \${interp.bar}" id="ovbar-ux" style="width:0%"></div></div>
+        <span class="ov-score-val">\${ux.total}<span style="font-weight:400;color:var(--faint)">/40</span></span>
+        <span class="ov-score-interp \${interp.cls}">\${interp.text}</span>
+      </div>\`;
+    }
+    if (slop) {
+      html += \`<div class="ov-slop-row">
+        <span class="ov-slop-label">Slop Test</span>
+        <span class="ov-slop-val \${slop.passed ? 'slop-pass' : 'slop-fail'}">\${slop.passed ? 'Đạt' : 'Không đạt'}</span>
+        \${slop.tells && slop.tells.length ? \`<span style="font-size:11px;color:var(--faint)">\${slop.tells.slice(0,2).map(t => esc(t)).join(' · ')}</span>\` : ''}
+      </div>\`;
+    }
+    html += '</div>';
   }
+
+  if (critical.length > 0) {
+    html += \`<div class="overview-hint">Phát hiện <strong>\${critical.length} vấn đề nghiêm trọng</strong> cần xử lý — xem tại <strong>Nghiêm trọng</strong> ở thanh bên.</div>\`;
+  } else if (issues.length > 0) {
+    html += \`<div class="overview-hint">Tìm thấy \${issues.length} vấn đề. Nhấn <strong>Tất cả vấn đề</strong> để xem chi tiết.</div>\`;
+  }
+
+  if (data.systemicIssues && data.systemicIssues.length) {
+    html += '<div class="ov-systemic"><div class="ov-systemic-head">Vấn đề hệ thống</div>';
+    data.systemicIssues.forEach(s => { html += \`<div class="ov-systemic-item">\${esc(s)}</div>\`; });
+    html += '</div>';
+  }
+
   el.innerHTML = html;
+
+  // Animate overview bars after render
+  if (!rm) {
+    if (tech) {
+      const b = document.getElementById('ovbar-tech');
+      if (b) requestAnimationFrame(() => requestAnimationFrame(() => {
+        b.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1) 0.5s';
+        b.style.width = (tech.total / 20 * 100).toFixed(1) + '%';
+      }));
+    }
+    if (ux) {
+      const b = document.getElementById('ovbar-ux');
+      if (b) requestAnimationFrame(() => requestAnimationFrame(() => {
+        b.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1) 0.65s';
+        b.style.width = (ux.total / 40 * 100).toFixed(1) + '%';
+      }));
+    }
+  }
 }
 
 function buildPanelIssues(panelId, issues, headLabel) {
   const el = document.getElementById(panelId);
   if (!issues.length) {
-    el.innerHTML = \`<div class="panel-head">\${esc(headLabel)}</div><p style="color:var(--faint);font-size:13px">Không có vấn đề nào.</p>\`;
-    return;
+    el.innerHTML = \`<p style="color:var(--faint);font-size:13.5px">Không có vấn đề nào.</p>\`; return;
   }
-  let html = \`<div class="panel-head">\${esc(headLabel)} (\${issues.length})</div><div>\`;
-  issues.forEach((f) => {
-    const p = normPriority(f.priority);
-    const sev = p === 'P0' ? 'sev-p0' : p === 'P1' ? 'sev-p1' : '';
-    html += \`<div class="issue-row \${sev}">
-      <div class="issue-head">
-        <span class="p-chip \${p}">\${p}</span>
-        <div class="issue-title-area">
-          <div class="issue-title">\${esc(f.title || f.id)}</div>
-          <div class="issue-meta">
-            \${f.location ? \`<span><b>Vị trí</b>\${esc(f.location)}</span>\` : ''}
-            \${f.category ? \`<span><b>Loại</b>\${esc(f.category)}</span>\` : ''}
+
+  const critical = issues.filter(i => { const p = normPriority(i.priority); return p === 'P0' || p === 'P1'; });
+  const minor    = issues.filter(i => { const p = normPriority(i.priority); return p !== 'P0' && p !== 'P1'; });
+
+  let html = \`<div class="panel-head">\${esc(headLabel)} (\${issues.length})</div>\`;
+
+  // P0/P1: full visible blocks, no accordion
+  if (critical.length) {
+    html += '<div class="issue-blocks">';
+    critical.forEach(f => {
+      const p = normPriority(f.priority);
+      const sevCls = p === 'P0' ? 'sev-p0' : 'sev-p1';
+      html += \`<div class="issue-block \${sevCls}">
+        <div class="issue-block-head">
+          <span class="p-chip \${p}">\${p}</span>
+          <div style="flex:1;min-width:0">
+            <div class="issue-block-title">\${esc(f.title || f.id)}</div>
+            <div class="issue-meta">
+              \${f.location ? \`<code>\${esc(f.location)}</code>\` : ''}
+              \${f.category ? \`<span>\${esc(f.category)}</span>\` : ''}
+            </div>
           </div>
         </div>
-        <span class="issue-toggle">▾</span>
-      </div>
-      <div class="issue-body">
-        <div class="issue-body-inner">
-          \${f.impact ? \`<div class="issue-impact">\${esc(f.impact)}</div>\` : ''}
+        <div class="issue-block-body">
+          \${f.impact ? \`<p class="issue-impact"><strong>Ảnh hưởng:</strong> \${esc(f.impact)}</p>\` : ''}
           \${f.recommendation ? \`<div class="issue-fix"><span class="fix-label">Cách sửa</span>\${esc(f.recommendation)}</div>\` : ''}
         </div>
-      </div>
-    </div>\`;
-  });
-  html += '</div>';
+      </div>\`;
+    });
+    html += '</div>';
+  }
+
+  // P2/P3: compact rows
+  if (minor.length) {
+    if (critical.length) html += \`<div class="panel-sub-head">Vấn đề khác (\${minor.length})</div>\`;
+    html += '<div class="issue-compacts">';
+    minor.forEach(f => {
+      const p = normPriority(f.priority);
+      html += \`<div class="issue-compact">
+        <span class="p-chip \${p}">\${p}</span>
+        <div class="issue-compact-body">
+          <div class="issue-compact-title">\${esc(f.title || f.id)}</div>
+          \${f.impact ? \`<div class="issue-compact-impact">\${esc(f.impact)}</div>\` : ''}
+          \${f.recommendation ? \`<div class="issue-compact-fix"><span class="fix-arrow">→</span> \${esc(f.recommendation)}</div>\` : ''}
+          \${f.location ? \`<div class="issue-meta" style="margin-top:4px"><code>\${esc(f.location)}</code></div>\` : ''}
+        </div>
+        \${f.category ? \`<span class="issue-compact-cat">\${esc(f.category)}</span>\` : ''}
+      </div>\`;
+    });
+    html += '</div>';
+  }
+
   el.innerHTML = html;
 
-  // Accordion
-  el.querySelectorAll('.issue-row').forEach(row => {
-    row.querySelector('.issue-head').addEventListener('click', () => {
-      const wasOpen = row.classList.contains('open');
-      el.querySelectorAll('.issue-row.open').forEach(r => r.classList.remove('open'));
-      if (!wasOpen) row.classList.add('open');
-    });
-  });
-
-  // Stagger + P0 pulse
   if (!rm) {
-    el.querySelectorAll('.issue-row').forEach((row, i) => {
-      const delay = i * 26;
-      row.style.opacity = '0';
-      row.style.transform = 'translateY(5px)';
-      row.style.transition = \`opacity 0.26s \${delay}ms ease, transform 0.26s \${delay}ms ease\`;
+    el.querySelectorAll('.issue-block').forEach((block, i) => {
+      block.style.opacity = '0'; block.style.transform = 'translateY(4px)';
+      const delay = i * 50;
+      block.style.transition = \`opacity 0.3s \${delay}ms ease, transform 0.3s \${delay}ms ease\`;
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        row.style.opacity = '1';
-        row.style.transform = 'none';
-        if (row.classList.contains('sev-p0')) {
-          setTimeout(() => { row.style.animation = 'warnPulse 1.4s ease-in-out 2'; }, delay + 350);
+        block.style.opacity = '1'; block.style.transform = 'none';
+        if (block.classList.contains('sev-p0')) {
+          setTimeout(() => { block.style.animation = 'warnPulse 1.6s ease-in-out 2'; }, delay + 400);
         }
+      }));
+    });
+    el.querySelectorAll('.issue-compact').forEach((row, i) => {
+      row.style.opacity = '0'; row.style.transform = 'translateY(3px)';
+      const delay = (critical.length * 50) + i * 20;
+      row.style.transition = \`opacity 0.25s \${delay}ms ease, transform 0.25s \${delay}ms ease\`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        row.style.opacity = '1'; row.style.transform = 'none';
       }));
     });
   }
@@ -1362,11 +1219,17 @@ function buildPanelIssues(panelId, issues, headLabel) {
 function buildPanelTech(tech) {
   const el = document.getElementById('panel-tech');
   if (!tech || !tech.breakdown || !tech.breakdown.length) {
-    el.innerHTML = '<p style="color:var(--faint);font-size:13px">Không có dữ liệu.</p>'; return;
+    el.innerHTML = '<p style="color:var(--faint);font-size:13.5px">Không có dữ liệu.</p>'; return;
   }
-  let html = '<div class="panel-head">Đánh giá kỹ thuật</div><table class="dim-table"><thead><tr><th class="col-num">#</th><th class="col-name">Chiều</th><th class="col-find">Phát hiện chính</th><th>Điểm</th></tr></thead><tbody>';
+  let html = '<div class="panel-head">Đánh giá kỹ thuật</div>';
+  html += '<table class="dim-table"><thead><tr><th class="col-num">#</th><th class="col-name">Tiêu chí</th><th class="col-find">Phát hiện chính</th><th>Điểm</th></tr></thead><tbody>';
   tech.breakdown.forEach((d, i) => {
-    html += \`<tr><td class="col-num">\${i+1}</td><td class="col-name">\${esc(d.label)}</td><td class="col-find">\${esc(d.keyFinding || '—')}</td><td><span class="schip \${sc(d.score)}">\${d.score}<span class="chip-max">/4</span></span></td></tr>\`;
+    html += \`<tr>
+      <td class="col-num">\${i+1}</td>
+      <td class="col-name">\${esc(d.label)}</td>
+      <td class="col-find">\${esc(d.keyFinding || '—')}</td>
+      <td><span class="schip \${sc(d.score)}">\${d.score}<span class="chip-max">/4</span></span></td>
+    </tr>\`;
   });
   html += '</tbody></table>';
   el.innerHTML = html;
@@ -1375,11 +1238,17 @@ function buildPanelTech(tech) {
 function buildPanelUX(ux) {
   const el = document.getElementById('panel-ux');
   if (!ux || !ux.heuristics || !ux.heuristics.length) {
-    el.innerHTML = '<p style="color:var(--faint);font-size:13px">Không có dữ liệu.</p>'; return;
+    el.innerHTML = '<p style="color:var(--faint);font-size:13.5px">Không có dữ liệu.</p>'; return;
   }
-  let html = '<div class="panel-head">Nguyên tắc UX · Nielsen</div><table class="dim-table"><thead><tr><th class="col-num">#</th><th class="col-name">Nguyên tắc</th><th class="col-find">Vấn đề chính</th><th>Điểm</th></tr></thead><tbody>';
+  let html = '<div class="panel-head">Nguyên tắc UX · Nielsen</div>';
+  html += '<table class="dim-table"><thead><tr><th class="col-num">#</th><th class="col-name">Nguyên tắc</th><th class="col-find">Vấn đề chính</th><th>Điểm</th></tr></thead><tbody>';
   ux.heuristics.forEach(h => {
-    html += \`<tr><td class="col-num">\${h.id}</td><td class="col-name">\${esc(h.name)}</td><td class="col-find">\${esc(h.keyIssue || '—')}</td><td><span class="schip \${sc(h.score)}">\${h.score}<span class="chip-max">/4</span></span></td></tr>\`;
+    html += \`<tr>
+      <td class="col-num">\${h.id}</td>
+      <td class="col-name">\${esc(h.name)}</td>
+      <td class="col-find">\${esc(h.keyIssue || '—')}</td>
+      <td><span class="schip \${sc(h.score)}">\${h.score}<span class="chip-max">/4</span></span></td>
+    </tr>\`;
   });
   html += '</tbody></table>';
   el.innerHTML = html;
@@ -1394,16 +1263,18 @@ function buildPanelPositive(positives, systemics, slop) {
     html += '</ul>';
   }
   if (systemics && systemics.length) {
-    html += '<div class="panel-head" style="margin-top:24px">Vấn đề hệ thống</div><ul class="callout-list systemic">';
+    html += '<div class="panel-head" style="margin-top:28px">Vấn đề hệ thống</div><ul class="callout-list systemic">';
     systemics.forEach(s => { html += \`<li>\${esc(s)}</li>\`; });
     html += '</ul>';
   }
   if (slop) {
-    html += '<div class="panel-head" style="margin-top:24px">Slop Test</div>';
+    html += '<div class="panel-head" style="margin-top:28px">Slop Test</div>';
     if (slop.verdict) html += \`<p class="slop-verdict-panel">\${esc(slop.verdict)}</p>\`;
-    if (slop.tells && slop.tells.length) html += \`<div class="slop-tells">\${slop.tells.join(' · ')}</div>\`;
+    if (slop.tells && slop.tells.length) {
+      html += '<div class="slop-tells-list">' + slop.tells.map(t => esc(t)).join('<br>') + '</div>';
+    }
   }
-  if (!html) html = '<p style="color:var(--faint);font-size:13px">Không có dữ liệu.</p>';
+  if (!html) html = '<p style="color:var(--faint);font-size:13.5px">Không có dữ liệu.</p>';
   el.innerHTML = html;
 }
 </script>
