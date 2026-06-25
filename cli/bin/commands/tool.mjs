@@ -59,8 +59,9 @@ async function setupWizard() {
     console.log(`  Phát hiện: ${agent} ✓`);
   }
 
-  const scopeAns = await ask('  Phạm vi — global hay project? [global] ');
-  const scope = scopeAns.trim() === 'project' ? 'project' : 'global';
+  const scopeAns = await ask('  Phạm vi — (1) global  (2) project  [1] ');
+  const s = scopeAns.trim().toLowerCase();
+  const scope = (s === 'project' || s === 'p' || s === '2') ? 'project' : 'global';
   rl.close();
 
   const config = { agent, scope };
