@@ -247,7 +247,7 @@ async function handleScan(body, config, res) {
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
   const args = config.agent === 'claude'
-    ? ['-p', fullPrompt, '--max-turns', '1']
+    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions']
     : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
