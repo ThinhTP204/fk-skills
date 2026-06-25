@@ -245,7 +245,10 @@ async function handleScan(body, config, res) {
   sseEvent(res, 'status', { text: `Đang chấm điểm với ${config.agent}...` });
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
-  const args = config.agent === 'claude' ? ['-p', fullPrompt] : ['--no-git', '--full-auto', '-q', fullPrompt];
+  // --max-turns 1: prevent Claude from doing multi-turn tool-use loops on the prompt
+  const args = config.agent === 'claude'
+    ? ['-p', fullPrompt, '--max-turns', '1']
+    : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
     let buffer = '', done = false;
@@ -253,7 +256,10 @@ async function handleScan(body, config, res) {
     const timer = setTimeout(() => {
       if (done) return;
       done = true; proc.kill('SIGTERM');
-      sseEvent(res, 'error', { text: `${config.agent} hết thời gian chờ (3 phút)` });
+      const hint = buffer.trim().length > 0
+        ? `\n\nOutput trước timeout:\n${buffer.trim().slice(-600)}`
+        : '\n\nKhông có output — có thể Claude đang chờ xác nhận. Chạy thử: claude -p "test" trong terminal.';
+      sseEvent(res, 'error', { text: `${config.agent} hết thời gian chờ (3 phút)${hint}` });
       resolve();
     }, 180000);
     proc.stdout.on('data', chunk => {
