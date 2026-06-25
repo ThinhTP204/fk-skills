@@ -252,7 +252,8 @@ async function handleScan(body, config, res) {
 
   await new Promise((resolve) => {
     let buffer = '', done = false;
-    const proc = spawn(config.agent, args, { env: process.env });
+    // Run from tmpdir so Claude doesn't pick up project CLAUDE.md / MCP servers
+    const proc = spawn(config.agent, args, { env: process.env, cwd: tmpdir() });
     proc.stdin.end();
     const timer = setTimeout(() => {
       if (done) return;
