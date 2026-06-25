@@ -8,7 +8,7 @@
  */
 
 import { createServer } from 'node:http';
-import { spawnSync, execSync } from 'node:child_process';
+import { spawnSync, spawn } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
@@ -181,26 +181,54 @@ function extractJson(text) {
 }
 
 function callLLM(agent, htmlContent) {
-  const truncated = htmlContent.slice(0, 80000);
+  const truncated = htmlContent.slice(0, 30000);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${truncated}\n</html>`;
 
   const args = agent === 'claude'
     ? ['-p', fullPrompt]
     : ['--no-git', '--full-auto', '-q', `${SCORE_PROMPT}\n\nHTML:\n${truncated}`];
 
-  const result = spawnSync(agent, args, {
-    encoding: 'utf-8',
-    timeout: 90000,
-    maxBuffer: 20 * 1024 * 1024,
+  return new Promise((resolve, reject) => {
+    let stdout = '';
+    let stderr = '';
+    let done = false;
+
+    const proc = spawn(agent, args, { env: process.env });
+
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      proc.kill('SIGTERM');
+      reject(new Error(`${agent} timed out — try again or reduce page complexity`));
+    }, 120000);
+
+    proc.stdout.on('data', d => { stdout += d; });
+    proc.stderr.on('data', d => { stderr += d; });
+
+    proc.on('error', err => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      reject(new Error(`${agent} subprocess error: ${err.message}`));
+    });
+
+    proc.on('close', code => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `${agent} exited with code ${code}`));
+        return;
+      }
+      const raw = stdout.trim();
+      if (!raw) { reject(new Error(`${agent} returned empty response`)); return; }
+      try {
+        resolve(JSON.parse(extractJson(raw)));
+      } catch {
+        reject(new Error(`${agent} response was not valid JSON — try again`));
+      }
+    });
   });
-
-  if (result.error) throw new Error(`${agent} subprocess error: ${result.error.message}`);
-  if (result.status !== 0) throw new Error(result.stderr?.trim() || `${agent} exited with code ${result.status}`);
-
-  const raw = result.stdout?.trim() || '';
-  if (!raw) throw new Error(`${agent} returned empty response`);
-
-  return JSON.parse(extractJson(raw));
 }
 
 // ─── detectHtml via temp file ──────────────────────────────────────────────
