@@ -246,14 +246,14 @@ async function handleScan(body, config, res) {
   sseEvent(res, 'status', { text: `Đang chấm điểm với ${config.agent}...` });
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
-  // --max-turns 1: prevent Claude from doing multi-turn tool-use loops on the prompt
   const args = config.agent === 'claude'
-    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions']
+    ? ['-p', fullPrompt, '--max-turns', '1']
     : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
     let buffer = '', done = false;
     const proc = spawn(config.agent, args, { env: process.env });
+    proc.stdin.end();
     const timer = setTimeout(() => {
       if (done) return;
       done = true; proc.kill('SIGTERM');
