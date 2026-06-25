@@ -1,6 +1,6 @@
 {
   "name": "fk-skills",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "Trần Phú Thịnh <tptvt.2002@gmail.com>",
   "description": "Design skills, commands, and anti-pattern detection for AI coding agents",
   "keywords": [
@@ -87,7 +87,8 @@
     "marked": "^18.0.5"
   },
   "optionalDependencies": {
-    "puppeteer": "^25.1.0"
+    "puppeteer": "^25.1.0",
+    "playwright": "^1.59.1"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "^3.0.71",
@@ -104,7 +105,6 @@
     "modern-screenshot": "^4.7.0",
     "motion": "^12.38.0",
     "opentype.js": "^2.0.0",
-    "playwright": "^1.59.1",
     "wrangler": "^4.85.0",
     "zod": "^4.3.6"
   }

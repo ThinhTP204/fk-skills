@@ -93,20 +93,41 @@ function isSpaShell(html) {
   return stripped.length < 200;
 }
 
+async function ensurePlaywrightBrowser(onStatus) {
+  const { execSync } = await import('node:child_process');
+  try {
+    execSync('npx playwright install chromium --with-deps 2>/dev/null', {
+      stdio: 'pipe', timeout: 120000,
+    });
+  } catch { /* may already be installed */ }
+}
+
 async function renderWithBrowser(url, onStatus) {
   let chromium;
   try {
     ({ chromium } = await import('playwright'));
   } catch {
-    throw new Error('Playwright not installed. Run: npx playwright install chromium');
+    throw new Error('playwright package missing — run: npm install in the fk-skills repo');
   }
-  onStatus('Launching browser to render JavaScript...');
-  const browser = await chromium.launch({ headless: true });
+
+  onStatus('Launching headless browser...');
+  let browser;
+  try {
+    browser = await chromium.launch({ headless: true });
+  } catch (err) {
+    if (err.message?.includes('Executable') || err.message?.includes('not found')) {
+      onStatus('Installing Chromium browser (one-time setup ~100MB)...');
+      await ensurePlaywrightBrowser(onStatus);
+      browser = await chromium.launch({ headless: true });
+    } else {
+      throw err;
+    }
+  }
+
   try {
     const page = await browser.newPage();
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-    // Extra wait for late-rendering SPAs
     await page.waitForTimeout(800);
     const html = await page.content();
     onStatus('Browser render complete.');
