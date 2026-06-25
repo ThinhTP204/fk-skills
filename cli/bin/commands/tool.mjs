@@ -247,26 +247,43 @@ async function handleScan(body, config, res) {
   const prepared = prepareHtml(html);
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
   const args = config.agent === 'claude'
-    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions']
+    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions', '--output-format', 'stream-json', '--verbose']
     : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
-    let buffer = '', done = false;
+    let buffer = '', streamText = '', done = false;
     const proc = spawn(config.agent, args, { env: process.env });
     proc.stdin.end();
     const timer = setTimeout(() => {
       if (done) return;
       done = true; proc.kill('SIGTERM');
-      const hint = buffer.trim().length > 0
-        ? `\n\nOutput trước timeout:\n${buffer.trim().slice(-600)}`
+      const hint = streamText.trim().length > 0
+        ? `\n\nOutput trước timeout:\n${streamText.trim().slice(-600)}`
         : '\n\nKhông có output — có thể Claude đang chờ xác nhận. Chạy thử: claude -p "test" trong terminal.';
       sseEvent(res, 'error', { text: `${config.agent} hết thời gian chờ (3 phút)${hint}` });
       resolve();
     }, 180000);
     proc.stdout.on('data', chunk => {
-      const text = chunk.toString();
-      buffer += text;
-      sseEvent(res, 'stream', { text });
+      buffer += chunk.toString();
+      // stream-json: each line is a JSON event, flush immediately
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete last line
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          const ev = JSON.parse(line);
+          if (ev.type === 'assistant') {
+            for (const block of (ev.message?.content || [])) {
+              if (block.type === 'text') {
+                streamText += block.text;
+                sseEvent(res, 'stream', { text: block.text });
+              }
+            }
+          } else if (ev.type === 'result') {
+            buffer = ev.result || '';
+          }
+        } catch {}
+      }
     });
     proc.stderr.on('data', chunk => {
       const t = chunk.toString().trim();
@@ -278,11 +295,12 @@ async function handleScan(body, config, res) {
     });
     proc.on('close', code => {
       if (done) return; done = true; clearTimeout(timer);
-      if (code !== 0 && !buffer.trim()) {
+      const raw = buffer.trim() || streamText.trim();
+      if (code !== 0 && !raw) {
         sseEvent(res, 'error', { text: `${config.agent} thoát với mã lỗi ${code}` }); resolve(); return;
       }
       try {
-        const parsed = JSON.parse(extractJson(buffer));
+        const parsed = JSON.parse(extractJson(raw));
         sseEvent(res, 'result', { ...parsed, findings, agent: config.agent, durationMs: Date.now() - start });
       } catch {
         sseEvent(res, 'error', { text: 'Không thể đọc kết quả — vui lòng thử lại' });
