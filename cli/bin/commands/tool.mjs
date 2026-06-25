@@ -247,7 +247,7 @@ async function handleScan(body, config, res) {
   const fullPrompt = `${SCORE_PROMPT}\n\n<html>\n${prepared}\n</html>`;
   // --max-turns 1: prevent Claude from doing multi-turn tool-use loops on the prompt
   const args = config.agent === 'claude'
-    ? ['-p', fullPrompt, '--max-turns', '1', '--allowedTools', '']
+    ? ['-p', fullPrompt, '--max-turns', '1', '--dangerously-skip-permissions']
     : ['--no-git', '--full-auto', '-q', fullPrompt];
 
   await new Promise((resolve) => {
