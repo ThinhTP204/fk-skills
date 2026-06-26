@@ -23,6 +23,13 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost/*", "http://127.0.0.1/*"],
+      "js": ["content/content-local.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "web_accessible_resources": [
     {
       "resources": ["detector/detect.js"],

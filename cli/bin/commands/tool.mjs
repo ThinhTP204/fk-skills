@@ -256,6 +256,23 @@ body {
 }
 .rescan-btn:hover { border-color: var(--faint); color: var(--text); }
 
+.dashboard-btn {
+  height: 30px; padding: 0 12px; background: transparent; color: var(--muted);
+  border: 1px solid var(--rule); border-radius: 3px; font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; cursor: pointer; flex-shrink: 0; text-decoration: none;
+  display: flex; align-items: center; transition: border-color 0.15s, color 0.15s;
+}
+.dashboard-btn:hover { border-color: var(--gold-border); color: var(--gold-text); }
+
+.ai-review-btn {
+  height: 30px; padding: 0 14px; background: transparent;
+  border: 1px solid var(--gold-border); border-radius: 3px; font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; cursor: pointer; flex-shrink: 0; color: var(--gold-text);
+  transition: background 0.14s, border-color 0.14s;
+}
+.ai-review-btn:hover { background: var(--gold-bg); }
+.ai-review-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .agent-tag {
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
   color: var(--gold-text); background: var(--gold-bg); border: 1px solid var(--gold-border);
@@ -535,7 +552,9 @@ body {
       <span id="result-url-val" class="result-url-val"></span>
     </div>
     <button id="rescan" class="rescan-btn">Quét lại</button>
+    <button id="ai-review" class="ai-review-btn" title="Phân tích bằng AI qua Anthropic API">AI Review</button>
   </div>
+  <a id="dashboard-link" href="http://localhost:3001" target="_blank" class="dashboard-btn" title="Mở Dashboard live">Dashboard →</a>
   <span class="agent-tag">44 rules</span>
 </div>
 
@@ -626,6 +645,33 @@ document.getElementById('rescan').addEventListener('click', () => {
   document.getElementById('top-scan').style.display = 'flex';
   resetAll();
   document.getElementById('url').focus();
+});
+
+document.getElementById('ai-review').addEventListener('click', async () => {
+  const url = window._scanUrl;
+  if (!url) return;
+  const btn = document.getElementById('ai-review');
+  btn.disabled = true;
+  btn.textContent = 'Đang xếp hàng...';
+  try {
+    const r = await fetch('http://localhost:3001/api/llm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    const data = await r.json();
+    if (data.error) {
+      btn.textContent = 'Lỗi';
+      showError('AI Review: ' + data.error);
+      setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 3000);
+    } else {
+      btn.textContent = 'Đang phân tích...';
+      setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 60000);
+    }
+  } catch (err) {
+    btn.textContent = 'Server chưa chạy';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 3000);
+  }
 });
 
 document.getElementById('scan').addEventListener('click', async () => {
