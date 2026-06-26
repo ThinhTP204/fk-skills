@@ -65,7 +65,7 @@ function sseEvent(res, event, data) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-async function handleScan(body, res) {
+async function handleScan(body, res, scanPort = 3001) {
   const { url } = body;
   if (!url) { sseEvent(res, 'error', { text: 'Vui lòng nhập URL' }); return; }
   const start = Date.now();
@@ -97,6 +97,13 @@ async function handleScan(body, res) {
 
   sseEvent(res, 'result', { durationMs: Date.now() - start });
   sseEvent(res, 'done', { durationMs: Date.now() - start });
+
+  // Auto-trigger AI Review (fire and forget — result pushed via scan server SSE)
+  fetch(`http://localhost:${scanPort}/api/llm`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  }).catch(() => {});
 }
 
 function parseBody(req) {
@@ -108,8 +115,8 @@ function parseBody(req) {
   });
 }
 
-async function startServer(port) {
-  const ui = buildUI();
+async function startServer(port, scanPort = 3001) {
+  const ui = buildUI(scanPort);
   const server = createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(ui); return;
@@ -121,7 +128,7 @@ async function startServer(port) {
         'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache',
         'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*',
       });
-      await handleScan(body, res); res.end(); return;
+      await handleScan(body, res, scanPort); res.end(); return;
     }
     res.writeHead(404); res.end('Not found');
   });
@@ -137,7 +144,7 @@ async function startServer(port) {
 
 // ─── UI ────────────────────────────────────────────────────────────────────
 
-function buildUI() {
+function buildUI(scanPort = 3001) {
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -264,14 +271,6 @@ body {
 }
 .dashboard-btn:hover { border-color: var(--gold-border); color: var(--gold-text); }
 
-.ai-review-btn {
-  height: 30px; padding: 0 14px; background: transparent;
-  border: 1px solid var(--gold-border); border-radius: 3px; font-family: var(--font-body);
-  font-size: 12px; font-weight: 500; cursor: pointer; flex-shrink: 0; color: var(--gold-text);
-  transition: background 0.14s, border-color 0.14s;
-}
-.ai-review-btn:hover { background: var(--gold-bg); }
-.ai-review-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .agent-tag {
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
@@ -552,7 +551,6 @@ body {
       <span id="result-url-val" class="result-url-val"></span>
     </div>
     <button id="rescan" class="rescan-btn">Quét lại</button>
-    <button id="ai-review" class="ai-review-btn" title="Phân tích bằng AI qua Anthropic API">AI Review</button>
   </div>
   <a id="dashboard-link" href="http://localhost:3001" target="_blank" class="dashboard-btn" title="Mở Dashboard live">Dashboard →</a>
   <span class="agent-tag">44 rules</span>
@@ -592,10 +590,12 @@ body {
     <div class="panel-content" id="panel-tech"></div>
     <div class="panel-content" id="panel-ux"></div>
     <div class="panel-content" id="panel-positive"></div>
+    <div class="panel-content" id="panel-ai"></div>
   </main>
 </div>
 
 <script>
+const SCAN_PORT = ${scanPort};
 const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function normPriority(p) {
@@ -647,32 +647,116 @@ document.getElementById('rescan').addEventListener('click', () => {
   document.getElementById('url').focus();
 });
 
-document.getElementById('ai-review').addEventListener('click', async () => {
-  const url = window._scanUrl;
-  if (!url) return;
-  const btn = document.getElementById('ai-review');
-  btn.disabled = true;
-  btn.textContent = 'Đang xếp hàng...';
-  try {
-    const r = await fetch('http://localhost:3001/api/llm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    });
-    const data = await r.json();
-    if (data.error) {
-      btn.textContent = 'Lỗi';
-      showError('AI Review: ' + data.error);
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 3000);
-    } else {
-      btn.textContent = 'Đang phân tích...';
-      setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 60000);
-    }
-  } catch (err) {
-    btn.textContent = 'Server chưa chạy';
-    setTimeout(() => { btn.disabled = false; btn.textContent = 'AI Review'; }, 3000);
+// ── AI Review via scan server SSE ──────────────────────────────────────────
+
+function setAiIndicator(text) {
+  const el = document.getElementById('ai-nav-indicator');
+  if (el) el.textContent = text;
+}
+
+function buildPanelAI(result) {
+  const el = document.getElementById('panel-ai');
+  if (!el) return;
+  let html = '<div class="panel-head">AI Review</div>';
+
+  if (!result) {
+    html += '<div style="color:var(--faint);font-size:13px;font-style:italic;padding:8px 0">AI đang phân tích<span id="ai-dots"></span></div>';
+    el.innerHTML = html;
+    let n = 0;
+    const iv = setInterval(() => {
+      const d = document.getElementById('ai-dots');
+      if (!d) { clearInterval(iv); return; }
+      d.textContent = '.'.repeat(n % 4);
+      n++;
+    }, 400);
+    return;
   }
-});
+
+  if (result.scores) {
+    html += \`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.4rem;color:var(--ink)">\${result.scores.overall || 0}</div>
+      <span style="font-size:13px;font-weight:600;color:var(--muted)">\${esc(result.scores.verdict || '')}</span>
+    </div>\`;
+  }
+  if (result.summary) {
+    html += \`<p class="overview-summary">\${esc(result.summary)}</p>\`;
+  }
+
+  const issues = result.issues || [];
+  if (issues.length) {
+    const critical = issues.filter(f => { const p = normPriority(f.priority); return p === 'P0' || p === 'P1'; });
+    const minor    = issues.filter(f => { const p = normPriority(f.priority); return p !== 'P0' && p !== 'P1'; });
+    if (critical.length) {
+      html += '<div class="issue-blocks">';
+      critical.forEach(f => {
+        const p = normPriority(f.priority);
+        html += \`<div class="issue-block \${p === 'P0' ? 'sev-p0' : 'sev-p1'}">
+          <div class="issue-block-head">
+            <span class="p-chip \${p}">\${p}</span>
+            <div style="flex:1;min-width:0">
+              <div class="issue-block-title">\${esc(f.title)}</div>
+            </div>
+          </div>
+          <div class="issue-block-body">
+            \${f.impact ? \`<p class="issue-impact"><strong>Ảnh hưởng:</strong> \${esc(f.impact)}</p>\` : ''}
+            \${f.recommendation ? \`<div class="issue-fix"><span class="fix-label">Cách sửa</span>\${esc(f.recommendation)}</div>\` : ''}
+          </div>
+        </div>\`;
+      });
+      html += '</div>';
+    }
+    if (minor.length) {
+      if (critical.length) html += \`<div class="panel-sub-head">Vấn đề khác (\${minor.length})</div>\`;
+      html += '<div class="issue-compacts">';
+      minor.forEach(f => {
+        const p = normPriority(f.priority);
+        html += \`<div class="issue-compact">
+          <span class="p-chip \${p}">\${p}</span>
+          <div class="issue-compact-body">
+            <div class="issue-compact-title">\${esc(f.title)}</div>
+            \${f.impact ? \`<div class="issue-compact-impact">\${esc(f.impact)}</div>\` : ''}
+            \${f.recommendation ? \`<div class="issue-compact-fix"><span class="fix-arrow">→</span> \${esc(f.recommendation)}</div>\` : ''}
+          </div>
+        </div>\`;
+      });
+      html += '</div>';
+    }
+  }
+
+  if (result.positiveFindings && result.positiveFindings.length) {
+    html += '<div class="panel-sub-head" style="margin-top:24px">Điểm mạnh</div><ul class="callout-list positive">';
+    result.positiveFindings.forEach(s => { html += \`<li>\${esc(s)}</li>\`; });
+    html += '</ul>';
+  }
+
+  el.innerHTML = html;
+}
+
+// Connect to scan server SSE for LLM results
+(function connectScanEvents() {
+  const es = new EventSource('http://localhost:' + SCAN_PORT + '/events');
+
+  es.addEventListener('llm_status', () => {
+    setAiIndicator('⟳');
+    buildPanelAI(null);
+  });
+
+  es.addEventListener('llm', e => {
+    const data = JSON.parse(e.data);
+    setAiIndicator('');
+    buildPanelAI(data.result);
+    // Auto-navigate to AI panel if user is on overview or waiting
+    const active = document.querySelector('.nav-item.active');
+    if (!active || active.dataset.view === 'overview') activateNav('ai');
+  });
+
+  es.addEventListener('llm_error', e => {
+    const data = JSON.parse(e.data);
+    setAiIndicator('!');
+    const el = document.getElementById('panel-ai');
+    if (el) el.innerHTML = \`<div class="panel-head">AI Review</div><p style="color:var(--p0-color);font-size:13px;margin-top:8px">Lỗi: \${esc(data.error)}</p>\`;
+  });
+})();
 
 document.getElementById('scan').addEventListener('click', async () => {
   const url = document.getElementById('url').value.trim();
@@ -751,7 +835,7 @@ function resetUI() {
   document.getElementById('stream-area').textContent = '';
   document.getElementById('sidebar-results').style.display = 'none';
   document.getElementById('panel-idle').style.display = 'none';
-  ['panel-overview','panel-critical','panel-all','panel-tech','panel-ux','panel-positive'].forEach(id => {
+  ['panel-overview','panel-critical','panel-all','panel-tech','panel-ux','panel-positive','panel-ai'].forEach(id => {
     const el = document.getElementById(id); el.innerHTML = ''; el.classList.remove('show');
   });
   window._findings = []; window._data = null;
@@ -894,6 +978,7 @@ function buildSidebarNav(issues, critical, data) {
   if (tech) html += '<div class="nav-item" data-view="tech">Kỹ thuật</div>';
   if (ux)   html += '<div class="nav-item" data-view="ux">UX · Nielsen</div>';
   if (pos)  html += '<div class="nav-item" data-view="positive">Điểm mạnh</div>';
+  html += \`<div class="nav-item" data-view="ai">AI Review<span id="ai-nav-indicator" class="nav-count" style="color:var(--gold-text)"></span></div>\`;
 
   el.innerHTML = html;
   el.querySelectorAll('.nav-item').forEach(item => {
@@ -905,7 +990,7 @@ function activateNav(view) {
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
-  ['panel-overview','panel-critical','panel-all','panel-tech','panel-ux','panel-positive'].forEach(id => {
+  ['panel-overview','panel-critical','panel-all','panel-tech','panel-ux','panel-positive','panel-ai'].forEach(id => {
     document.getElementById(id).classList.remove('show');
   });
   const panel = document.getElementById('panel-' + view);
@@ -1166,7 +1251,7 @@ export async function run(args = []) {
     scanServer.listen(scanPort, '127.0.0.1', done);
   });
 
-  const server = await startServer(port);
+  const server = await startServer(port, scanPort);
   const url = `http://localhost:${port}`;
   console.log(`\n  fk-skills tool   →  ${url}`);
   console.log(`  Scan API         →  http://localhost:${scanPort}/health`);
