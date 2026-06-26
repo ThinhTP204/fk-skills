@@ -672,20 +672,58 @@ function buildPanelAI(result) {
     return;
   }
 
+  // Score header
   if (result.scores) {
+    const overall = result.scores.overall || 0;
+    const verdict = result.scores.verdict || '';
+    const interpCls = overall >= 18 ? 'si-great' : overall >= 14 ? 'si-good' : overall >= 10 ? 'si-mid' : 'si-bad';
     html += \`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.4rem;color:var(--ink)">\${result.scores.overall || 0}</div>
-      <span style="font-size:13px;font-weight:600;color:var(--muted)">\${esc(result.scores.verdict || '')}</span>
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--surface);border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.5rem;color:var(--ink)">\${overall}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">\${overall}/20</div>
+        <div style="font-size:12px;font-weight:600" class="\${interpCls}">\${esc(verdict)}</div>
+      </div>
     </div>\`;
   }
+
+  // Executive summary
   if (result.summary) {
     html += \`<p class="overview-summary">\${esc(result.summary)}</p>\`;
   }
 
+  // Anti-patterns verdict
+  if (result.antiPatternsVerdict) {
+    const isPass = /^pass/i.test(result.antiPatternsVerdict);
+    html += \`<div style="padding:12px 16px;border-radius:3px;margin-bottom:20px;font-size:13px;line-height:1.65;
+      background:\${isPass ? 'var(--patina-bg)' : 'var(--p0-bg)'};
+      border:1px solid \${isPass ? 'var(--patina)' : 'var(--p0-border)'};
+      color:\${isPass ? 'var(--patina-text)' : 'var(--p0-color)'}">
+      <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:4px">AI Slop Test</span>
+      \${esc(result.antiPatternsVerdict)}
+    </div>\`;
+  }
+
+  // Dimension table
+  if (result.dimensions && result.dimensions.length) {
+    html += '<div class="panel-sub-head">Đánh giá 5 chiều</div>';
+    html += '<table class="dim-table"><thead><tr><th class="col-num">#</th><th class="col-name">Tiêu chí</th><th class="col-find">Phát hiện chính</th><th>Điểm</th></tr></thead><tbody>';
+    result.dimensions.forEach((d, i) => {
+      html += \`<tr>
+        <td class="col-num">\${i+1}</td>
+        <td class="col-name">\${esc(d.name)}</td>
+        <td class="col-find">\${esc(d.keyFinding || '—')}</td>
+        <td><span class="schip \${sc(d.score || 0)}">\${d.score || 0}<span class="chip-max">/4</span></span></td>
+      </tr>\`;
+    });
+    html += '</tbody></table>';
+  }
+
+  // Issues
   const issues = result.issues || [];
   if (issues.length) {
     const critical = issues.filter(f => { const p = normPriority(f.priority); return p === 'P0' || p === 'P1'; });
     const minor    = issues.filter(f => { const p = normPriority(f.priority); return p !== 'P0' && p !== 'P1'; });
+    html += \`<div class="panel-sub-head" style="margin-top:24px">Vấn đề tìm thấy (\${issues.length})</div>\`;
     if (critical.length) {
       html += '<div class="issue-blocks">';
       critical.forEach(f => {
@@ -695,6 +733,11 @@ function buildPanelAI(result) {
             <span class="p-chip \${p}">\${p}</span>
             <div style="flex:1;min-width:0">
               <div class="issue-block-title">\${esc(f.title)}</div>
+              <div class="issue-meta">
+                \${f.category ? \`<span>\${esc(f.category)}</span>\` : ''}
+                \${f.location ? \`<code>\${esc(f.location)}</code>\` : ''}
+                \${f.wcag ? \`<span style="color:var(--patina-text)">\${esc(f.wcag)}</span>\` : ''}
+              </div>
             </div>
           </div>
           <div class="issue-block-body">
@@ -716,6 +759,11 @@ function buildPanelAI(result) {
             <div class="issue-compact-title">\${esc(f.title)}</div>
             \${f.impact ? \`<div class="issue-compact-impact">\${esc(f.impact)}</div>\` : ''}
             \${f.recommendation ? \`<div class="issue-compact-fix"><span class="fix-arrow">→</span> \${esc(f.recommendation)}</div>\` : ''}
+            \${(f.location || f.category || f.wcag) ? \`<div class="issue-meta" style="margin-top:4px">
+              \${f.category ? \`<span>\${esc(f.category)}</span>\` : ''}
+              \${f.location ? \`<code>\${esc(f.location)}</code>\` : ''}
+              \${f.wcag ? \`<span style="color:var(--patina-text)">\${esc(f.wcag)}</span>\` : ''}
+            </div>\` : ''}
           </div>
         </div>\`;
       });
@@ -723,10 +771,34 @@ function buildPanelAI(result) {
     }
   }
 
+  // Systemic issues
+  if (result.systemicIssues && result.systemicIssues.length) {
+    html += '<div class="panel-sub-head" style="margin-top:24px">Vấn đề hệ thống</div><ul class="callout-list systemic">';
+    result.systemicIssues.forEach(s => { html += \`<li>\${esc(s)}</li>\`; });
+    html += '</ul>';
+  }
+
+  // Positive findings
   if (result.positiveFindings && result.positiveFindings.length) {
     html += '<div class="panel-sub-head" style="margin-top:24px">Điểm mạnh</div><ul class="callout-list positive">';
     result.positiveFindings.forEach(s => { html += \`<li>\${esc(s)}</li>\`; });
     html += '</ul>';
+  }
+
+  // Recommended actions
+  if (result.recommendedActions && result.recommendedActions.length) {
+    html += '<div class="panel-sub-head" style="margin-top:24px">Hành động tiếp theo</div><div class="issue-compacts">';
+    result.recommendedActions.forEach(a => {
+      const p = normPriority(a.priority);
+      html += \`<div class="issue-compact">
+        <span class="p-chip \${p}">\${p}</span>
+        <div class="issue-compact-body">
+          <div class="issue-compact-title" style="font-family:var(--font-mono);font-size:12.5px">\${esc(a.command)}</div>
+          \${a.description ? \`<div class="issue-compact-impact">\${esc(a.description)}</div>\` : ''}
+        </div>
+      </div>\`;
+    });
+    html += '</div>';
   }
 
   el.innerHTML = html;

@@ -157,8 +157,11 @@ async function runLlmJob(url) {
 
   // Load check.md as the evaluation framework, but prepend a hard read-only
   // preamble so Claude treats "Run checks" as "evaluate mentally" not "exec tool".
+  // Also strip unresolved placeholders so they don't appear literally in output.
   const skillPath = join(__dirname, '../../../skill/reference/check.md');
-  const skillRef = readFileSync(skillPath, 'utf-8');
+  const skillRef = readFileSync(skillPath, 'utf-8')
+    .replace(/\{\{available_commands\}\}/g, '/fk audit, /fk polish, /fk colorize, /fk typeset, /fk layout, /fk animate, /fk bolder, /fk quieter, /fk delight, /fk check')
+    .replace(/\{\{command_prefix\}\}/g, '/fk ');
 
   const prompt = `You are in READ-ONLY analysis mode. You have NO tools available and must not attempt to use any.
 All information you need is in the HTML provided below — analyze it mentally.
@@ -181,11 +184,31 @@ ${safeHtml}
 Return ONLY valid JSON (no markdown, no code fences, no extra text):
 {
   "summary": "one sentence overall verdict",
-  "issues": [
-    { "title": "issue name", "priority": "P0|P1|P2|P3", "impact": "why it matters", "recommendation": "how to fix" }
+  "antiPatternsVerdict": "pass or fail — does this look AI-generated? list specific tells if any",
+  "dimensions": [
+    { "name": "Accessibility", "score": 0, "keyFinding": "most critical a11y issue or --" },
+    { "name": "Performance", "score": 0, "keyFinding": "key perf finding or --" },
+    { "name": "Responsive Design", "score": 0, "keyFinding": "key responsive finding or --" },
+    { "name": "Theming", "score": 0, "keyFinding": "key theming finding or --" },
+    { "name": "Anti-Patterns", "score": 0, "keyFinding": "key anti-pattern finding or --" }
   ],
+  "issues": [
+    {
+      "title": "issue name",
+      "priority": "P0|P1|P2|P3",
+      "location": "Component, file, or selector",
+      "category": "Accessibility|Performance|Theming|Responsive Design|Anti-Pattern",
+      "wcag": "WCAG 2.1 criterion violated or null",
+      "impact": "why it matters",
+      "recommendation": "how to fix"
+    }
+  ],
+  "systemicIssues": ["recurring pattern description"],
   "positiveFindings": ["thing done well"],
-  "scores": { "overall": 1, "verdict": "Needs work|Acceptable|Good|Excellent" }
+  "recommendedActions": [
+    { "priority": "P0|P1|P2|P3", "command": "/fk command-name", "description": "specific context from audit findings" }
+  ],
+  "scores": { "overall": 0, "verdict": "Needs work|Acceptable|Good|Excellent" }
 }`;
 
   const text = await runClaudeCli(prompt);
