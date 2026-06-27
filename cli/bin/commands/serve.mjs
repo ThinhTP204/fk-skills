@@ -164,7 +164,8 @@ async function runCodexCli(prompt) {
 
   return new Promise((resolve, reject) => {
     // Pass prompt via stdin to avoid Windows 8191-char command line limit
-    const child = spawn('codex', ['-q'], {
+    // Codex v0.142+ uses --full-auto for non-interactive mode (no -q flag)
+    const child = spawn('codex', ['--full-auto'], {
       cwd: tmpdir(),
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: process.platform === 'win32',
