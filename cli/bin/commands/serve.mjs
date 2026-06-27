@@ -107,8 +107,9 @@ function stripUnsafeHtml(html) {
 
 async function detectAvailableLlm() {
   const { execFile } = await import('node:child_process');
+  const isWin = process.platform === 'win32';
   const check = (cmd) => new Promise(resolve => {
-    execFile(cmd, ['--version'], { timeout: 4000 }, err => resolve(!err));
+    execFile(cmd, ['--version'], { timeout: 4000, shell: isWin }, err => resolve(!err));
   });
   if (await check('claude')) return 'claude';
   if (await check('codex')) return 'codex';
@@ -122,6 +123,7 @@ async function runClaudeCli(prompt) {
     const child = spawn('claude', ['-p', prompt, '--tools', ''], {
       cwd: tmpdir(), // avoid project CLAUDE.md / MCP server hang
       stdio: ['ignore', 'pipe', 'pipe'],
+      shell: process.platform === 'win32',
     });
 
     let stdout = '';
@@ -161,6 +163,7 @@ async function runCodexCli(prompt) {
     const child = spawn('codex', ['-q', prompt], {
       cwd: tmpdir(),
       stdio: ['ignore', 'pipe', 'pipe'],
+      shell: process.platform === 'win32',
     });
 
     let stdout = '';
