@@ -120,11 +120,14 @@ async function runClaudeCli(prompt) {
   const { spawn } = await import('node:child_process');
 
   return new Promise((resolve, reject) => {
-    const child = spawn('claude', ['-p', prompt, '--tools', ''], {
+    // Pass prompt via stdin to avoid Windows 8191-char command line limit
+    const child = spawn('claude', ['-p', '-', '--tools', ''], {
       cwd: tmpdir(), // avoid project CLAUDE.md / MCP server hang
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: ['pipe', 'pipe', 'pipe'],
       shell: process.platform === 'win32',
     });
+    child.stdin.write(prompt, 'utf8');
+    child.stdin.end();
 
     let stdout = '';
     let stderr = '';
@@ -160,11 +163,14 @@ async function runCodexCli(prompt) {
   const { spawn } = await import('node:child_process');
 
   return new Promise((resolve, reject) => {
-    const child = spawn('codex', ['-q', prompt], {
+    // Pass prompt via stdin to avoid Windows 8191-char command line limit
+    const child = spawn('codex', ['-q'], {
       cwd: tmpdir(),
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: ['pipe', 'pipe', 'pipe'],
       shell: process.platform === 'win32',
     });
+    child.stdin.write(prompt, 'utf8');
+    child.stdin.end();
 
     let stdout = '';
     let stderr = '';
