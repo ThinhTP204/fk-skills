@@ -115,8 +115,8 @@ function parseBody(req) {
   });
 }
 
-async function startServer(port, scanPort = 3001) {
-  const ui = buildUI(scanPort);
+async function startServer(port, scanPort = 3001, llm = 'claude') {
+  const ui = buildUI(scanPort, llm);
   const server = createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(ui); return;
@@ -144,7 +144,9 @@ async function startServer(port, scanPort = 3001) {
 
 // ─── UI ────────────────────────────────────────────────────────────────────
 
-function buildUI(scanPort = 3001) {
+function buildUI(scanPort = 3001, llm = 'claude') {
+  const llmLabel = llm === 'codex' ? 'Codex' : llm === 'auto' ? 'Auto' : 'Claude';
+  const llmTag = `<span class="agent-tag" id="llm-tag" title="AI provider: ${llmLabel}">${llmLabel}</span>`;
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -553,6 +555,7 @@ body {
     <button id="rescan" class="rescan-btn">Quét lại</button>
   </div>
   <a id="dashboard-link" href="http://localhost:3001" target="_blank" class="dashboard-btn" title="Mở Dashboard live">Dashboard →</a>
+  ${llmTag}
   <span class="agent-tag">44 rules</span>
 </div>
 
@@ -803,6 +806,16 @@ function buildPanelAI(result) {
 
   el.innerHTML = html;
 }
+
+// Update LLM badge from server (resolves 'auto' after first job)
+fetch('http://localhost:' + SCAN_PORT + '/api/llm-provider')
+  .then(r => r.json())
+  .then(d => {
+    const el = document.getElementById('llm-tag');
+    if (el && d.llm && d.llm !== 'auto') {
+      el.textContent = d.llm === 'codex' ? 'Codex' : 'Claude';
+    }
+  }).catch(() => {});
 
 // Connect to scan server SSE for LLM results
 (function connectScanEvents() {
@@ -1309,10 +1322,12 @@ export async function run(args = []) {
   const port = portIdx !== -1 && args[portIdx + 1] ? parseInt(args[portIdx + 1], 10) : 4444;
   const scanPortIdx = args.indexOf('--scan-port');
   const scanPort = scanPortIdx !== -1 && args[scanPortIdx + 1] ? parseInt(args[scanPortIdx + 1], 10) : 3001;
+  const llmIdx = args.indexOf('--llm');
+  const llm = llmIdx !== -1 && args[llmIdx + 1] ? args[llmIdx + 1] : 'claude';
 
   // Start scan server (used by Chrome Extension in Phase 3)
   const { createScanServer } = await import('./serve.mjs');
-  const scanServer = createScanServer();
+  const scanServer = createScanServer({ llm });
   await new Promise(resolve => {
     let settled = false;
     const done = () => { if (!settled) { settled = true; resolve(); } };
@@ -1323,7 +1338,7 @@ export async function run(args = []) {
     scanServer.listen(scanPort, '127.0.0.1', done);
   });
 
-  const server = await startServer(port, scanPort);
+  const server = await startServer(port, scanPort, llm);
   const url = `http://localhost:${port}`;
   console.log(`\n  fk-skills tool   →  ${url}`);
   console.log(`  Scan API         →  http://localhost:${scanPort}/health`);

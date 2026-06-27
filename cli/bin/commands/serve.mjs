@@ -23,6 +23,7 @@ export const SCAN_PORT = 3001;
 const sseClients = new Set();
 let lastScan = null; // { url, findings, scannedAt }
 let lastLlm = null;  // { url, result, completedAt }
+let activeLlm = 'claude'; // 'claude' | 'codex' | resolved after auto-detect
 
 function broadcast(event, data) {
   const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
@@ -104,6 +105,16 @@ function stripUnsafeHtml(html) {
     .slice(0, 40000);
 }
 
+async function detectAvailableLlm() {
+  const { execFile } = await import('node:child_process');
+  const check = (cmd) => new Promise(resolve => {
+    execFile(cmd, ['--version'], { timeout: 4000 }, err => resolve(!err));
+  });
+  if (await check('claude')) return 'claude';
+  if (await check('codex')) return 'codex';
+  throw new Error('Không tìm thấy claude hoặc codex CLI.\n  Claude: npm install -g @anthropic-ai/claude-code\n  Codex:  npm install -g @openai/codex');
+}
+
 async function runClaudeCli(prompt) {
   const { spawn } = await import('node:child_process');
 
@@ -136,6 +147,45 @@ async function runClaudeCli(prompt) {
       clearTimeout(timer);
       if (err.code === 'ENOENT') {
         reject(new Error('claude CLI không tìm thấy. Cài: npm install -g @anthropic-ai/claude-code'));
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
+async function runCodexCli(prompt) {
+  const { spawn } = await import('node:child_process');
+
+  return new Promise((resolve, reject) => {
+    const child = spawn('codex', ['-q', prompt], {
+      cwd: tmpdir(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', d => { stdout += d; });
+    child.stderr.on('data', d => { stderr += d; });
+
+    const timer = setTimeout(() => {
+      child.kill();
+      reject(new Error('Codex CLI timeout (120s)'));
+    }, 120000);
+
+    child.on('close', code => {
+      clearTimeout(timer);
+      if (code !== 0 && !stdout.trim()) {
+        reject(new Error(`Codex CLI exit ${code}: ${stderr.slice(0, 200)}`));
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+
+    child.on('error', err => {
+      clearTimeout(timer);
+      if (err.code === 'ENOENT') {
+        reject(new Error('codex CLI không tìm thấy. Cài: npm install -g @openai/codex'));
       } else {
         reject(err);
       }
@@ -211,7 +261,10 @@ Return ONLY valid JSON (no markdown, no code fences, no extra text):
   "scores": { "overall": 0, "verdict": "Needs work|Acceptable|Good|Excellent" }
 }`;
 
-  const text = await runClaudeCli(prompt);
+  // Resolve 'auto' once on first job
+  if (activeLlm === 'auto') activeLlm = await detectAvailableLlm();
+
+  const text = activeLlm === 'codex' ? await runCodexCli(prompt) : await runClaudeCli(prompt);
 
   try {
     const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -496,7 +549,8 @@ fetch('/api/state').then(r => r.json()).then(state => {
 
 // ── HTTP Server ───────────────────────────────────────────────────────────────
 
-export function createScanServer() {
+export function createScanServer({ llm = 'claude' } = {}) {
+  activeLlm = llm;
   const pkg = JSON.parse(readFileSync(join(__dirname, '../../../package.json'), 'utf8'));
 
   return createServer(async (req, res) => {
@@ -525,7 +579,12 @@ export function createScanServer() {
 
     // Health
     if (req.method === 'GET' && req.url === '/health') {
-      return json(res, { ok: true, version: pkg.version, clients: sseClients.size });
+      return json(res, { ok: true, version: pkg.version, clients: sseClients.size, llm: activeLlm });
+    }
+
+    // LLM provider info
+    if (req.method === 'GET' && req.url === '/api/llm-provider') {
+      return json(res, { llm: activeLlm });
     }
 
     // State snapshot (for dashboard restore on reload)
@@ -589,8 +648,10 @@ export function createScanServer() {
 export async function run(args = []) {
   const portIdx = args.indexOf('--port');
   const port = portIdx !== -1 && args[portIdx + 1] ? parseInt(args[portIdx + 1], 10) : SCAN_PORT;
+  const llmIdx = args.indexOf('--llm');
+  const llm = llmIdx !== -1 && args[llmIdx + 1] ? args[llmIdx + 1] : 'claude';
 
-  const server = createScanServer();
+  const server = createScanServer({ llm });
   await new Promise((resolve, reject) => {
     server.on('error', err => {
       if (err.code === 'EADDRINUSE') reject(new Error(`Port ${port} in use. Try --port <other>`));
