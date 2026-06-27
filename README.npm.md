@@ -39,6 +39,35 @@ npx fk-skills detect --json src/
 npx fk-skills detect --fast src/
 ```
 
+## Tool UI
+
+A local browser UI that scans any URL and runs an AI review using your installed CLI (Claude or Codex).
+
+```bash
+# Start the tool UI (opens http://localhost:4444 automatically)
+npx fk-skills tool
+
+# Use Codex CLI instead of Claude
+npx fk-skills tool --llm codex
+
+# Auto-detect whichever CLI is installed
+npx fk-skills tool --llm auto
+
+# Custom ports
+npx fk-skills tool --port 4444 --scan-port 3001
+```
+
+**What it does:**
+- Fetches and scans any URL with 44 deterministic rules
+- Auto-renders SPAs via headless Chromium if needed
+- Queues an AI review via your CLI after every scan (no API key needed)
+- AI review covers 5 dimensions: Accessibility, Performance, Responsive Design, Theming, Anti-Patterns — scored 0-4 each (/20 total)
+- Results include dimension table, per-issue location/category/WCAG, systemic issues, and recommended `/fk` commands
+
+**Requirements:**
+- `claude` CLI: `npm install -g @anthropic-ai/claude-code`
+- OR `codex` CLI: `npm install -g @openai/codex`
+
 ## What It Detects
 
 **AI Slop Tells**: patterns that scream "AI generated this":
