@@ -163,9 +163,9 @@ async function runCodexCli(prompt) {
   const { spawn } = await import('node:child_process');
 
   return new Promise((resolve, reject) => {
+    // 'codex exec' is the non-interactive subcommand (alias: e)
     // Pass prompt via stdin to avoid Windows 8191-char command line limit
-    // Codex v0.142+ uses --full-auto for non-interactive mode (no -q flag)
-    const child = spawn('codex', ['--full-auto'], {
+    const child = spawn('codex', ['exec'], {
       cwd: tmpdir(),
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: process.platform === 'win32',
